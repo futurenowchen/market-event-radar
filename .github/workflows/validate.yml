@@ -12,15 +12,32 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-event-radar.txt
       - name: Validate snapshot contract
         run: python scripts/validate_snapshot.py data/latest.json
-      - name: Install package
-        run: python -m pip install .
+      - name: Install package and collector dependencies
+        run: |
+          python -m pip install .
+          python -m pip install -r requirements-event-radar.txt
+      - name: Compile standalone collector runtime
+        run: |
+          python -m py_compile \
+            v2_event_radar.py \
+            v2_event_official.py \
+            v2_event_official_asia.py \
+            v2_event_official_taiwan.py \
+            v2_event_official_resilience.py \
+            v2_event_company_ir.py \
+            scripts/refresh_gate.py \
+            scripts/update_event_radar_snapshot.py \
+            scripts/check_event_official_backend.py
       - name: Smoke test package API
         run: |
           python - <<'PY'
@@ -39,3 +56,5 @@ jobs:
           assert score in {1, 2, 3}
           print(f"package smoke passed: {len(snapshot.events)} events, risk={level}")
           PY
+      - name: Probe official-source collectors
+        run: python scripts/check_event_official_backend.py
