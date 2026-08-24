@@ -14,6 +14,7 @@ on:
       - "requirements-event-radar.txt"
       - "scripts/refresh_gate.py"
       - "scripts/update_event_radar_snapshot.py"
+      - "scripts/update_event_history.py"
       - ".github/workflows/refresh.yml"
   schedule:
     - cron: "5,20,35,50 * * * *"
@@ -76,15 +77,22 @@ jobs:
         if: steps.gate.outputs.mode != 'none'
         run: python scripts/validate_snapshot.py data/latest.json
 
-      - name: Commit refreshed public feed
+      - name: Persist meaningful event history
+        if: steps.gate.outputs.mode != 'none'
+        run: |
+          python scripts/update_event_history.py \
+            --snapshot data/latest.json \
+            --history-dir data/history
+
+      - name: Commit refreshed public feed and history
         if: steps.gate.outputs.mode != 'none'
         shell: bash
         run: |
           git config user.name "market-event-radar-bot"
           git config user.email "market-event-radar-bot@users.noreply.github.com"
-          git add -- data/latest.json
+          git add -- data/latest.json data/history
           if git diff --cached --quiet; then
-            echo "No snapshot changes to commit."
+            echo "No snapshot or history changes to commit."
             exit 0
           fi
           git commit -m "data: refresh market event feed"
