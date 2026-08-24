@@ -37,7 +37,10 @@ jobs:
             v2_event_company_ir.py \
             scripts/refresh_gate.py \
             scripts/update_event_radar_snapshot.py \
+            scripts/update_event_history.py \
             scripts/check_event_official_backend.py
+      - name: Test event history ledger
+        run: python scripts/test_event_history.py
       - name: Smoke test package API
         run: |
           python - <<'PY'
