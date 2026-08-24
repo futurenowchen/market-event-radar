@@ -2,7 +2,7 @@
 
 **Free, official-source-first financial event data for developers and investors.**
 
-Market Event Radar normalizes high-impact macroeconomic releases, central-bank decisions, and selected major-company events into one stable JSON feed. It was extracted from the event-radar engine behind the Negentropic Ataraxia investment dashboard and is now maintained as a standalone public project.
+Market Event Radar normalizes high-impact macroeconomic releases, central-bank decisions, and selected major-company events into one stable JSON feed. It was extracted from the event-radar engine behind the Negentropic Ataraxia investment dashboard and now runs as a standalone public project.
 
 ## Why this exists
 
@@ -16,7 +16,7 @@ Most economic calendars are either tied to a commercial API, scrape a third-part
 
 ## Current source families
 
-The extracted production engine currently covers first-party sources from:
+The standalone collector currently covers first-party sources from:
 
 - United States: Federal Reserve, BLS, BEA
 - Taiwan: DGBAS, Central Bank of the Republic of China (Taiwan)
@@ -24,7 +24,7 @@ The extracted production engine currently covers first-party sources from:
 - South Korea: Ministry of Data and Statistics, Bank of Korea
 - Major company investor-relations announcements for selected S-tier earnings events
 
-Coverage will be migrated into this repository incrementally while preserving the production JSON contract.
+The refresh pipeline runs in this repository. No private dashboard repository is required to publish the feed.
 
 ## Public feed
 
@@ -60,6 +60,19 @@ The snapshot contains a rolling event window and metadata describing source heal
 }
 ```
 
+## Python use
+
+The repository also exposes a small dependency-light consumer package:
+
+```python
+from market_event_radar import fetch_latest, build_risk_windows
+
+snapshot = fetch_latest()
+windows = build_risk_windows(snapshot.events)
+```
+
+This public interface is intentionally separate from the collector internals so downstream projects can depend on the feed contract without inheriting scraper implementation details.
+
 ## Tier convention
 
 - **S** — systemically important / likely to create a major risk window
@@ -76,16 +89,26 @@ Tiering is an opinionated normalization layer, not investment advice.
 4. **Consumers should depend on the schema, not scraper internals.**
 5. **The feed is public data. Personal portfolio logic does not belong here.**
 
+## Refresh model
+
+GitHub Actions checks the feed four times per hour. A lightweight gate chooses one of three modes:
+
+- `daily` — rebuild the rolling seven-day event window
+- `smart` — refresh recently released events that are still missing actual values
+- `none` — skip network work when the snapshot is current
+
+The generated snapshot is schema-validated before it is committed.
+
 ## Roadmap
 
 - [x] Public repository and v2 JSON contract
-- [x] Seed production snapshot
-- [ ] Migrate official-source collectors from the original dashboard
-- [ ] Move unattended GitHub Actions refresh into this repository
-- [ ] Add JSON Schema validation and CI source probes
+- [x] Standalone official-source collectors
+- [x] Unattended GitHub Actions refresh
+- [x] JSON validation and official-source CI probes
+- [x] Reusable Python consumer package
 - [ ] Add optional iCalendar (`.ics`) output
-- [ ] Package the Python core for direct reuse
 - [ ] Expand official company-IR coverage
+- [ ] Split collector adapters into a cleaner plugin-style package layout
 
 ## License
 
