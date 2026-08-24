@@ -60,6 +60,27 @@ The snapshot contains a rolling event window and metadata describing source heal
 }
 ```
 
+## Research history ledger
+
+`data/latest.json` is optimized for current monitoring. Research history is stored separately under:
+
+```text
+data/history/YYYY/MM.jsonl
+```
+
+The history ledger is **change-based, not snapshot-based**. It does not copy the feed every fifteen minutes. A new row is appended only when a meaningful event state changes, such as:
+
+- an event is first discovered
+- its scheduled time changes
+- its market forecast changes
+- the official result is released
+- a released value is subsequently revised
+- its source/provider metadata changes
+
+Each history row records `observed_at_tpe`, `change_type`, a content fingerprint, and the normalized event state. This preserves first-seen information and revisions without filling the repository with duplicate snapshots.
+
+The ledger intentionally stores structured event facts rather than full news articles or copied official webpages.
+
 ## Python use
 
 The repository also exposes a small dependency-light consumer package:
@@ -88,6 +109,7 @@ Tiering is an opinionated normalization layer, not investment advice.
 3. **Published official schedules may be cached as resilience fallbacks.** Such fallbacks must be traceable to the first-party agency that published them.
 4. **Consumers should depend on the schema, not scraper internals.**
 5. **The feed is public data. Personal portfolio logic does not belong here.**
+6. **History should preserve meaningful state changes, not duplicate polling snapshots.**
 
 ## Refresh model
 
@@ -97,7 +119,7 @@ GitHub Actions checks the feed four times per hour. A lightweight gate chooses o
 - `smart` — refresh recently released events that are still missing actual values
 - `none` — skip network work when the snapshot is current
 
-The generated snapshot is schema-validated before it is committed.
+The generated snapshot is schema-validated before it is committed. Whenever a refresh runs, the change-based research ledger is updated from the validated snapshot before the commit.
 
 ## Roadmap
 
@@ -106,6 +128,7 @@ The generated snapshot is schema-validated before it is committed.
 - [x] Unattended GitHub Actions refresh
 - [x] JSON validation and official-source CI probes
 - [x] Reusable Python consumer package
+- [x] Change-based event research history ledger
 - [ ] Add optional iCalendar (`.ics`) output
 - [ ] Expand official company-IR coverage
 - [ ] Split collector adapters into a cleaner plugin-style package layout
