@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-08-24",
-  "generated_at_tpe": "2026-08-24T15:37:48.087785+08:00",
+  "generated_at_tpe": "2026-08-24T15:49:27.733770+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
@@ -106,7 +106,7 @@
       "event_id": "official-fallback-bok-2026-08-27",
       "time_tpe": "2026-08-27T09:00:00+08:00",
       "title": "韓國銀行（BOK）利率決議",
-      "category": "總體經濟",
+      "category": "央行事件",
       "importance": 3,
       "tier": "S",
       "country": "韓國",
@@ -130,7 +130,7 @@
     {
       "event_id": "jh-2026-08-27-29",
       "time_tpe": "2026-08-27T12:00:00+08:00",
-      "title": "傑克森霍爾全球央行年會（Jackson Hole）開幕",
+      "title": "傑克森霍爾全球央行年會（Jackson Hole，8/27–29，時間未定）",
       "category": "央行事件",
       "importance": 3,
       "tier": "S",
