@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/futurenowchen/market-event-radar/schema/event-radar-v2.schema.json",
+  "title": "Market Event Radar Snapshot v2",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "snapshot_date_tpe",
+    "generated_at_tpe",
+    "update_mode",
+    "official_macro_ready",
+    "event_count",
+    "events"
+  ],
+  "properties": {
+    "schema_version": {"const": 2},
+    "snapshot_date_tpe": {"type": "string", "format": "date"},
+    "generated_at_tpe": {"type": "string", "format": "date-time"},
+    "update_mode": {"type": "string", "enum": ["daily", "smart"]},
+    "macro_backend": {"type": "string"},
+    "official_macro_ready": {"type": "boolean"},
+    "event_count": {"type": "integer", "minimum": 0},
+    "source_health": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"}
+    },
+    "provider_counts": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0}
+    },
+    "events": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/event"}
+    }
+  },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "time_tpe",
+        "title",
+        "category",
+        "importance",
+        "tier",
+        "country",
+        "market_tags",
+        "actual",
+        "forecast",
+        "previous",
+        "source",
+        "source_url",
+        "status",
+        "expects_result",
+        "provider",
+        "symbol"
+      ],
+      "properties": {
+        "event_id": {"type": "string", "minLength": 1},
+        "time_tpe": {"type": "string", "format": "date-time"},
+        "title": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "minLength": 1},
+        "importance": {"type": "integer", "minimum": 1, "maximum": 3},
+        "tier": {"type": "string", "enum": ["S", "A", "B"]},
+        "country": {"type": "string"},
+        "market_tags": {"type": "array", "items": {"type": "string"}},
+        "actual": {"type": "string"},
+        "forecast": {"type": "string"},
+        "previous": {"type": "string"},
+        "source": {"type": "string"},
+        "source_url": {"type": "string"},
+        "status": {"type": "string"},
+        "expects_result": {"type": "boolean"},
+        "provider": {"type": "string"},
+        "symbol": {"type": "string"}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
