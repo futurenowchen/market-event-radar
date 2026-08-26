@@ -193,9 +193,70 @@ def _kr_mods_events(start: datetime, end: datetime, refresh_token: str) -> tuple
     return core._dedupe(events), bool(any_live_schedule or KR_2026)
 
 
+def _signed_percent(direction: str, value: str) -> str:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return ""
+    if str(direction).strip().lower() == "decreased":
+        number = -abs(number)
+    return backend._pct(number)
+
+
+def _bea_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
+    """Parse BEA releases while tolerating month names inserted into result prose."""
+    listing = backend._fetch_text(backend.BEA_RELEASES_URL, refresh_token)
+    if not listing:
+        return "", ""
+
+    href = ""
+    for text, url in backend._links(listing, backend.BEA_RELEASES_URL):
+        lower = text.lower()
+        if family == "gdp" and "gdp" in lower and "estimate" in lower:
+            href = url
+            break
+        if family == "pce" and "personal income and outlays" in lower:
+            href = url
+            break
+    if not href:
+        return "", ""
+
+    text = backend._plain_text(backend._fetch_text(href, refresh_token))
+    if family == "gdp":
+        match = re.search(
+            r"real gross domestic product\s*\(gdp\)\s+(increased|decreased).*?annual rate of\s+([0-9]+(?:\.[0-9]+)?)\s+percent",
+            text,
+            re.I,
+        )
+        if not match:
+            match = re.search(
+                r"real GDP\s+(increased|decreased).*?([0-9]+(?:\.[0-9]+)?)\s+percent",
+                text,
+                re.I,
+            )
+        return (_signed_percent(match.group(1), match.group(2)) if match else "", "")
+
+    # BEA currently writes e.g. "the PCE price index for July increased 3.7 percent".
+    # The previous parser expected "index increased" with no month name, so the smart
+    # refresh ran correctly but could never extract the released value.
+    match = re.search(
+        r"from the same month one year ago,?\s+the PCE price index(?:\s+for\s+[A-Za-z]+)?\s+(increased|decreased)\s+([0-9]+(?:\.[0-9]+)?)\s+percent",
+        text,
+        re.I,
+    )
+    if not match:
+        match = re.search(
+            r"PCE price index(?:\s+for\s+[A-Za-z]+)?\s+(increased|decreased)\s+([0-9]+(?:\.[0-9]+)?)\s+percent\s+from one year ago",
+            text,
+            re.I,
+        )
+    return (_signed_percent(match.group(1), match.group(2)) if match else "", "")
+
+
 def install() -> None:
     backend._us_bls_events = _us_bls_events
     backend._kr_mods_events = _kr_mods_events
+    backend._bea_latest_result = _bea_latest_result
 
 
 install()
