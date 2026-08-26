@@ -203,8 +203,70 @@ def _signed_percent(direction: str, value: str) -> str:
     return backend._pct(number)
 
 
+def _parse_pce_yoy(text: str) -> str:
+    match = re.search(
+        r"from the same month one year ago,?\s+the PCE price index(?:\s+for\s+[A-Za-z]+)?\s+"
+        r"(increased|decreased)\s+([0-9]+(?:\.[0-9]+)?)\s+percent",
+        text,
+        re.I,
+    )
+    if not match:
+        match = re.search(
+            r"PCE price index(?:\s+for\s+[A-Za-z]+)?\s+(increased|decreased)\s+"
+            r"([0-9]+(?:\.[0-9]+)?)\s+percent\s+from one year ago",
+            text,
+            re.I,
+        )
+    return _signed_percent(match.group(1), match.group(2)) if match else ""
+
+
+def _parse_gdp_annual_rate(text: str) -> str:
+    match = re.search(
+        r"real gross domestic product\s*\(gdp\)\s+(increased|decreased).*?annual rate of\s+"
+        r"([0-9]+(?:\.[0-9]+)?)\s+percent",
+        text,
+        re.I,
+    )
+    if not match:
+        match = re.search(
+            r"real GDP\s+(increased|decreased).*?([0-9]+(?:\.[0-9]+)?)\s+percent",
+            text,
+            re.I,
+        )
+    return _signed_percent(match.group(1), match.group(2)) if match else ""
+
+
+def _previous_pce_url(current_url: str) -> str:
+    match = re.search(r"personal-income-and-outlays-([a-z]+)-(20\d{2})", current_url, re.I)
+    if not match:
+        return ""
+    month_names = [
+        "january", "february", "march", "april", "may", "june",
+        "july", "august", "september", "october", "november", "december",
+    ]
+    month = match.group(1).lower()
+    year = int(match.group(2))
+    if month not in month_names:
+        return ""
+    index = month_names.index(month)
+    if index == 0:
+        index = 11
+        year -= 1
+    else:
+        index -= 1
+    return f"https://www.bea.gov/news/{year}/personal-income-and-outlays-{month_names[index]}-{year}"
+
+
+def _previous_gdp_url(current_url: str) -> str:
+    if "gdp-second-estimate" in current_url:
+        return current_url.replace("gdp-second-estimate-and-corporate-profits", "gdp-advance-estimate")
+    if "gdp-third-estimate" in current_url:
+        return current_url.replace("gdp-third-estimate-industries-corporate-profits", "gdp-second-estimate-and-corporate-profits")
+    return ""
+
+
 def _bea_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
-    """Parse BEA releases while tolerating month names inserted into result prose."""
+    """Parse BEA actual and previous-release values from first-party release pages."""
     listing = backend._fetch_text(backend.BEA_RELEASES_URL, refresh_token)
     if not listing:
         return "", ""
@@ -221,36 +283,19 @@ def _bea_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
     if not href:
         return "", ""
 
-    text = backend._plain_text(backend._fetch_text(href, refresh_token))
+    current_text = backend._plain_text(backend._fetch_text(href, refresh_token))
     if family == "gdp":
-        match = re.search(
-            r"real gross domestic product\s*\(gdp\)\s+(increased|decreased).*?annual rate of\s+([0-9]+(?:\.[0-9]+)?)\s+percent",
-            text,
-            re.I,
-        )
-        if not match:
-            match = re.search(
-                r"real GDP\s+(increased|decreased).*?([0-9]+(?:\.[0-9]+)?)\s+percent",
-                text,
-                re.I,
-            )
-        return (_signed_percent(match.group(1), match.group(2)) if match else "", "")
+        actual = _parse_gdp_annual_rate(current_text)
+        previous_url = _previous_gdp_url(href)
+        previous_text = backend._plain_text(backend._fetch_text(previous_url, refresh_token)) if previous_url else ""
+        previous = _parse_gdp_annual_rate(previous_text)
+        return actual, previous
 
-    # BEA currently writes e.g. "the PCE price index for July increased 3.7 percent".
-    # The previous parser expected "index increased" with no month name, so the smart
-    # refresh ran correctly but could never extract the released value.
-    match = re.search(
-        r"from the same month one year ago,?\s+the PCE price index(?:\s+for\s+[A-Za-z]+)?\s+(increased|decreased)\s+([0-9]+(?:\.[0-9]+)?)\s+percent",
-        text,
-        re.I,
-    )
-    if not match:
-        match = re.search(
-            r"PCE price index(?:\s+for\s+[A-Za-z]+)?\s+(increased|decreased)\s+([0-9]+(?:\.[0-9]+)?)\s+percent\s+from one year ago",
-            text,
-            re.I,
-        )
-    return (_signed_percent(match.group(1), match.group(2)) if match else "", "")
+    actual = _parse_pce_yoy(current_text)
+    previous_url = _previous_pce_url(href)
+    previous_text = backend._plain_text(backend._fetch_text(previous_url, refresh_token)) if previous_url else ""
+    previous = _parse_pce_yoy(previous_text)
+    return actual, previous
 
 
 def install() -> None:
