@@ -1,0 +1,43 @@
+name: Radar data watchdog
+
+on:
+  schedule:
+    - cron: "12 * * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/check_radar_health.py"
+      - ".github/workflows/watchdog.yml"
+      - "data/latest.json"
+      - "data/history/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radar-data-watchdog
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check radar data chain
+        run: |
+          python scripts/check_radar_health.py \
+            --snapshot data/latest.json \
+            --history-dir data/history \
+            --max-snapshot-age-hours 30 \
+            --result-grace-minutes 90 \
+            --released-retention-hours 48
