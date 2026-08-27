@@ -21,6 +21,9 @@ import v2_event_semantics  # noqa: F401  # normalizes fallback categories/date-o
 import v2_event_radar as er
 
 
+RECENT_RELEASE_RETENTION = timedelta(hours=48)
+
+
 def event_to_json(event: er.MarketEvent) -> dict:
     row = asdict(event)
     row["time_tpe"] = event.time_tpe.isoformat()
@@ -90,6 +93,12 @@ def build_smart(existing: list[er.MarketEvent], now: datetime) -> list[er.Market
     return official.smart_refresh_missing(existing, now)
 
 
+def _recent_released(events: list[er.MarketEvent], now: datetime) -> list[er.MarketEvent]:
+    """Keep recently published results visible after collectors stop looking backward 12h."""
+    lower = now - RECENT_RELEASE_RETENTION
+    return [e for e in events if e.actual and lower <= e.time_tpe < now]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=("daily", "smart"), required=True)
@@ -106,12 +115,19 @@ def main() -> None:
             failed = ", ".join(name for name, ok in sorted(source_health.items()) if not ok) or "unknown"
             print(f"Official macro sources incomplete ({failed}); preserving previous snapshot for unattended retry.")
             return
+        # A daily collector intentionally searches only a short lookback window. Merge
+        # already-published results from the prior snapshot so a result does not vanish
+        # from the public feed merely because it became 12 hours old.
+        events = er._dedupe([*events, *_recent_released(existing, now)])
     else:
         events = build_smart(existing, now)
         source_health = dict(existing_payload.get("source_health") or {})
         official_macro_ready = bool(existing_payload.get("official_macro_ready"))
 
-    events = [e for e in er._dedupe(events) if now - timedelta(hours=12) <= e.time_tpe <= now + timedelta(days=7)]
+    events = [
+        e for e in er._dedupe(events)
+        if now - RECENT_RELEASE_RETENTION <= e.time_tpe <= now + timedelta(days=7)
+    ]
 
     if args.mode == "smart" and events_signature(events) == events_signature(existing):
         print("No provider values changed; snapshot left untouched.")
