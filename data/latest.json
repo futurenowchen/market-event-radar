@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-08-27",
-  "generated_at_tpe": "2026-08-27T16:46:32.100048+08:00",
+  "snapshot_date_tpe": "2026-08-28",
+  "generated_at_tpe": "2026-08-28T08:05:58.652729+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 6,
+  "event_count": 4,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -19,12 +19,10 @@
     "us_fed": true
   },
   "provider_counts": {
-    "official-kr-bok": 1,
     "official-kr-mods-cpi": 1,
     "official-kr-mods-industry": 1,
     "official-us-bea-gdp": 1,
-    "official-us-bea-pce": 1,
-    "official-us-kc-fed": 1
+    "official-us-bea-pce": 1
   },
   "events": [
     {
@@ -75,55 +73,6 @@
       "status": "released",
       "expects_result": true,
       "provider": "official-us-bea-pce",
-      "symbol": ""
-    },
-    {
-      "event_id": "official-fallback-bok-2026-08-27",
-      "time_tpe": "2026-08-27T09:00:00+08:00",
-      "title": "韓國銀行（BOK）利率決議",
-      "category": "央行事件",
-      "importance": 3,
-      "tier": "S",
-      "country": "韓國",
-      "market_tags": [
-        "韓國",
-        "BOK",
-        "利率",
-        "韓元",
-        "韓股"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Bank of Korea (BOK)",
-      "source_url": "https://www.bok.or.kr/portal/singl/crncyPolicyDrcMtg/listYear.do?menuNo=200755&mtgSe=A",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-kr-bok",
-      "symbol": ""
-    },
-    {
-      "event_id": "jh-2026-08-27-29",
-      "time_tpe": "2026-08-27T12:00:00+08:00",
-      "title": "傑克森霍爾全球央行年會（Jackson Hole，8/27–29，時間未定）",
-      "category": "央行事件",
-      "importance": 3,
-      "tier": "S",
-      "country": "美國",
-      "market_tags": [
-        "Fed",
-        "利率",
-        "美元",
-        "全球風險資產"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Federal Reserve Bank of Kansas City",
-      "source_url": "https://www.kansascityfed.org/research/jackson-hole-economic-symposium/",
-      "status": "scheduled",
-      "expects_result": false,
-      "provider": "official-us-kc-fed",
       "symbol": ""
     },
     {
