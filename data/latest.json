@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-08-28",
-  "generated_at_tpe": "2026-08-28T08:05:58.652729+08:00",
+  "snapshot_date_tpe": "2026-08-29",
+  "generated_at_tpe": "2026-08-29T05:31:27.111007+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 4,
+  "event_count": 3,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -21,60 +21,9 @@
   "provider_counts": {
     "official-kr-mods-cpi": 1,
     "official-kr-mods-industry": 1,
-    "official-us-bea-gdp": 1,
-    "official-us-bea-pce": 1
+    "official-us-bls-nfp": 1
   },
   "events": [
-    {
-      "event_id": "official-us-bea-gdp-20260826",
-      "time_tpe": "2026-08-26T20:30:00+08:00",
-      "title": "美國國內生產毛額（GDP）－(Second Estimate) and Corporate Profits, 2nd Quarter 2026",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "A",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "GDP",
-        "景氣",
-        "利率",
-        "美股"
-      ],
-      "actual": "1.5%",
-      "forecast": "",
-      "previous": "1.5%",
-      "source": "U.S. Bureau of Economic Analysis (BEA)",
-      "source_url": "https://www.bea.gov/news/2026/gdp-second-estimate-and-corporate-profits-2nd-quarter-2026",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-bea-gdp",
-      "symbol": ""
-    },
-    {
-      "event_id": "official-us-bea-pce-20260826",
-      "time_tpe": "2026-08-26T20:30:00+08:00",
-      "title": "美國個人消費支出物價指數（PCE）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "S",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "PCE",
-        "Fed",
-        "利率",
-        "NASDAQ"
-      ],
-      "actual": "3.7%",
-      "forecast": "",
-      "previous": "3.7%",
-      "source": "U.S. Bureau of Economic Analysis (BEA)",
-      "source_url": "https://www.bea.gov/news/2026/personal-income-and-outlays-july-2026",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-bea-pce",
-      "symbol": ""
-    },
     {
       "event_id": "official-kr-mods-industry-2026-08-31",
       "time_tpe": "2026-08-31T07:00:00+08:00",
@@ -122,6 +71,31 @@
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-kr-mods-cpi",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-bls-nfp-2026-09-04",
+      "time_tpe": "2026-09-04T20:30:00+08:00",
+      "title": "美國非農就業人數（NFP）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "就業",
+        "Fed",
+        "美元",
+        "NASDAQ"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "U.S. Bureau of Labor Statistics (BLS)",
+      "source_url": "https://www.bls.gov/schedule/news_release/empsit.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bls-nfp",
       "symbol": ""
     }
   ]
