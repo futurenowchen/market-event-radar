@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-02",
-  "generated_at_tpe": "2026-09-02T02:38:50.251337+08:00",
+  "snapshot_date_tpe": "2026-09-03",
+  "generated_at_tpe": "2026-09-03T02:56:16.004697+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 3,
+  "event_count": 2,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -19,36 +19,10 @@
     "us_fed": true
   },
   "provider_counts": {
-    "official-kr-mods-cpi": 1,
     "official-tw-dgbas-cpi": 1,
     "official-us-bls-nfp": 1
   },
   "events": [
-    {
-      "event_id": "official-kr-mods-cpi-2026-09-02",
-      "time_tpe": "2026-09-02T07:00:00+08:00",
-      "title": "韓國消費者物價指數（CPI）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "S",
-      "country": "韓國",
-      "market_tags": [
-        "韓國",
-        "CPI",
-        "通膨",
-        "BOK",
-        "韓元"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Ministry of Data and Statistics, Korea",
-      "source_url": "https://mods.go.kr/cpiOaSchdlView.es?mid=b70203020000",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-kr-mods-cpi",
-      "symbol": ""
-    },
     {
       "event_id": "official-us-bls-nfp-2026-09-04",
       "time_tpe": "2026-09-04T20:30:00+08:00",
