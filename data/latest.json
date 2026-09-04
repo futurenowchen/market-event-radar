@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-04",
-  "generated_at_tpe": "2026-09-04T23:05:23.031775+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-09-05",
+  "generated_at_tpe": "2026-09-05T02:22:19.679744+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 2,
+  "event_count": 3,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -20,6 +20,7 @@
   },
   "provider_counts": {
     "official-tw-dgbas-cpi": 1,
+    "official-us-bls-cpi": 1,
     "official-us-bls-nfp": 1
   },
   "events": [
@@ -71,6 +72,31 @@
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-tw-dgbas-cpi",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-bls-cpi-2026-09-11",
+      "time_tpe": "2026-09-11T20:30:00+08:00",
+      "title": "美國消費者物價指數（CPI）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "通膨",
+        "Fed",
+        "NASDAQ",
+        "台指"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "U.S. Bureau of Labor Statistics (BLS)",
+      "source_url": "https://www.bls.gov/schedule/news_release/cpi.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bls-cpi",
       "symbol": ""
     }
   ]
