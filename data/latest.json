@@ -1,16 +1,16 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-06",
-  "generated_at_tpe": "2026-09-06T02:12:10.597909+08:00",
+  "snapshot_date_tpe": "2026-09-07",
+  "generated_at_tpe": "2026-09-07T00:11:11.977439+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 3,
+  "event_count": 2,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
     "jp_stat": true,
-    "kr_bok": true,
+    "kr_bok": false,
     "kr_mods": true,
     "tw_cbc": true,
     "tw_dgbas": true,
@@ -20,35 +20,9 @@
   },
   "provider_counts": {
     "official-tw-dgbas-cpi": 1,
-    "official-us-bls-cpi": 1,
-    "official-us-bls-nfp": 1
+    "official-us-bls-cpi": 1
   },
   "events": [
-    {
-      "event_id": "official-us-bls-nfp-2026-09-04",
-      "time_tpe": "2026-09-04T20:30:00+08:00",
-      "title": "美國非農就業人數（NFP）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "S",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "就業",
-        "Fed",
-        "美元",
-        "NASDAQ"
-      ],
-      "actual": "+162K",
-      "forecast": "",
-      "previous": "+21K",
-      "source": "U.S. Bureau of Labor Statistics (BLS)",
-      "source_url": "https://www.bls.gov/schedule/news_release/empsit.htm",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-bls-nfp",
-      "symbol": ""
-    },
     {
       "event_id": "official-tw-dgbas-cpi-20260908",
       "time_tpe": "2026-09-08T16:00:00+08:00",
