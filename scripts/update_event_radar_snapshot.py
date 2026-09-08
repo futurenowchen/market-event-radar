@@ -15,7 +15,8 @@ if str(ROOT) not in sys.path:
 import v2_event_official as official
 import v2_event_official_asia  # noqa: F401  # installs hardened JP schedule parsers
 import v2_event_official_taiwan  # noqa: F401  # installs hardened TW schedules
-import v2_event_official_resilience  # noqa: F401  # installs resilient BLS/KR schedules
+import v2_event_official_resilience  # noqa: F401  # installs resilient BLS/KR/BEA parsers
+import v2_event_official_taiwan_resilience  # noqa: F401  # installs resilient TW result parser
 import v2_event_company_ir  # noqa: F401  # installs official company IR fallbacks
 import v2_event_semantics  # noqa: F401  # normalizes fallback categories/date-only semantics
 import v2_event_radar as er
