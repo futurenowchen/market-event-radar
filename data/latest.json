@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-09",
-  "generated_at_tpe": "2026-09-09T02:04:59.720371+08:00",
+  "snapshot_date_tpe": "2026-09-10",
+  "generated_at_tpe": "2026-09-10T00:33:26.133042+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
