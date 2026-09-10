@@ -17,6 +17,7 @@ import v2_event_official_asia  # noqa: F401  # installs hardened JP schedule par
 import v2_event_official_taiwan  # noqa: F401  # installs hardened TW schedules
 import v2_event_official_resilience  # noqa: F401  # installs resilient BLS/KR/BEA parsers
 import v2_event_official_taiwan_resilience  # noqa: F401  # installs resilient TW result parser
+import v2_event_official_us_high_signal  # noqa: F401  # installs PPI + rich US release bundles
 import v2_event_company_ir  # noqa: F401  # installs official company IR fallbacks
 import v2_event_semantics  # noqa: F401  # normalizes fallback categories/date-only semantics
 import v2_event_radar as er
@@ -29,6 +30,9 @@ def event_to_json(event: er.MarketEvent) -> dict:
     row = asdict(event)
     row["time_tpe"] = event.time_tpe.isoformat()
     row["market_tags"] = list(event.market_tags)
+    metrics = getattr(event, "metrics", ())
+    if metrics:
+        row["metrics"] = [dict(metric) for metric in metrics]
     return row
 
 
@@ -37,7 +41,7 @@ def event_from_json(row: dict) -> er.MarketEvent | None:
         dt = datetime.fromisoformat(str(row.get("time_tpe") or "")).astimezone(er.TPE)
     except Exception:
         return None
-    return er.MarketEvent(
+    event = er.MarketEvent(
         event_id=str(row.get("event_id") or ""),
         time_tpe=dt,
         title=str(row.get("title") or ""),
@@ -56,6 +60,12 @@ def event_from_json(row: dict) -> er.MarketEvent | None:
         provider=str(row.get("provider") or "manual"),
         symbol=str(row.get("symbol") or ""),
     )
+    metrics = row.get("metrics") or ()
+    if isinstance(metrics, list):
+        clean_metrics = tuple(dict(metric) for metric in metrics if isinstance(metric, dict))
+        if clean_metrics:
+            object.__setattr__(event, "metrics", clean_metrics)
+    return event
 
 
 def load_existing(path: Path) -> tuple[dict, list[er.MarketEvent]]:
