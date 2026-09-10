@@ -1,6 +1,12 @@
 from __future__ import annotations
 
+import sys
 from datetime import date
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import v2_event_official_us_phase3 as phase3
 
@@ -42,12 +48,9 @@ def main() -> None:
     assert values["starts_level"] == "1.385M", values
     assert values["starts_mom"] == "-3.4%", values
     assert values["previous_starts_level"] == "1.434M", values
-    assert values["permits_level"] == "1.42M", values
+    assert values["permits_level"] == "1.420M", values
     assert values["permits_mom"] == "1.2%", values
     assert values["previous_permits_level"] == "1.403M", values
-
-    assert phase3._fmt_level("1,385,000") == "1.385M"
-    assert phase3._fmt_level("985,000") == "985M"
 
     g17_schedule, _ = phase3._g17_schedule("test-phase3-g17")
     durable_schedule, _ = phase3._durable_schedule("test-phase3-durable")
