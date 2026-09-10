@@ -14,15 +14,16 @@ import v2_event_official_taiwan as taiwan  # noqa: F401  # install hardened TW s
 import v2_event_official_resilience as resilience  # noqa: F401  # install resilient BLS/KR schedules
 import v2_event_official_taiwan_resilience  # noqa: F401  # install resilient TW results
 import v2_event_official_us_high_signal as us_high_signal  # noqa: F401  # install PPI + rich US metrics
+import v2_event_official_us_phase2 as us_phase2  # noqa: F401  # install retail/JOLTS/ECI/claims
 import v2_event_company_ir as company_ir  # noqa: F401  # install official company IR fallbacks
 
 
 def main() -> None:
     now = datetime.now(official.TPE)
     start = now - timedelta(hours=48)
-    # A 35-day horizon is long enough to cross monthly release cycles. A 21-day
-    # rolling probe can legitimately omit NFP/CPI families depending on today's
-    # position in the calendar and should not turn that into a false CI failure.
+    # 35 days covers the monthly CPI/PPI/NFP cadence without turning a quiet
+    # calendar position into a false CI failure. Phase 2 schedule contracts are
+    # checked separately below instead of requiring every family in this window.
     end = now + timedelta(days=35)
     macro, health = official.collect_official_macro(start, end, "ci-smoke")
 
@@ -33,6 +34,10 @@ def main() -> None:
     print("live_schedule_reachability:")
     print(f"  bls_cpi: {'ok' if official._fetch_text(resilience.BLS_CPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
     print(f"  bls_ppi: {'ok' if official._fetch_text(us_high_signal.PPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
+    print(f"  bls_jolts: {'ok' if official._fetch_text(us_phase2.JOLTS_SCHEDULE_URL, 'ci-live') else 'fallback'}")
+    print(f"  bls_eci: {'ok' if official._fetch_text(us_phase2.ECI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
+    print(f"  census_retail: {'ok' if official._fetch_text(us_phase2.CENSUS_CALENDAR_URL, 'ci-live') else 'fallback'}")
+    print(f"  dol_claims: {'ok' if official._fetch_text(us_phase2.CLAIMS_RELEASES_URL, 'ci-live') else 'fallback'}")
     print(f"  tw_cpi: {'ok' if official._fetch_text(taiwan.TW_CPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
     print(f"  kr_cpi: {'ok' if official._fetch_text(resilience.KR_CPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
 
@@ -46,7 +51,7 @@ def main() -> None:
         )
 
     groups = {
-        "United States": ("us_bls", "us_bea", "us_fed"),
+        "United States": ("us_bls", "us_bea", "us_fed", "us_census", "us_dol"),
         "Taiwan": ("tw_dgbas", "tw_cbc"),
         "Japan": ("jp_stat", "jp_esri", "jp_boj"),
         "South Korea": ("kr_mods", "kr_bok"),
@@ -68,19 +73,61 @@ def main() -> None:
     if missing:
         raise SystemExit("Resilient official schedules missing providers: " + ", ".join(missing))
 
-    bls_probe = official._bls_observations(["CUUR0000SA0", "WPUFD4"], now, "ci-bls-api")
+    jolts_schedule, _ = us_phase2._jolts_schedule("ci-jolts-schedule")
+    eci_schedule, _ = us_phase2._eci_schedule("ci-eci-schedule")
+    retail_schedule, _ = us_phase2._retail_schedule("ci-retail-schedule")
+    if not jolts_schedule:
+        raise SystemExit("JOLTS schedule unavailable")
+    if not eci_schedule:
+        raise SystemExit("ECI schedule unavailable")
+    if not retail_schedule:
+        raise SystemExit("Retail Sales schedule unavailable")
+    print(
+        "Phase 2 schedules: ok "
+        f"(JOLTS={len(jolts_schedule)}, ECI={len(eci_schedule)}, retail={len(retail_schedule)})"
+    )
+
+    bls_probe = official._bls_observations(
+        [
+            "CUUR0000SA0",
+            "WPUFD4",
+            us_phase2.JOLTS_SERIES["openings"],
+        ],
+        now,
+        "ci-bls-api",
+    )
     if not bls_probe.get("CUUR0000SA0"):
         raise SystemExit("BLS keyless Public Data API returned no CPI observations")
     if not bls_probe.get("WPUFD4"):
         raise SystemExit("BLS keyless Public Data API returned no PPI observations")
+    if not bls_probe.get(us_phase2.JOLTS_SERIES["openings"]):
+        raise SystemExit("BLS keyless Public Data API returned no JOLTS observations")
     print(
         "BLS Public Data API: ok "
-        f"({len(bls_probe['CUUR0000SA0'])} CPI, {len(bls_probe['WPUFD4'])} PPI observations)"
+        f"({len(bls_probe['CUUR0000SA0'])} CPI, "
+        f"{len(bls_probe['WPUFD4'])} PPI, "
+        f"{len(bls_probe[us_phase2.JOLTS_SERIES['openings']])} JOLTS observations)"
     )
+
+    eci_probe = us_phase2._bls_quarter_observations(
+        [us_phase2.ECI_SERIES["comp_qoq"]], now, "ci-eci-api"
+    ).get(us_phase2.ECI_SERIES["comp_qoq"], [])
+    if not eci_probe:
+        raise SystemExit("BLS keyless Public Data API returned no ECI observations")
+    print(f"BLS ECI API: ok ({len(eci_probe)} quarterly observations)")
 
     rich = [
         event for event in macro
-        if event.provider in {"official-us-bls-cpi", "official-us-bls-ppi", "official-us-bls-nfp", "official-us-bea-pce"}
+        if event.provider in {
+            "official-us-bls-cpi",
+            "official-us-bls-ppi",
+            "official-us-bls-nfp",
+            "official-us-bea-pce",
+            "official-us-bls-jolts",
+            "official-us-bls-eci",
+            "official-us-census-retail",
+            "official-us-dol-claims",
+        }
         and getattr(event, "metrics", ())
     ]
     if not rich:
