@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-09-10",
-  "generated_at_tpe": "2026-09-10T00:33:26.133042+08:00",
+  "generated_at_tpe": "2026-09-10T23:40:36.482756+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 2,
+  "event_count": 4,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -19,34 +19,79 @@
     "us_fed": true
   },
   "provider_counts": {
-    "official-tw-dgbas-cpi": 1,
-    "official-us-bls-cpi": 1
+    "official-tw-cbc": 1,
+    "official-us-bls-cpi": 1,
+    "official-us-bls-ppi": 1,
+    "official-us-fed-fomc": 1
   },
   "events": [
     {
-      "event_id": "official-tw-dgbas-cpi-20260908",
-      "time_tpe": "2026-09-08T16:00:00+08:00",
-      "title": "台灣消費者物價指數（CPI）",
+      "event_id": "official-us-bls-ppi-2026-09-10",
+      "time_tpe": "2026-09-10T20:30:00+08:00",
+      "title": "美國生產者物價指數（PPI）",
       "category": "總體經濟",
       "importance": 3,
       "tier": "S",
-      "country": "台灣",
+      "country": "美國",
       "market_tags": [
-        "台灣",
-        "CPI",
+        "美國",
+        "PPI",
         "通膨",
-        "台股",
-        "央行"
+        "Fed",
+        "NASDAQ",
+        "台指"
       ],
-      "actual": "2.04%",
+      "actual": "5.4%",
       "forecast": "",
-      "previous": "2.54%",
-      "source": "行政院主計總處",
-      "source_url": "https://www.stat.gov.tw/News_NoticeCalendar.aspx?Dept=315000000H&PageSize=10&n=3717&page=2&sms=11505",
+      "previous": "4.8%",
+      "source": "U.S. Bureau of Labor Statistics (BLS)",
+      "source_url": "https://www.bls.gov/schedule/news_release/ppi.htm",
       "status": "released",
       "expects_result": true,
-      "provider": "official-tw-dgbas-cpi",
-      "symbol": ""
+      "provider": "official-us-bls-ppi",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "headline_yoy",
+          "label": "Final Demand YoY",
+          "actual": "5.4%",
+          "forecast": "",
+          "previous": "4.8%",
+          "unit": "%",
+          "is_primary": true,
+          "source_series": "WPUFD4"
+        },
+        {
+          "metric_id": "headline_mom",
+          "label": "Final Demand MoM",
+          "actual": "0.4%",
+          "forecast": "",
+          "previous": "0.1%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "WPSFD4"
+        },
+        {
+          "metric_id": "core_yoy",
+          "label": "Core YoY（除食品/能源/貿易服務）",
+          "actual": "4.7%",
+          "forecast": "",
+          "previous": "4.7%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "WPUFD49116"
+        },
+        {
+          "metric_id": "core_mom",
+          "label": "Core MoM（除食品/能源/貿易服務）",
+          "actual": "0.3%",
+          "forecast": "",
+          "previous": "0.4%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "WPSFD49116"
+        }
+      ]
     },
     {
       "event_id": "official-us-bls-cpi-2026-09-11",
@@ -65,12 +110,104 @@
       ],
       "actual": "",
       "forecast": "",
-      "previous": "",
+      "previous": "3.4%",
       "source": "U.S. Bureau of Labor Statistics (BLS)",
       "source_url": "https://www.bls.gov/schedule/news_release/cpi.htm",
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-us-bls-cpi",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "headline_yoy",
+          "label": "Headline YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "3.4%",
+          "unit": "%",
+          "is_primary": true,
+          "source_series": "CUUR0000SA0"
+        },
+        {
+          "metric_id": "headline_mom",
+          "label": "Headline MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.1%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUSR0000SA0"
+        },
+        {
+          "metric_id": "core_yoy",
+          "label": "Core YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "2.5%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUUR0000SA0L1E"
+        },
+        {
+          "metric_id": "core_mom",
+          "label": "Core MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.2%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUSR0000SA0L1E"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-fed-fomc-2026-09-16",
+      "time_tpe": "2026-09-17T02:00:00+08:00",
+      "title": "美國聯邦公開市場委員會（FOMC）利率決議",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "FOMC",
+        "Fed",
+        "利率",
+        "全球風險資產"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Federal Reserve",
+      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-fed-fomc",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-tw-cbc-2026-09-17",
+      "time_tpe": "2026-09-17T16:30:00+08:00",
+      "title": "台灣中央銀行理監事會利率決議",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "台灣",
+      "market_tags": [
+        "台灣",
+        "央行",
+        "利率",
+        "台幣",
+        "台股"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "中央銀行",
+      "source_url": "https://www.cbc.gov.tw/tw/cp-357-189514-82841-1.html",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-tw-cbc",
       "symbol": ""
     }
   ]
