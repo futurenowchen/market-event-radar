@@ -17,6 +17,7 @@ import v2_event_official_us_high_signal as us_high_signal  # noqa: F401
 import v2_event_official_us_phase2 as us_phase2  # noqa: F401
 import v2_event_official_us_claims  # noqa: F401
 import v2_event_official_us_phase3 as us_phase3  # noqa: F401
+import v2_event_official_us_phase4 as us_phase4  # noqa: F401
 import v2_event_company_ir as company_ir  # noqa: F401
 
 
@@ -36,9 +37,12 @@ def main() -> None:
         "bls_ppi": us_high_signal.PPI_SCHEDULE_URL,
         "bls_jolts": us_phase2.JOLTS_SCHEDULE_URL,
         "bls_eci": us_phase2.ECI_SCHEDULE_URL,
+        "bls_productivity": us_phase4.BLS_PRODUCTIVITY_SCHEDULE_URL,
         "census_retail": us_phase2.CENSUS_CALENDAR_URL,
         "dol_claims": us_phase2.CLAIMS_RELEASES_URL,
         "fed_g17": us_phase3.FED_G17_URL,
+        "fed_calendar": official.FED_FOMC_URL,
+        "ism_calendar": us_phase4.ISM_CALENDAR_URL,
         "census_durable": us_phase3.DURABLE_SCHEDULE_URL,
         "census_housing": us_phase3.HOUSING_SCHEDULE_URL,
         "tw_cpi": taiwan.TW_CPI_SCHEDULE_URL,
@@ -59,7 +63,7 @@ def main() -> None:
     groups = {
         "United States": (
             "us_bls", "us_bea", "us_fed", "us_census", "us_dol",
-            "us_fed_g17", "us_census_m3", "us_census_housing",
+            "us_fed_g17", "us_census_m3", "us_census_housing", "us_ism", "us_fed_chair",
         ),
         "Taiwan": ("tw_dgbas", "tw_cbc"),
         "Japan": ("jp_stat", "jp_esri", "jp_boj"),
@@ -88,6 +92,8 @@ def main() -> None:
     g17_schedule, _ = us_phase3._g17_schedule("ci-g17-schedule")
     durable_schedule, _ = us_phase3._durable_schedule("ci-durable-schedule")
     housing_schedule, _ = us_phase3._housing_schedule("ci-housing-schedule")
+    ism_schedule, _ = us_phase4._ism_schedule("ci-ism-schedule")
+    productivity_schedule, _ = us_phase4._productivity_schedule("ci-productivity-schedule")
     schedules = {
         "JOLTS": jolts_schedule,
         "ECI": eci_schedule,
@@ -95,6 +101,8 @@ def main() -> None:
         "G17": g17_schedule,
         "Durable Goods": durable_schedule,
         "Housing": housing_schedule,
+        "ISM": ism_schedule,
+        "Productivity": productivity_schedule,
     }
     unavailable = [name for name, rows in schedules.items() if not rows]
     if unavailable:
@@ -120,14 +128,32 @@ def main() -> None:
     if not eci_probe:
         raise SystemExit("BLS keyless Public Data API returned no ECI observations")
 
+    productivity_probe = us_phase2._bls_quarter_observations(
+        list(us_phase4.PRODUCTIVITY_SERIES.values()), now, "ci-productivity-api"
+    )
+    for series_id, label in (
+        (us_phase4.PRODUCTIVITY_SERIES["labor_productivity"], "labor productivity"),
+        (us_phase4.PRODUCTIVITY_SERIES["unit_labor_costs"], "unit labor costs"),
+    ):
+        if not productivity_probe.get(series_id):
+            raise SystemExit(f"BLS keyless Public Data API returned no {label} observations")
+
     extended_providers = {
         "official-us-fed-g17",
         "official-us-census-durable",
         "official-us-census-housing",
+        "official-us-ism-manufacturing",
+        "official-us-fed-fomc-minutes",
     }
     if not extended_providers.issubset(providers):
         missing_extended = sorted(extended_providers - providers)
-        raise SystemExit("Phase 3 schedules missing providers: " + ", ".join(missing_extended))
+        raise SystemExit("Extended US schedules missing providers: " + ", ".join(missing_extended))
+
+    ism_events = [event for event in macro if event.provider.startswith("official-us-ism-")]
+    if not ism_events or any(event.expects_result for event in ism_events):
+        raise SystemExit("ISM schedule-only policy missing or expects_result is enabled")
+    if any(event.actual or event.previous or event.forecast for event in ism_events):
+        raise SystemExit("ISM licensed values leaked into official-free feed")
 
     rich = [
         event for event in macro
