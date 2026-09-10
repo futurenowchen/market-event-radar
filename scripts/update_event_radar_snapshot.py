@@ -18,6 +18,7 @@ import v2_event_official_taiwan  # noqa: F401  # installs hardened TW schedules
 import v2_event_official_resilience  # noqa: F401  # installs resilient BLS/KR/BEA parsers
 import v2_event_official_taiwan_resilience  # noqa: F401  # installs resilient TW result parser
 import v2_event_official_us_high_signal  # noqa: F401  # installs PPI + rich US release bundles
+import v2_event_official_us_phase2  # noqa: F401  # installs retail/JOLTS/ECI/claims adapters
 import v2_event_company_ir  # noqa: F401  # installs official company IR fallbacks
 import v2_event_semantics  # noqa: F401  # normalizes fallback categories/date-only semantics
 import v2_event_radar as er
@@ -126,9 +127,6 @@ def main() -> None:
             failed = ", ".join(name for name, ok in sorted(source_health.items()) if not ok) or "unknown"
             print(f"Official macro sources incomplete ({failed}); preserving previous snapshot for unattended retry.")
             return
-        # A daily collector intentionally searches only a short lookback window. Merge
-        # already-published results from the prior snapshot so a result does not vanish
-        # from the public feed merely because it became 12 hours old.
         events = er._dedupe([*events, *_recent_released(existing, now)])
     else:
         events = build_smart(existing, now)
