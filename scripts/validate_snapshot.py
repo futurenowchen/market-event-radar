@@ -35,6 +35,17 @@ REQUIRED_EVENT = {
     "symbol",
 }
 
+REQUIRED_METRIC = {
+    "metric_id",
+    "label",
+    "actual",
+    "forecast",
+    "previous",
+    "unit",
+    "is_primary",
+    "source_series",
+}
+
 
 def fail(message: str) -> None:
     raise SystemExit(f"snapshot validation failed: {message}")
@@ -85,6 +96,35 @@ def validate(path: Path) -> None:
             fail(f"events[{index}].market_tags must be an array")
         if not isinstance(event["expects_result"], bool):
             fail(f"events[{index}].expects_result must be boolean")
+
+        metrics = event.get("metrics")
+        if metrics is None:
+            continue
+        if not isinstance(metrics, list):
+            fail(f"events[{index}].metrics must be an array")
+        metric_ids: set[str] = set()
+        primary_count = 0
+        for metric_index, metric in enumerate(metrics):
+            if not isinstance(metric, dict):
+                fail(f"events[{index}].metrics[{metric_index}] must be an object")
+            missing_metric = REQUIRED_METRIC - metric.keys()
+            if missing_metric:
+                fail(
+                    f"events[{index}].metrics[{metric_index}] missing fields: "
+                    f"{sorted(missing_metric)}"
+                )
+            metric_id = str(metric["metric_id"])
+            if not metric_id:
+                fail(f"events[{index}].metrics[{metric_index}].metric_id is empty")
+            if metric_id in metric_ids:
+                fail(f"events[{index}] duplicate metric_id={metric_id}")
+            metric_ids.add(metric_id)
+            if not isinstance(metric["is_primary"], bool):
+                fail(f"events[{index}].metrics[{metric_index}].is_primary must be boolean")
+            if metric["is_primary"]:
+                primary_count += 1
+        if metrics and primary_count != 1:
+            fail(f"events[{index}] metrics must contain exactly one primary metric")
 
     print(f"OK: {path} contains {len(events)} valid events (schema v2).")
 
