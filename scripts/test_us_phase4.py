@@ -10,6 +10,7 @@ if str(ROOT) not in sys.path:
 
 import v2_event_official as official
 import v2_event_official_us_phase4 as phase4
+import v2_event_official_us_phase4_resilience  # noqa: F401  # patch title matching
 
 
 def main() -> None:
