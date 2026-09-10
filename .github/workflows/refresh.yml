@@ -57,7 +57,7 @@ jobs:
           if [ "${{ github.event_name }}" = "push" ]; then
             FORCE="true"
           else
-            FORCE="${{ github.event.inputs.force_daily || 'false'}"
+            FORCE="${{ github.event.inputs.force_daily || 'false' }}"
           fi
           python scripts/refresh_gate.py \
             --snapshot data/latest.json \
