@@ -20,7 +20,10 @@ import v2_event_company_ir as company_ir  # noqa: F401  # install official compa
 def main() -> None:
     now = datetime.now(official.TPE)
     start = now - timedelta(hours=48)
-    end = now + timedelta(days=21)
+    # A 35-day horizon is long enough to cross monthly release cycles. A 21-day
+    # rolling probe can legitimately omit NFP/CPI families depending on today's
+    # position in the calendar and should not turn that into a false CI failure.
+    end = now + timedelta(days=35)
     macro, health = official.collect_official_macro(start, end, "ci-smoke")
 
     print("source_health:")
@@ -102,7 +105,7 @@ def main() -> None:
         raise SystemExit("NVIDIA official IR earnings anchor missing or shifted")
     print("NVIDIA official IR anchor: ok (2026-08-27 04:20 TPE)")
 
-    print(f"official backend smoke check passed: {len(macro)} macro event(s) in the 21-day CI horizon")
+    print(f"official backend smoke check passed: {len(macro)} macro event(s) in the 35-day CI horizon")
 
 
 if __name__ == "__main__":
