@@ -6,6 +6,31 @@ from typing import Any
 
 
 @dataclass(frozen=True)
+class EventMetric:
+    metric_id: str
+    label: str
+    actual: str = ""
+    forecast: str = ""
+    previous: str = ""
+    unit: str = ""
+    is_primary: bool = False
+    source_series: str = ""
+
+    @classmethod
+    def from_dict(cls, row: dict[str, Any]) -> "EventMetric":
+        return cls(
+            metric_id=str(row.get("metric_id") or ""),
+            label=str(row.get("label") or ""),
+            actual=str(row.get("actual") or ""),
+            forecast=str(row.get("forecast") or ""),
+            previous=str(row.get("previous") or ""),
+            unit=str(row.get("unit") or ""),
+            is_primary=bool(row.get("is_primary")),
+            source_series=str(row.get("source_series") or ""),
+        )
+
+
+@dataclass(frozen=True)
 class MarketEvent:
     event_id: str
     time_tpe: datetime
@@ -24,12 +49,19 @@ class MarketEvent:
     expects_result: bool = False
     provider: str = "manual"
     symbol: str = ""
+    metrics: tuple[EventMetric, ...] = ()
 
     @classmethod
     def from_dict(cls, row: dict[str, Any]) -> "MarketEvent":
         dt = datetime.fromisoformat(str(row.get("time_tpe") or ""))
         if dt.tzinfo is None:
             raise ValueError("time_tpe must include a timezone offset")
+        metric_rows = row.get("metrics") or ()
+        metrics = tuple(
+            EventMetric.from_dict(metric)
+            for metric in metric_rows
+            if isinstance(metric, dict)
+        )
         return cls(
             event_id=str(row.get("event_id") or ""),
             time_tpe=dt,
@@ -48,6 +80,7 @@ class MarketEvent:
             expects_result=bool(row.get("expects_result")),
             provider=str(row.get("provider") or "manual"),
             symbol=str(row.get("symbol") or ""),
+            metrics=metrics,
         )
 
 
