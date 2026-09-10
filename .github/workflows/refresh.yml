@@ -15,6 +15,8 @@ on:
       - "v2_event_official_us_phase2.py"
       - "v2_event_official_us_claims.py"
       - "v2_event_official_us_phase3.py"
+      - "v2_event_official_us_phase4.py"
+      - "v2_event_official_us_phase4_resilience.py"
       - "v2_event_release_metrics.py"
       - "v2_event_company_ir.py"
       - "requirements-event-radar.txt"
