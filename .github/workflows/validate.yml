@@ -41,6 +41,7 @@ jobs:
             v2_event_official_us_claims.py \
             v2_event_official_us_phase3.py \
             v2_event_official_us_phase4.py \
+            v2_event_official_us_phase4_resilience.py \
             v2_event_company_ir.py \
             scripts/refresh_gate.py \
             scripts/update_event_radar_snapshot.py \
