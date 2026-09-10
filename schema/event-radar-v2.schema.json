@@ -34,6 +34,21 @@
     }
   },
   "$defs": {
+    "metric": {
+      "type": "object",
+      "required": ["metric_id", "label", "actual", "forecast", "previous", "unit", "is_primary", "source_series"],
+      "properties": {
+        "metric_id": {"type": "string", "minLength": 1},
+        "label": {"type": "string", "minLength": 1},
+        "actual": {"type": "string"},
+        "forecast": {"type": "string"},
+        "previous": {"type": "string"},
+        "unit": {"type": "string"},
+        "is_primary": {"type": "boolean"},
+        "source_series": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
     "event": {
       "type": "object",
       "required": [
@@ -67,6 +82,7 @@
         "actual": {"type": "string"},
         "forecast": {"type": "string"},
         "previous": {"type": "string"},
+        "metrics": {"type": "array", "items": {"$ref": "#/$defs/metric"}},
         "source": {"type": "string"},
         "source_url": {"type": "string"},
         "status": {"type": "string"},
