@@ -18,6 +18,7 @@ MEANINGFUL_FIELDS = (
     "actual",
     "forecast",
     "previous",
+    "metrics",
     "source",
     "source_url",
     "status",
@@ -86,6 +87,8 @@ def _change_type(previous: dict[str, Any] | None, current: dict[str, Any]) -> st
         return "forecast_changed"
     if before.get("previous") != after.get("previous"):
         return "previous_changed"
+    if before.get("metrics") != after.get("metrics"):
+        return "metrics_changed"
     if (before.get("source"), before.get("source_url"), before.get("provider")) != (
         after.get("source"), after.get("source_url"), after.get("provider")
     ):
