@@ -19,6 +19,7 @@ MEANINGFUL_FIELDS = (
     "actual",
     "forecast",
     "previous",
+    "metrics",
     "source",
     "source_url",
     "status",
@@ -118,6 +119,45 @@ def _check_source_health(payload: dict[str, Any]) -> list[str]:
     return issues
 
 
+def _check_metrics(row: dict[str, Any], event_id: str) -> list[str]:
+    issues: list[str] = []
+    metrics = row.get("metrics")
+    if metrics is None:
+        return issues
+    if not isinstance(metrics, list):
+        return [f"metrics must be an array for {event_id}"]
+
+    ids: set[str] = set()
+    primary: dict[str, Any] | None = None
+    for index, metric in enumerate(metrics):
+        if not isinstance(metric, dict):
+            issues.append(f"metrics[{index}] is not an object for {event_id}")
+            continue
+        metric_id = str(metric.get("metric_id") or "").strip()
+        label = str(metric.get("label") or "").strip()
+        if not metric_id or not label:
+            issues.append(f"metrics[{index}] missing metric_id/label for {event_id}")
+            continue
+        if metric_id in ids:
+            issues.append(f"duplicate metric_id={metric_id} for {event_id}")
+        ids.add(metric_id)
+        if metric.get("is_primary"):
+            if primary is not None:
+                issues.append(f"multiple primary metrics for {event_id}")
+            primary = metric
+
+    if metrics and primary is None:
+        issues.append(f"metrics bundle has no primary metric for {event_id}")
+    if primary is not None:
+        primary_actual = str(primary.get("actual") or "")
+        primary_previous = str(primary.get("previous") or "")
+        if primary_actual != str(row.get("actual") or ""):
+            issues.append(f"primary metric actual disagrees with legacy actual for {event_id}")
+        if primary_previous != str(row.get("previous") or ""):
+            issues.append(f"primary metric previous disagrees with legacy previous for {event_id}")
+    return issues
+
+
 def check_health(
     snapshot_path: Path,
     history_dir: Path,
@@ -167,6 +207,7 @@ def check_health(
             issues.append("snapshot contains an event without event_id")
             continue
         snapshot_by_id[event_id] = row
+        issues.extend(_check_metrics(row, event_id))
 
         history_row = latest_history.get(event_id)
         if history_row is None:
@@ -185,8 +226,6 @@ def check_health(
             issues.append(f"event has invalid time_tpe: {event_id}")
             continue
 
-        # Consensus forecasts are intentionally not required in official-free-v1.
-        # Actual values, however, are expected for released S/A macro and central-bank events.
         category = str(row.get("category") or "")
         should_have_result = (
             bool(row.get("expects_result"))
@@ -202,8 +241,6 @@ def check_health(
                     f"{elapsed.total_seconds() / 3600:.1f}h after release time"
                 )
 
-    # A released event must stay in the live snapshot during the configured retention window.
-    # This catches the class of bug where daily refreshes silently drop yesterday's releases.
     for event_id, history_row in latest_history.items():
         event = history_row.get("event")
         if not isinstance(event, dict) or not str(event.get("actual") or "").strip():
@@ -266,6 +303,7 @@ def main() -> int:
     print("- snapshot freshness: OK")
     print("- official source health: OK")
     print("- snapshot/history consistency: OK")
+    print("- release-bundle metrics: OK")
     print("- released-event retention: OK")
     print("- overdue S/A macro results: none")
     return 0
