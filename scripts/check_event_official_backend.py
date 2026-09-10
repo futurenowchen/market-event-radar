@@ -9,21 +9,20 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import v2_event_official as official
-import v2_event_official_asia  # noqa: F401  # install source-format-specific JP parsers
-import v2_event_official_taiwan as taiwan  # noqa: F401  # install hardened TW schedules
-import v2_event_official_resilience as resilience  # noqa: F401  # install resilient BLS/KR schedules
-import v2_event_official_taiwan_resilience  # noqa: F401  # install resilient TW results
-import v2_event_official_us_high_signal as us_high_signal  # noqa: F401  # install PPI + rich US metrics
-import v2_event_official_us_phase2 as us_phase2  # noqa: F401  # install retail/JOLTS/ECI/claims
-import v2_event_company_ir as company_ir  # noqa: F401  # install official company IR fallbacks
+import v2_event_official_asia  # noqa: F401
+import v2_event_official_taiwan as taiwan  # noqa: F401
+import v2_event_official_resilience as resilience  # noqa: F401
+import v2_event_official_taiwan_resilience  # noqa: F401
+import v2_event_official_us_high_signal as us_high_signal  # noqa: F401
+import v2_event_official_us_phase2 as us_phase2  # noqa: F401
+import v2_event_official_us_claims  # noqa: F401
+import v2_event_official_us_phase3 as us_phase3  # noqa: F401
+import v2_event_company_ir as company_ir  # noqa: F401
 
 
 def main() -> None:
     now = datetime.now(official.TPE)
     start = now - timedelta(hours=48)
-    # 35 days covers the monthly CPI/PPI/NFP cadence without turning a quiet
-    # calendar position into a false CI failure. Phase 2 schedule contracts are
-    # checked separately below instead of requiring every family in this window.
     end = now + timedelta(days=35)
     macro, health = official.collect_official_macro(start, end, "ci-smoke")
 
@@ -32,14 +31,21 @@ def main() -> None:
         print(f"  {name}: {'ok' if ok else 'failed'}")
 
     print("live_schedule_reachability:")
-    print(f"  bls_cpi: {'ok' if official._fetch_text(resilience.BLS_CPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
-    print(f"  bls_ppi: {'ok' if official._fetch_text(us_high_signal.PPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
-    print(f"  bls_jolts: {'ok' if official._fetch_text(us_phase2.JOLTS_SCHEDULE_URL, 'ci-live') else 'fallback'}")
-    print(f"  bls_eci: {'ok' if official._fetch_text(us_phase2.ECI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
-    print(f"  census_retail: {'ok' if official._fetch_text(us_phase2.CENSUS_CALENDAR_URL, 'ci-live') else 'fallback'}")
-    print(f"  dol_claims: {'ok' if official._fetch_text(us_phase2.CLAIMS_RELEASES_URL, 'ci-live') else 'fallback'}")
-    print(f"  tw_cpi: {'ok' if official._fetch_text(taiwan.TW_CPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
-    print(f"  kr_cpi: {'ok' if official._fetch_text(resilience.KR_CPI_SCHEDULE_URL, 'ci-live') else 'fallback'}")
+    probes = {
+        "bls_cpi": resilience.BLS_CPI_SCHEDULE_URL,
+        "bls_ppi": us_high_signal.PPI_SCHEDULE_URL,
+        "bls_jolts": us_phase2.JOLTS_SCHEDULE_URL,
+        "bls_eci": us_phase2.ECI_SCHEDULE_URL,
+        "census_retail": us_phase2.CENSUS_CALENDAR_URL,
+        "dol_claims": us_phase2.CLAIMS_RELEASES_URL,
+        "fed_g17": us_phase3.FED_G17_URL,
+        "census_durable": us_phase3.DURABLE_SCHEDULE_URL,
+        "census_housing": us_phase3.HOUSING_SCHEDULE_URL,
+        "tw_cpi": taiwan.TW_CPI_SCHEDULE_URL,
+        "kr_cpi": resilience.KR_CPI_SCHEDULE_URL,
+    }
+    for name, url in probes.items():
+        print(f"  {name}: {'ok' if official._fetch_text(url, 'ci-live') else 'fallback'}")
 
     print("events:")
     for event in macro:
@@ -51,7 +57,10 @@ def main() -> None:
         )
 
     groups = {
-        "United States": ("us_bls", "us_bea", "us_fed", "us_census", "us_dol"),
+        "United States": (
+            "us_bls", "us_bea", "us_fed", "us_census", "us_dol",
+            "us_fed_g17", "us_census_m3", "us_census_housing",
+        ),
         "Taiwan": ("tw_dgbas", "tw_cbc"),
         "Japan": ("jp_stat", "jp_esri", "jp_boj"),
         "South Korea": ("kr_mods", "kr_bok"),
@@ -76,66 +85,59 @@ def main() -> None:
     jolts_schedule, _ = us_phase2._jolts_schedule("ci-jolts-schedule")
     eci_schedule, _ = us_phase2._eci_schedule("ci-eci-schedule")
     retail_schedule, _ = us_phase2._retail_schedule("ci-retail-schedule")
-    if not jolts_schedule:
-        raise SystemExit("JOLTS schedule unavailable")
-    if not eci_schedule:
-        raise SystemExit("ECI schedule unavailable")
-    if not retail_schedule:
-        raise SystemExit("Retail Sales schedule unavailable")
-    print(
-        "Phase 2 schedules: ok "
-        f"(JOLTS={len(jolts_schedule)}, ECI={len(eci_schedule)}, retail={len(retail_schedule)})"
-    )
+    g17_schedule, _ = us_phase3._g17_schedule("ci-g17-schedule")
+    durable_schedule, _ = us_phase3._durable_schedule("ci-durable-schedule")
+    housing_schedule, _ = us_phase3._housing_schedule("ci-housing-schedule")
+    schedules = {
+        "JOLTS": jolts_schedule,
+        "ECI": eci_schedule,
+        "Retail Sales": retail_schedule,
+        "G17": g17_schedule,
+        "Durable Goods": durable_schedule,
+        "Housing": housing_schedule,
+    }
+    unavailable = [name for name, rows in schedules.items() if not rows]
+    if unavailable:
+        raise SystemExit("Official/fallback schedules unavailable: " + ", ".join(unavailable))
+    print("US extended schedules: ok " + ", ".join(f"{name}={len(rows)}" for name, rows in schedules.items()))
 
     bls_probe = official._bls_observations(
-        [
-            "CUUR0000SA0",
-            "WPUFD4",
-            us_phase2.JOLTS_SERIES["openings"],
-        ],
+        ["CUUR0000SA0", "WPUFD4", us_phase2.JOLTS_SERIES["openings"]],
         now,
         "ci-bls-api",
     )
-    if not bls_probe.get("CUUR0000SA0"):
-        raise SystemExit("BLS keyless Public Data API returned no CPI observations")
-    if not bls_probe.get("WPUFD4"):
-        raise SystemExit("BLS keyless Public Data API returned no PPI observations")
-    if not bls_probe.get(us_phase2.JOLTS_SERIES["openings"]):
-        raise SystemExit("BLS keyless Public Data API returned no JOLTS observations")
-    print(
-        "BLS Public Data API: ok "
-        f"({len(bls_probe['CUUR0000SA0'])} CPI, "
-        f"{len(bls_probe['WPUFD4'])} PPI, "
-        f"{len(bls_probe[us_phase2.JOLTS_SERIES['openings']])} JOLTS observations)"
-    )
+    for series_id, label in (
+        ("CUUR0000SA0", "CPI"),
+        ("WPUFD4", "PPI"),
+        (us_phase2.JOLTS_SERIES["openings"], "JOLTS"),
+    ):
+        if not bls_probe.get(series_id):
+            raise SystemExit(f"BLS keyless Public Data API returned no {label} observations")
 
     eci_probe = us_phase2._bls_quarter_observations(
         [us_phase2.ECI_SERIES["comp_qoq"]], now, "ci-eci-api"
     ).get(us_phase2.ECI_SERIES["comp_qoq"], [])
     if not eci_probe:
         raise SystemExit("BLS keyless Public Data API returned no ECI observations")
-    print(f"BLS ECI API: ok ({len(eci_probe)} quarterly observations)")
+
+    extended_providers = {
+        "official-us-fed-g17",
+        "official-us-census-durable",
+        "official-us-census-housing",
+    }
+    if not extended_providers.issubset(providers):
+        missing_extended = sorted(extended_providers - providers)
+        raise SystemExit("Phase 3 schedules missing providers: " + ", ".join(missing_extended))
 
     rich = [
         event for event in macro
-        if event.provider in {
-            "official-us-bls-cpi",
-            "official-us-bls-ppi",
-            "official-us-bls-nfp",
-            "official-us-bea-pce",
-            "official-us-bls-jolts",
-            "official-us-bls-eci",
-            "official-us-census-retail",
-            "official-us-dol-claims",
-        }
-        and getattr(event, "metrics", ())
+        if event.provider.startswith("official-us-") and getattr(event, "metrics", ())
     ]
     if not rich:
         raise SystemExit("No high-signal US release carried a metrics bundle")
 
-    te_events = [event for event in macro if "tradingeconomics" in event.provider.lower()]
-    if te_events:
-        raise SystemExit(f"Trading Economics leaked into official macro path: {len(te_events)} event(s)")
+    if any("tradingeconomics" in event.provider.lower() for event in macro):
+        raise SystemExit("Trading Economics leaked into official macro path")
 
     if not official._official_macro_ready(macro, health):
         raise SystemExit("official_macro_ready unexpectedly false")
@@ -149,8 +151,7 @@ def main() -> None:
         and event.time_tpe == datetime(2026, 8, 27, 4, 20, tzinfo=official.TPE)
         for event in ir_events
     ):
-        raise SystemExit("NVIDIA official IR earnings anchor missing or shifted")
-    print("NVIDIA official IR anchor: ok (2026-08-27 04:20 TPE)")
+        raise SystemExit("NVIDIA official IR anchor missing or shifted")
 
     print(f"official backend smoke check passed: {len(macro)} macro event(s) in the 35-day CI horizon")
 

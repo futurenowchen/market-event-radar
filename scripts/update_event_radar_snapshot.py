@@ -20,6 +20,7 @@ import v2_event_official_taiwan_resilience  # noqa: F401  # installs resilient T
 import v2_event_official_us_high_signal  # noqa: F401  # installs PPI + rich US release bundles
 import v2_event_official_us_phase2  # noqa: F401  # installs retail/JOLTS/ECI/claims adapters
 import v2_event_official_us_claims  # noqa: F401  # reads weekly claims from official DOL PDF
+import v2_event_official_us_phase3  # noqa: F401  # installs G17/durable-goods/housing adapters
 import v2_event_company_ir  # noqa: F401  # installs official company IR fallbacks
 import v2_event_semantics  # noqa: F401  # normalizes fallback categories/date-only semantics
 import v2_event_radar as er
