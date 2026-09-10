@@ -1,29 +1,33 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-09-11",
-  "generated_at_tpe": "2026-09-11T00:11:56.846098+08:00",
+  "generated_at_tpe": "2026-09-11T00:36:38.842180+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 7,
+  "event_count": 8,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
     "jp_stat": true,
-    "kr_bok": false,
+    "kr_bok": true,
     "kr_mods": true,
     "tw_cbc": true,
     "tw_dgbas": true,
     "us_bea": true,
     "us_bls": true,
     "us_census": true,
+    "us_census_housing": true,
+    "us_census_m3": true,
     "us_dol": true,
-    "us_fed": true
+    "us_fed": true,
+    "us_fed_g17": true
   },
   "provider_counts": {
     "official-tw-cbc": 1,
     "official-us-bls-cpi": 1,
     "official-us-bls-ppi": 1,
+    "official-us-census-housing": 1,
     "official-us-census-retail": 1,
     "official-us-dol-claims": 2,
     "official-us-fed-fomc": 1
@@ -333,6 +337,54 @@
           "unit": "K",
           "is_primary": true,
           "source_series": "DOL UI Weekly Claims PDF"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-census-housing-2026-09-17",
+      "time_tpe": "2026-09-17T20:30:00+08:00",
+      "title": "美國新屋開工與建築許可（Housing Starts / Permits）",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "B",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "房市",
+        "新屋開工",
+        "建築許可",
+        "景氣",
+        "利率"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "1.239M",
+      "source": "U.S. Census Bureau / HUD",
+      "source_url": "https://www.census.gov/construction/nrc/current/",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-census-housing",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "housing_starts_saar",
+          "label": "新屋開工 SAAR",
+          "actual": "",
+          "forecast": "",
+          "previous": "1.239M",
+          "unit": "annualized units",
+          "is_primary": true,
+          "source_series": "Census/HUD New Residential Construction"
+        },
+        {
+          "metric_id": "building_permits_saar",
+          "label": "建築許可 SAAR",
+          "actual": "",
+          "forecast": "",
+          "previous": "1.443M",
+          "unit": "annualized units",
+          "is_primary": false,
+          "source_series": "Census/HUD New Residential Construction"
         }
       ]
     }
