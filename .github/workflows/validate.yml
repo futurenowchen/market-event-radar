@@ -38,6 +38,7 @@ jobs:
             v2_event_release_metrics.py \
             v2_event_official_us_high_signal.py \
             v2_event_official_us_phase2.py \
+            v2_event_official_us_claims.py \
             v2_event_company_ir.py \
             scripts/refresh_gate.py \
             scripts/update_event_radar_snapshot.py \
@@ -45,13 +46,16 @@ jobs:
             scripts/check_radar_health.py \
             scripts/check_event_official_backend.py \
             scripts/test_release_metrics.py \
-            scripts/test_us_phase2.py
+            scripts/test_us_phase2.py \
+            scripts/test_us_claims.py
       - name: Test event history ledger
         run: python scripts/test_event_history.py
       - name: Test release metric bundles
         run: python scripts/test_release_metrics.py
       - name: Test Phase 2 US events
         run: python scripts/test_us_phase2.py
+      - name: Test DOL claims PDF parser
+        run: python scripts/test_us_claims.py
       - name: Smoke test package API
         run: |
           python - <<'PY'
