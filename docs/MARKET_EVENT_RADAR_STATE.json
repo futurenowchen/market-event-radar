@@ -2,63 +2,64 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-11T10:36:00+08:00",
+  "last_reconciled_tpe": "2026-09-11T11:04:00+08:00",
   "verified_code_commit": "044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c",
-  "phase": "consensus-live-canary-execution",
-  "status": "CANARY_HARNESS_MERGED_GREEN",
+  "phase": "zero-cost-consensus-canary",
+  "status": "MT5_CANARY_SELECTED",
   "completed": [
     "official-source-first macro feed",
     "snapshot schema v2 and rich release metrics",
     "US high-signal coverage phases 1-4",
     "handoff AGENTS + human Markdown + machine JSON control plane",
     "portable investment-system-handoff Skill source and package",
-    "Trading Economics selected as first consensus provider",
     "provider-neutral ConsensusObservation with pre-release/PIT eligibility",
     "event_family + metric_id Surprise semantics",
-    "conservative official metric to TE mapping registry",
-    "core PPI deliberate non-mapping for definition mismatch",
-    "isolated TE canary CLI with safe no-key dry-run",
-    "strict TE indicator + release-time row matching helpers",
-    "PR #16 foundation merged green",
-    "PR #17 semantic hardening merged green",
-    "PR #18 mapping registry merged green",
-    "PR #19 canary harness merged green"
+    "conservative Trading Economics mapping registry and isolated canary harness",
+    "zero-cost provider audit completed",
+    "MetaTrader 5 Economic Calendar selected as primary zero-cost machine canary",
+    "Myfxbook selected as free Consensus-labelled cross-check",
+    "Trading Economics demoted to semantic/reference benchmark",
+    "Forex Factory excluded for automated persistence/redistribution",
+    "Finnhub excluded from zero-cost path because Economic Calendar requires Premium access"
   ],
   "active_work": [
-    "execute credentialed TE canary",
-    "verify provider IDs/tickers, units, release-time alignment, Forecast availability and PIT semantics",
-    "design production snapshot consensus/surprise enrichment only after live canary evidence"
+    "build private/local MT5 MQL5 Economic Calendar export canary",
+    "capture CPI/PPI headline/Initial Claims forecasts before release",
+    "cross-check MT5 forecast values against Myfxbook Consensus labels",
+    "design private consensus/surprise overlay only after validation"
   ],
   "validation": {
-    "foundation_merge_commit": "1514cf89db3b73683ae6d4db09c0eeb2ac937ed9",
-    "semantic_merge_commit": "d8fac316b1cb694bd981a6781354193edd464f62",
-    "mapping_merge_commit": "e398e17ad39edf3fea06b41a4ab9d6342ee09f5b",
-    "canary_pr": 19,
-    "canary_merge_commit": "044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c",
-    "canary_workflow_run": 34554747667,
-    "canary_result": "success",
-    "canary_helper_tests": "passed",
-    "no_key_dry_run": "passed",
-    "official_source_probe": "passed"
+    "last_code_merge_commit": "044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c",
+    "last_code_ci_run": 34554747667,
+    "last_code_ci_result": "success",
+    "provider_audit_date": "2026-09-11",
+    "mt5_documented_calendar_fields": "actual_previous_revised_forecast",
+    "myfxbook_consensus_label": "verified_in_official_help_and_calendar_ui",
+    "forex_factory_redistribution": "excluded_by_notices",
+    "finnhub_economic_calendar_free": "no_premium_required"
   },
   "blocked": [
-    "live Trading Economics API validation requires TRADING_ECONOMICS_API_KEY supplied as a secret; no credential has been provided in this chat"
+    "MT5 forecast values cannot be promoted to canonical survey consensus until cross-source canary evidence is collected",
+    "third-party redistribution rights are not assumed; vendor values remain private/local until explicitly permitted"
   ],
   "known_debt": [
-    "production snapshot schema does not yet persist consensus/surprise fields",
-    "PIT semantics still need credentialed verification before historical surprise is trusted",
+    "no MT5 MQL5 calendar export bridge exists yet",
+    "no private consensus overlay contract exists yet",
+    "production/public snapshot schema intentionally does not persist third-party consensus/surprise",
     "some secondary metrics remain intentionally unmapped",
     "dashboard embedded live fallback lags standalone collector coverage",
     "dashboard legacy rolling-21-day smoke gate can false-fail"
   ],
   "do_not_repeat": [
+    "pay for Trading Economics before zero-cost path is disproven",
+    "call MT5 generic forecast survey consensus before empirical validation",
+    "use current post-release forecast as proof of original pre-release consensus",
+    "scrape undocumented internal endpoints when a supported terminal/export path exists",
+    "publicly persist third-party calendar values without redistribution permission",
     "key Surprise semantics by metric_id alone",
     "map metrics based only on similar labels",
-    "map official core PPI to a differently-defined provider core PPI series",
-    "use current post-release consensus as proof of original pre-release consensus without PIT evidence",
     "put consensus retrieval in Streamlit reruns",
-    "make consensus provider health affect official_macro_ready",
-    "use Trading Economics TEForecast as market consensus"
+    "make consensus provider health affect official_macro_ready"
   ],
-  "exact_next_action": "Provide TRADING_ECONOMICS_API_KEY through a secret-capable environment and run scripts/canary_trading_economics_consensus.py --snapshot data/latest.json --require-key; persist the canary evidence before any production snapshot enrichment."
+  "exact_next_action": "Implement an isolated MQL5 Service/EA export canary for CPI, headline PPI and Initial Claims that writes private/local JSON with provider event/value IDs, forecast, previous, actual, unit, release time and capture time; do not modify data/latest.json."
 }
