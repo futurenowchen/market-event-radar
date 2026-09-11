@@ -2,23 +2,46 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-11T10:05:00+08:00",
+  "last_reconciled_tpe": "2026-09-11T10:17:00+08:00",
   "verified_code_commit": "848dab220427efe0240ea2662c1f19d4b39ed1ce",
   "phase": "consensus-surprise-layer",
-  "status": "READY_FOR_IMPLEMENTATION",
+  "status": "PR_VALIDATION_IN_PROGRESS",
   "completed": [
     "official-source-first macro feed",
     "snapshot schema v2",
     "rich release metrics and history persistence",
     "US high-signal coverage phases 1-4",
-    "dashboard rich-metrics consumer integration"
+    "dashboard rich-metrics consumer integration",
+    "repository AGENTS continuity protocol",
+    "human-readable handoff document",
+    "machine-readable handoff state",
+    "consensus provider audit selecting Trading Economics as first target"
   ],
   "active_work": [
-    "provider-neutral consensus domain model",
+    "PR #16 feat/consensus-surprise-v1",
+    "provider-neutral ConsensusObservation contract",
     "surprise semantics engine",
-    "opt-in Trading Economics consensus adapter"
+    "opt-in Trading Economics adapter",
+    "GitHub Actions validation"
   ],
-  "blocked": [],
+  "validation": {
+    "pr": 16,
+    "head_commit": "49c2f02135e6e7e811bca6fce425e69e89974ed8",
+    "snapshot_contract": "passed",
+    "compile": "passed",
+    "event_history": "passed",
+    "release_metrics": "passed",
+    "consensus_surprise": "passed",
+    "phase2": "passed",
+    "claims": "passed",
+    "phase3": "passed",
+    "phase4": "passed",
+    "package_smoke": "passed",
+    "official_source_probe": "in_progress"
+  },
+  "blocked": [
+    "PR #16 should not merge until the current validation run reaches a terminal state"
+  ],
   "known_debt": [
     "dashboard legacy 21-day provider smoke gate can false-fail",
     "dashboard embedded live fallback lags standalone collector coverage"
@@ -27,7 +50,8 @@
     "expand macro coverage before consensus/surprise is proven",
     "put consensus retrieval in Streamlit reruns",
     "make consensus provider health affect official_macro_ready",
-    "treat unattributed estimates as survey consensus"
+    "treat unattributed estimates as survey consensus",
+    "use Trading Economics TEForecast as market consensus"
   ],
-  "exact_next_action": "Implement provider-neutral consensus records and surprise semantics with deterministic tests; add an inert-without-credentials Trading Economics adapter."
+  "exact_next_action": "Inspect PR #16 terminal CI result; if the implementation is green, merge it and update verified_code_commit to the merged implementation SHA before starting event/metric mapping and credentialed canary work."
 }
