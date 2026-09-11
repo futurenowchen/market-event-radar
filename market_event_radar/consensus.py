@@ -13,6 +13,7 @@ class ConsensusObservation:
     provider: str
     fetched_at: datetime
     release_time: datetime
+    event_family: str = ""
     provider_event_id: str = ""
     as_of: datetime | None = None
     unit: str = ""
@@ -41,6 +42,7 @@ class ConsensusObservation:
     def to_dict(self) -> dict[str, Any]:
         return {
             "event_key": self.event_key,
+            "event_family": self.event_family,
             "metric_id": self.metric_id,
             "consensus": self.consensus,
             "provider": self.provider,
