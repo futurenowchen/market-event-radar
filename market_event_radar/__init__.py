@@ -4,7 +4,13 @@ from .consensus import ConsensusObservation
 from .feed import fetch_latest, load_snapshot
 from .models import EventMetric, MarketEvent, RadarSnapshot
 from .risk import RiskWindow, build_risk_windows, event_risk_level
-from .surprise import SurpriseResult, evaluate_surprise, parse_numeric, supported_metric_ids
+from .surprise import (
+    SurpriseResult,
+    evaluate_surprise,
+    parse_numeric,
+    supported_metric_ids,
+    supported_surprise_keys,
+)
 
 __all__ = [
     "ConsensusObservation",
@@ -20,4 +26,5 @@ __all__ = [
     "load_snapshot",
     "parse_numeric",
     "supported_metric_ids",
+    "supported_surprise_keys",
 ]
