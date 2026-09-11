@@ -8,7 +8,7 @@ Last reconciled: 2026-09-11 Asia/Taipei
 
 ## Verified implementation baseline
 
-Verified code commit: `e89c24f71ddbd0f493e40e19517c6ace57cb5c36`
+Verified code commit: `7dfcf7c4b63711f49a6e33bd92131bcde606acbb`
 
 Current merged implementation includes:
 
@@ -20,6 +20,7 @@ Current merged implementation includes:
 - MQL5 Service source for exporting Economic Calendar values to terminal common-files storage
 - conservative MT5 identity mapping for CPI, headline PPI, and Initial Claims
 - deliberate fail-closed handling for Core PPI semantic mismatch
+- Windows PowerShell deployment helper and Windows deployment runbook
 - no third-party forecast/consensus values written into public `data/latest.json`
 
 ## Merge / validation evidence
@@ -29,19 +30,19 @@ Current merged implementation includes:
 - PR #18 — TE mapping v1 — merge `e398e17ad39edf3fea06b41a4ab9d6342ee09f5b`, CI `34554463876`, success
 - PR #19 — isolated TE canary — merge `044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c`, CI `34554747667`, success
 - PR #20 — zero-cost MT5 consensus canary — merge `e89c24f71ddbd0f493e40e19517c6ace57cb5c36`, CI `34558404985`, success
+- PR #21 — Windows MT5 deployment helper — merge `7dfcf7c4b63711f49a6e33bd92131bcde606acbb`, CI `34559135551`, success
 
-PR #20 CI validates:
+PR #21 adds:
 
-- Python compilation for the MT5 parser/CLI
-- deterministic MT5 export fixture parsing
-- pre-release capture eligibility
-- official snapshot event/metric matching
-- Core PPI fail-closed behavior
-- all prior consensus/surprise and Phase 2-4 regressions
-- package smoke
-- live official-source probe
+- `scripts/install_mt5_canary.ps1`
+- `docs/WINDOWS_MT5_CANARY_DEPLOYMENT.md`
+- CI PowerShell parser validation
 
-The MQL5 Service source cannot be compiled on the Ubuntu GitHub runner. **Real MetaTrader 5 / MetaEditor compilation and runtime calendar access remain an explicit deployment-side verification step.**
+The helper detects MT5 data directories under the current Windows user, copies only the canary Service source into `MQL5/Services`, prints the expected private `FILE_COMMON` export location, and prints the exact downstream Python canary command. It supports `-ListCandidates`, explicit `-Mt5DataPath`, and PowerShell `-WhatIf`.
+
+PR #21 CI validates the PowerShell syntax plus all existing MT5 parser/CLI, consensus/surprise, Phase 2-4, package, and live official-source tests.
+
+The MQL5 Service source still cannot be compiled on the Ubuntu GitHub runner. **Real MetaTrader 5 / MetaEditor compilation and runtime calendar access remain an explicit deployment-side verification step.**
 
 ## Product direction
 
@@ -67,9 +68,9 @@ Therefore:
 - private `investment-dashboard` may later consume official public data plus that private overlay;
 - do not delete a useful paid adapter merely because the maintainer does not subscribe.
 
-## Zero-cost MT5 canary — implementation now merged
+## Zero-cost MT5 canary
 
-Files added by PR #20:
+Files merged by PR #20:
 
 - `mt5/Services/MarketEventRadarCalendarExport.mq5`
 - `market_event_radar/providers/mt5_calendar.py`
@@ -84,6 +85,7 @@ The MQL5 Service:
 - records terminal server time, GMT time, and inferred server UTC offset;
 - writes through `FILE_COMMON` to a private/local JSON file using a temp-file + move pattern;
 - defaults to US/USD, price/jobs sectors, 48-hour lookback and 14-day lookahead;
+- contains no trade/order API calls;
 - does not write to this repository or `data/latest.json`.
 
 The Python canary:
@@ -97,22 +99,35 @@ The Python canary:
 - can optionally write private local evidence JSON;
 - always reports `promotion_status = NOT_PROMOTED` until repeated cross-source evidence justifies promotion.
 
-## Immediate real-world canary opportunity
+## Company Windows deployment path — active
 
-The current official snapshot schedules US CPI for **2026-09-11 20:30 Asia/Taipei**. This is a useful pre-release validation window.
+The first live deployment target is the user's company Windows computer.
 
-Myfxbook currently exposes Consensus-labelled CPI expectations that can be used as a human cross-check. Those third-party values must **not** be committed to the public repo; retain cross-check evidence privately.
+Deployment sequence:
 
-A successful first live canary should establish:
+1. Install and start MetaTrader 5 once so its data directory is created.
+2. Clone or pull `futurenowchen/market-event-radar` `main` on that computer.
+3. From repository root run:
+   `powershell -ExecutionPolicy Bypass -File scripts\install_mt5_canary.ps1`
+4. If multiple terminal directories exist, run `-ListCandidates` and then pass the chosen `-Mt5DataPath`.
+5. Open MetaEditor from the same MT5 terminal, compile `Navigator > Services > MarketEventRadarCalendarExport.mq5` with F7, and require **0 errors**.
+6. Start `MarketEventRadarCalendarExport` under MT5 Navigator > Services.
+7. Confirm private export exists, normally beneath `C:\ProgramData\MetaQuotes\Terminal\Common\Files\MarketEventRadar\mt5_calendar_latest.json`.
+8. Run `scripts/canary_mt5_consensus.py --require-pre-release` against that private export and the official `data/latest.json` snapshot.
+9. Cross-check the same release privately against Myfxbook's explicitly labelled Consensus.
 
-- MQL5 Service compiles in MetaEditor;
-- service can access calendar rows on the selected MT5 demo/broker terminal;
-- expected CPI rows are present with stable event/value IDs, units and release time;
-- forecast is captured before 20:30 TPE;
-- Python CLI matches the MT5 rows to `official-us-bls-cpi-2026-09-11`;
-- MT5 values can be compared privately with the same-release Myfxbook Consensus labels.
+The deployment helper handles no credentials and does not alter MT5 trade settings. A demo terminal/account is sufficient for the canary if its Economic Calendar is available.
 
-One successful CPI match is useful evidence but is **not enough** to promote MT5 forecast to canonical survey consensus. Repeat across multiple releases/families before promotion.
+A successful first live canary must establish:
+
+- MQL5 Service compiles with zero errors;
+- service can access calendar rows on the selected MT5 terminal;
+- expected CPI/PPI/Claims rows are present with stable event/value IDs, units, and release time;
+- forecast is captured before the official release;
+- Python CLI matches provider rows to the correct official event/metric;
+- MT5 values can be compared privately with same-release Myfxbook Consensus labels.
+
+One successful match is useful evidence but is **not enough** to promote MT5 forecast to canonical survey consensus. Repeat across multiple releases/families before promotion.
 
 ## Provider status
 
@@ -122,7 +137,7 @@ Best semantic benchmark. Existing adapter/mapping/canary remains available for p
 
 ### MetaTrader 5
 
-Primary zero-cost machine canary. Parser/CLI/exporter source is merged. Real terminal compile/runtime verification is the current blocker.
+Primary zero-cost machine canary. Parser/CLI/exporter and Windows deployment helper are merged and green. Real terminal compile/runtime verification is the current blocker.
 
 ### Myfxbook
 
@@ -163,4 +178,4 @@ Secondary probes only; free entitlement plus survey-consensus provenance remains
 
 ## Exact next action
 
-**Compile and run `mt5/Services/MarketEventRadarCalendarExport.mq5` in a real MetaTrader 5 terminal before the 2026-09-11 20:30 TPE CPI release, then run `scripts/canary_mt5_consensus.py` on the private/local export and preserve that pre-release evidence privately.**
+**On the company Windows computer, install/start MetaTrader 5 once, pull `market-event-radar` main, run `powershell -ExecutionPolicy Bypass -File scripts\install_mt5_canary.ps1`, compile `MarketEventRadarCalendarExport.mq5` in MetaEditor with 0 errors, start the Service, and run `scripts/canary_mt5_consensus.py` against the generated private JSON.**
