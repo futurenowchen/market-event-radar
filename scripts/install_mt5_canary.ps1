@@ -1,11 +1,19 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string]$Mt5DataPath,
-    [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")),
+    [string]$RepoRoot,
     [switch]$ListCandidates
 )
 
 $ErrorActionPreference = "Stop"
+
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+    $scriptDir = $PSScriptRoot
+    if ([string]::IsNullOrWhiteSpace($scriptDir)) {
+        $scriptDir = (Get-Location).Path
+    }
+    $RepoRoot = (Resolve-Path (Join-Path $scriptDir "..")).Path
+}
 
 function Get-Mt5DataCandidates {
     $terminalRoot = Join-Path $env:APPDATA "MetaQuotes\Terminal"
