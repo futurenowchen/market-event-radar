@@ -2,69 +2,63 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-11T10:31:00+08:00",
-  "verified_code_commit": "e398e17ad39edf3fea06b41a4ab9d6342ee09f5b",
-  "phase": "consensus-credentialed-canary",
-  "status": "MAPPING_FOUNDATION_MERGED_GREEN",
+  "last_reconciled_tpe": "2026-09-11T10:36:00+08:00",
+  "verified_code_commit": "044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c",
+  "phase": "consensus-live-canary-execution",
+  "status": "CANARY_HARNESS_MERGED_GREEN",
   "completed": [
     "official-source-first macro feed",
-    "snapshot schema v2",
-    "rich release metrics and history persistence",
+    "snapshot schema v2 and rich release metrics",
     "US high-signal coverage phases 1-4",
-    "dashboard rich-metrics consumer integration",
-    "repository AGENTS continuity protocol",
-    "human-readable handoff document",
-    "machine-readable handoff state",
-    "portable investment-system-handoff Skill source established",
-    "consensus provider audit selecting Trading Economics as first target",
-    "provider-neutral ConsensusObservation contract",
-    "strict pre-release/PIT surprise eligibility guard",
-    "event_family + metric_id surprise semantic disambiguation",
-    "correct ECI compensation_qoq semantic identity",
-    "opt-in Trading Economics adapter using Forecast not TEForecast",
-    "conservative official-metric to Trading Economics indicator mapping registry",
-    "core PPI deliberately left unmapped because provider definitions differ",
+    "handoff AGENTS + human Markdown + machine JSON control plane",
+    "portable investment-system-handoff Skill source and package",
+    "Trading Economics selected as first consensus provider",
+    "provider-neutral ConsensusObservation with pre-release/PIT eligibility",
+    "event_family + metric_id Surprise semantics",
+    "conservative official metric to TE mapping registry",
+    "core PPI deliberate non-mapping for definition mismatch",
+    "isolated TE canary CLI with safe no-key dry-run",
+    "strict TE indicator + release-time row matching helpers",
     "PR #16 foundation merged green",
     "PR #17 semantic hardening merged green",
-    "PR #18 mapping registry merged green"
+    "PR #18 mapping registry merged green",
+    "PR #19 canary harness merged green"
   ],
   "active_work": [
-    "credentialed Trading Economics canary design",
-    "verify live TE row identities, units, release-time alignment, PIT/pre-release Forecast availability",
-    "future production snapshot enrichment contract"
+    "execute credentialed TE canary",
+    "verify provider IDs/tickers, units, release-time alignment, Forecast availability and PIT semantics",
+    "design production snapshot consensus/surprise enrichment only after live canary evidence"
   ],
   "validation": {
-    "foundation_pr": 16,
     "foundation_merge_commit": "1514cf89db3b73683ae6d4db09c0eeb2ac937ed9",
-    "semantic_pr": 17,
     "semantic_merge_commit": "d8fac316b1cb694bd981a6781354193edd464f62",
-    "semantic_workflow_run": 34554223095,
-    "semantic_result": "success",
-    "mapping_pr": 18,
     "mapping_merge_commit": "e398e17ad39edf3fea06b41a4ab9d6342ee09f5b",
-    "mapping_workflow_run": 34554463876,
-    "mapping_result": "success",
-    "mapping_tests": "passed",
+    "canary_pr": 19,
+    "canary_merge_commit": "044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c",
+    "canary_workflow_run": 34554747667,
+    "canary_result": "success",
+    "canary_helper_tests": "passed",
+    "no_key_dry_run": "passed",
     "official_source_probe": "passed"
   },
   "blocked": [
-    "credentialed Trading Economics canary requires a user-provided/API-secret credential before live provider API behavior can be validated"
+    "live Trading Economics API validation requires TRADING_ECONOMICS_API_KEY supplied as a secret; no credential has been provided in this chat"
   ],
   "known_debt": [
-    "dashboard legacy 21-day provider smoke gate can false-fail",
-    "dashboard embedded live fallback lags standalone collector coverage",
     "production snapshot schema does not yet persist consensus/surprise fields",
-    "some secondary metrics remain intentionally unmapped until semantic equivalence is verified"
+    "PIT semantics still need credentialed verification before historical surprise is trusted",
+    "some secondary metrics remain intentionally unmapped",
+    "dashboard embedded live fallback lags standalone collector coverage",
+    "dashboard legacy rolling-21-day smoke gate can false-fail"
   ],
   "do_not_repeat": [
-    "key surprise semantics by metric_id alone",
-    "map metrics merely because labels look similar",
+    "key Surprise semantics by metric_id alone",
+    "map metrics based only on similar labels",
     "map official core PPI to a differently-defined provider core PPI series",
-    "expand macro coverage before consensus/surprise is proven",
+    "use current post-release consensus as proof of original pre-release consensus without PIT evidence",
     "put consensus retrieval in Streamlit reruns",
     "make consensus provider health affect official_macro_ready",
-    "treat unattributed estimates as survey consensus",
     "use Trading Economics TEForecast as market consensus"
   ],
-  "exact_next_action": "Run a credentialed Trading Economics canary outside production using the mapping registry; verify returned Forecast values are pre-release survey consensus with correct event identity, unit, time and PIT behavior before designing snapshot enrichment."
+  "exact_next_action": "Provide TRADING_ECONOMICS_API_KEY through a secret-capable environment and run scripts/canary_trading_economics_consensus.py --snapshot data/latest.json --require-key; persist the canary evidence before any production snapshot enrichment."
 }
