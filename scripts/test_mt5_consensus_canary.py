@@ -116,6 +116,30 @@ def main() -> None:
     assert late_observation is not None
     assert not late_observation.captured_before_release
 
+    # Canonical event_code mapping tests
+    assert target_key_for_row({"event_code": "consumer-price-index-yy"}) == ("cpi", "headline_yoy")
+    assert target_key_for_row({"event_code": "consumer-price-index-mm"}) == ("cpi", "headline_mom")
+    assert target_key_for_row({"event_code": "consumer-price-index-ex-food-energy-yy"}) == ("cpi", "core_yoy")
+    assert target_key_for_row({"event_code": "consumer-price-index-ex-food-energy-mm"}) == ("cpi", "core_mom")
+    assert target_key_for_row({"event_code": "producer-price-index-yy"}) == ("ppi", "headline_yoy")
+    assert target_key_for_row({"event_code": "producer-price-index-mm"}) == ("ppi", "headline_mom")
+    assert target_key_for_row({"event_code": "initial-jobless-claims"}) == ("claims", "initial_claims")
+
+    # Localized Chinese names fallback
+    assert target_key_for_row({"event_name": "CPI 年率y/y"}) == ("cpi", "headline_yoy")
+    assert target_key_for_row({"event_name": "核心CPI月率 m/m"}) == ("cpi", "core_mom")
+    assert target_key_for_row({"event_name": "初领失业金人数"}) == ("claims", "initial_claims")
+    assert target_key_for_row({"event_name": "生产者物价指数（PPI）年率y/y"}) == ("ppi", "headline_yoy")
+
+    # Core PPI must fail closed under both code and name lookups
+    assert target_key_for_row({"event_code": "producer-price-index-ex-food-energy-yy"}) is None
+    assert target_key_for_row({"event_code": "producer-price-index-ex-food-energy-mm"}) is None
+    assert target_key_for_row({"event_name": "核心生产者物价指数(PPI)年率 y/y"}) is None
+
+    # Unmapped events return None
+    assert target_key_for_row({"event_code": "michigan-inflation-expectations"}) is None
+    assert target_key_for_row({"event_code": "continuing-jobless-claims"}) is None
+
     print("MT5 consensus canary helper tests passed")
 
 

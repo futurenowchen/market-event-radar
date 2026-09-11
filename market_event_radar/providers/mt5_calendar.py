@@ -17,10 +17,20 @@ def _norm(value: object) -> str:
     return " ".join(text.split())
 
 
-# Intentionally conservative. These names are exposed on the public MQL5
-# United States calendar. Core PPI is deliberately absent because MetaQuotes'
+# Intentionally conservative.
+# Core PPI is deliberately absent from both mappings because MetaQuotes'
 # public description excludes food and energy, while this radar's official BLS
 # core PPI series also excludes trade services.
+_CODE_TO_KEY: dict[str, tuple[str, str]] = {
+    "consumer-price-index-yy": ("cpi", "headline_yoy"),
+    "consumer-price-index-mm": ("cpi", "headline_mom"),
+    "consumer-price-index-ex-food-energy-yy": ("cpi", "core_yoy"),
+    "consumer-price-index-ex-food-energy-mm": ("cpi", "core_mom"),
+    "producer-price-index-yy": ("ppi", "headline_yoy"),
+    "producer-price-index-mm": ("ppi", "headline_mom"),
+    "initial-jobless-claims": ("claims", "initial_claims"),
+}
+
 _NAME_TO_KEY: dict[str, tuple[str, str]] = {
     _norm("CPI y/y"): ("cpi", "headline_yoy"),
     _norm("Consumer Price Index CPI y/y"): ("cpi", "headline_yoy"),
@@ -33,6 +43,22 @@ _NAME_TO_KEY: dict[str, tuple[str, str]] = {
     _norm("PPI m/m"): ("ppi", "headline_mom"),
     _norm("Producer Price Index PPI m/m"): ("ppi", "headline_mom"),
     _norm("Initial Jobless Claims"): ("claims", "initial_claims"),
+    # Localized Chinese names (MetaTrader 5 on zh-TW / zh-CN systems)
+    _norm("CPI 年率y/y"): ("cpi", "headline_yoy"),
+    _norm("CPI 年率 y/y"): ("cpi", "headline_yoy"),
+    _norm("CPI 月率m/m"): ("cpi", "headline_mom"),
+    _norm("CPI 月率 m/m"): ("cpi", "headline_mom"),
+    _norm("核心CPI年率 y/y"): ("cpi", "core_yoy"),
+    _norm("核心CPI年率y/y"): ("cpi", "core_yoy"),
+    _norm("核心CPI月率 m/m"): ("cpi", "core_mom"),
+    _norm("核心CPI月率m/m"): ("cpi", "core_mom"),
+    _norm("生产者物价指数（PPI）年率y/y"): ("ppi", "headline_yoy"),
+    _norm("生产者物价指数(PPI)年率 y/y"): ("ppi", "headline_yoy"),
+    _norm("PPI 年率y/y"): ("ppi", "headline_yoy"),
+    _norm("PPI年率y/y"): ("ppi", "headline_yoy"),
+    _norm("PPI月率m/m"): ("ppi", "headline_mom"),
+    _norm("PPI 月率m/m"): ("ppi", "headline_mom"),
+    _norm("初领失业金人数"): ("claims", "initial_claims"),
 }
 
 
@@ -123,6 +149,9 @@ def release_time_utc(payload: dict[str, Any], row: dict[str, Any]) -> datetime:
 
 
 def target_key_for_row(row: dict[str, Any]) -> tuple[str, str] | None:
+    code = str(row.get("event_code") or "").strip().lower()
+    if code in _CODE_TO_KEY:
+        return _CODE_TO_KEY[code]
     return _NAME_TO_KEY.get(_norm(row.get("event_name")))
 
 
