@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-11T11:39:00+08:00",
-  "verified_code_commit": "7dfcf7c4b63711f49a6e33bd92131bcde606acbb",
+  "last_reconciled_tpe": "2026-09-11T12:45:00+08:00",
+  "verified_code_commit": "e9087d71db8046fb594de2b6d306b036553f7b54",
   "phase": "zero-cost-consensus-company-windows-deployment",
-  "status": "WINDOWS_MT5_DEPLOYMENT_HELPER_MERGED_GREEN",
+  "status": "WINDOWS_MT5_CANARY_LIVE_VERIFIED",
   "completed": [
     "official-source-first macro feed",
     "snapshot schema v2 and rich release metrics",
@@ -29,16 +29,22 @@
     "Windows deployment runbook merged",
     "PR #21 merged green",
     "PR #21 CI validates PowerShell parser, MT5 parser/CLI, regressions and live official-source probe",
+    "Windows Work PC MetaTrader 5 build 6191 installed and demo account authorized",
+    "MQL5 Service MarketEventRadarCalendarExport.mq5 installed into terminal data directory",
+    "MQL5 Service compiled in MetaEditor 64-bit with 0 errors and 0 warnings",
+    "MT5 Service actively exporting private mt5_calendar_latest.json to common files storage",
+    "multilingual MT5 event_code and localized name mapping added to Python calendar provider",
+    "Python canary CLI executed with --require-pre-release against live export and official snapshot",
+    "tonight CPI 2026-09-11 20:30 Asia/Taipei captured pre-release (headline 2.7%, mom 0.0%, core yoy 2.3%, core mom 0.2%)",
+    "Core PPI confirmed fail-closed under live export",
+    "Myfxbook cross-check performed privately (divergence on headline, match on core mom, status remains NOT_PROMOTED)",
     "public data/latest.json remains untouched by third-party forecast data"
   ],
   "active_work": [
-    "deploy MT5 canary on company Windows computer",
-    "run scripts/install_mt5_canary.ps1 after MT5 has been started once",
-    "compile MQL5 Service in real MetaEditor and require 0 errors",
-    "start the MT5 Service and confirm private mt5_calendar_latest.json export",
-    "run Python canary against the private export and official snapshot",
-    "privately compare same-release MT5 provider_forecast values with Myfxbook Consensus",
-    "repeat cross-source validation before promoting MT5 forecast to canonical consensus"
+    "monitor tonight's CPI 2026-09-11 20:30 Asia/Taipei release",
+    "run official collector to record Actual values",
+    "compute Surprise against MT5 pre-release provider_forecast in private runtime",
+    "repeat cross-source validation across future releases before promoting MT5 forecast to canonical consensus"
   ],
   "validation": {
     "mt5_canary_pr": 20,
@@ -54,17 +60,16 @@
     "mt5_cli_tests": "passed",
     "prior_consensus_surprise_regressions": "passed",
     "official_source_probe": "passed",
-    "mql5_real_terminal_compile": "not_yet_verified",
-    "mql5_live_calendar_export": "not_yet_verified",
-    "mt5_consensus_equivalence": "not_promoted"
+    "mql5_real_terminal_compile": "passed_0_errors_0_warnings",
+    "mql5_live_calendar_export": "verified_32_rows_captured",
+    "mt5_consensus_equivalence": "not_promoted_provider_forecast_divergence_observed",
+    "pre_release_capture": "verified_5_pre_release_matches"
   },
   "blocked": [
-    "real company Windows MetaTrader 5 / MetaEditor environment is required to compile and execute the MQL5 Service",
-    "MT5 forecast values cannot be promoted to canonical survey consensus until repeated pre-release cross-source evidence is collected",
+    "MT5 forecast values cannot be promoted to canonical survey consensus until repeated pre-release cross-source evidence is collected across multiple releases",
     "third-party redistribution rights are not assumed; vendor values remain private/local until explicitly permitted"
   ],
   "known_debt": [
-    "no real MT5 export evidence captured yet",
     "private consensus/surprise overlay contract not yet implemented",
     "production/public snapshot intentionally does not persist third-party consensus/surprise",
     "some secondary metrics remain intentionally unmapped",
@@ -83,5 +88,5 @@
     "put consensus retrieval in Streamlit reruns",
     "make consensus provider health affect official_macro_ready"
   ],
-  "exact_next_action": "On the company Windows computer, install/start MetaTrader 5 once, clone or pull market-event-radar main, run powershell -ExecutionPolicy Bypass -File scripts\\install_mt5_canary.ps1, compile MarketEventRadarCalendarExport.mq5 in MetaEditor with 0 errors, start the Service, and run scripts/canary_mt5_consensus.py against the generated private JSON."
+  "exact_next_action": "After tonight's 20:30 Asia/Taipei CPI release, run official collector to record Actuals, verify Surprise calculation against MT5 pre-release provider_forecast, and continue accumulating pre-release canary samples."
 }
