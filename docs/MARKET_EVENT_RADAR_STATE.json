@@ -36,7 +36,7 @@
     "mt5_documented_calendar_fields": "actual_previous_revised_forecast",
     "myfxbook_consensus_label": "verified_in_official_help_and_calendar_ui",
     "forex_factory_redistribution": "excluded_by_notices",
-    "finnhub_economic_calendar_free": "no_premium_required"
+    "finnhub_economic_calendar_free": "premium_required"
   },
   "blocked": [
     "MT5 forecast values cannot be promoted to canonical survey consensus until cross-source canary evidence is collected",
