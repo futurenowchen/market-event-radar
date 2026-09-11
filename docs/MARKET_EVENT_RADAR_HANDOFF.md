@@ -8,123 +8,159 @@ Last reconciled: 2026-09-11 Asia/Taipei
 
 ## Verified implementation baseline
 
-Verified code commit: `044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c`
+Verified code commit: `e89c24f71ddbd0f493e40e19517c6ace57cb5c36`
 
 Current merged implementation includes:
 
 - official-source-first macro feed, snapshot schema v2, rich release metrics, and US high-signal coverage through Phase 4
-- provider-neutral `ConsensusObservation` with provider provenance and strict pre-release/PIT eligibility
-- Surprise engine producing numeric surprise, direction, magnitude, economic impulse, and policy implication
-- Surprise semantics keyed by `event_family + metric_id`
-- optional Trading Economics adapter using survey `Forecast`, never `TEForecast`
-- conservative official-metric ↔ TE indicator registry
-- deliberate non-mapping of core PPI for semantic-definition mismatch
-- isolated TE canary harness that never writes production snapshots and safely dry-runs without credentials
+- provider-neutral `ConsensusObservation` with strict pre-release/PIT eligibility
+- deterministic Surprise engine keyed by `event_family + metric_id`
+- optional Trading Economics adapter/mapping/canary retained as a paid BYO-credential reference path
+- zero-cost MetaTrader 5 canary parser and private/local CLI
+- MQL5 Service source for exporting Economic Calendar values to terminal common-files storage
+- conservative MT5 identity mapping for CPI, headline PPI, and Initial Claims
+- deliberate fail-closed handling for Core PPI semantic mismatch
+- no third-party forecast/consensus values written into public `data/latest.json`
 
-PRs #16-#19 remain green and merged. No implementation commits have occurred after `044c3bc...`; later commits are handoff/provider-audit documentation only.
+## Merge / validation evidence
+
+- PR #16 — Consensus / Surprise foundation — merge `1514cf89db3b73683ae6d4db09c0eeb2ac937ed9`, CI `34553881787`, success
+- PR #17 — semantic-family hardening — merge `d8fac316b1cb694bd981a6781354193edd464f62`, CI `34554223095`, success
+- PR #18 — TE mapping v1 — merge `e398e17ad39edf3fea06b41a4ab9d6342ee09f5b`, CI `34554463876`, success
+- PR #19 — isolated TE canary — merge `044c3bc10b4bc7dc54227f0c5879efa4a5bf0b1c`, CI `34554747667`, success
+- PR #20 — zero-cost MT5 consensus canary — merge `e89c24f71ddbd0f493e40e19517c6ace57cb5c36`, CI `34558404985`, success
+
+PR #20 CI validates:
+
+- Python compilation for the MT5 parser/CLI
+- deterministic MT5 export fixture parsing
+- pre-release capture eligibility
+- official snapshot event/metric matching
+- Core PPI fail-closed behavior
+- all prior consensus/surprise and Phase 2-4 regressions
+- package smoke
+- live official-source probe
+
+The MQL5 Service source cannot be compiled on the Ubuntu GitHub runner. **Real MetaTrader 5 / MetaEditor compilation and runtime calendar access remain an explicit deployment-side verification step.**
 
 ## Product direction
 
-1. **Official layer** — stable.
-2. **Consensus layer** — provider-neutral contract/semantics exist; paid TE is no longer the active personal deployment target.
-3. **Surprise engine** — semantic foundation merged; private persistence remains.
+1. **Official layer** — stable and public.
+2. **Consensus layer** — public provider-neutral interface; paid adapters are opt-in; maintainer runtime follows zero-cost private-overlay path.
+3. **Surprise engine** — semantic foundation merged; private runtime persistence remains.
 4. **Event Reaction layer** — later attach post-release market-price response.
 
 Coverage expansion remains secondary to interpretation depth.
 
-## Public / private provider policy — confirmed 2026-09-11
+## Public / private provider policy
 
-The public project may keep **optional paid-provider adapters** such as Trading Economics. Users who want the strongest documented commercial consensus source may supply their own credentials and pay the provider themselves.
+The public project may keep optional paid-provider adapters such as Trading Economics. Users who want commercial survey consensus supply their own credentials/subscription.
 
-The maintainer's personal deployment should **not incur recurring consensus-data fees while the strategy cannot economically justify them**. It will follow the zero-cost/private-overlay path instead.
+The maintainer's personal deployment should not incur recurring consensus-data fees while a validated zero-cost path remains viable.
 
 Therefore:
 
-- public repo: official-source data, provider-neutral contracts, Surprise logic, mapping code, and optional adapters for paid or free providers;
-- public repo does **not** subsidize or embed vendor credentials;
-- paid adapters remain opt-in and disabled without user-supplied credentials;
-- maintainer's private deployment: prefer zero-cost sources such as MT5, validated against free cross-checks, and keep vendor-derived values in a private overlay unless redistribution rights are explicit;
-- do not delete a useful paid-provider adapter merely because the maintainer does not personally subscribe to that provider.
+- public repo keeps official-source data, provider-neutral contracts, Surprise logic, mappings, and optional provider adapters;
+- public repo never embeds vendor credentials;
+- public `data/latest.json` remains official-source-only unless third-party redistribution rights are explicit;
+- maintainer private runtime uses MT5/provider data only in a private/local overlay;
+- private `investment-dashboard` may later consume official public data plus that private overlay;
+- do not delete a useful paid adapter merely because the maintainer does not subscribe.
 
-This allows the open-source project to remain useful to people willing to pay for premium data without forcing that cost onto the maintainer's own system.
+## Zero-cost MT5 canary — implementation now merged
 
-## Zero-cost provider pivot — 2026-09-11
+Files added by PR #20:
 
-Do **not** purchase Trading Economics for the current personal deployment. Keep TE as the best-documented semantic/reference benchmark only.
+- `mt5/Services/MarketEventRadarCalendarExport.mq5`
+- `market_event_radar/providers/mt5_calendar.py`
+- `scripts/canary_mt5_consensus.py`
+- `scripts/test_mt5_consensus_canary.py`
+- `scripts/test_canary_mt5_cli.py`
 
-The active zero-cost canary path is now:
+The MQL5 Service:
 
-1. **MetaTrader 5 Economic Calendar** as the primary machine-readable forecast source candidate.
-2. **Myfxbook Economic Calendar** as a free cross-check because its calendar explicitly labels `Previous`, `Consensus`, and `Actual`.
-3. Promote an MT5 `forecast` to our canonical `consensus` only after repeated event/metric/time/unit/value agreement. Until then call it `provider_forecast`.
+- queries MetaTrader 5 Economic Calendar through supported MQL5 calendar functions;
+- exports event/value IDs, code/name, sector, importance, unit, multiplier, digits, source URL, release/period times, forecast, previous, revised previous, and actual;
+- records terminal server time, GMT time, and inferred server UTC offset;
+- writes through `FILE_COMMON` to a private/local JSON file using a temp-file + move pattern;
+- defaults to US/USD, price/jobs sectors, 48-hour lookback and 14-day lookahead;
+- does not write to this repository or `data/latest.json`.
 
-### Why MT5
+The Python canary:
 
-MetaQuotes documents that MetaTrader 5 is free to download, demo accounts require no investment and provide platform functionality for testing, and the built-in Economic Calendar exposes current/forecast/previous macro values. The supported MQL5 calendar API exposes programmatic event/value/history functions including `CalendarValueHistory` and `CalendarValueLast`.
+- validates export schema/provider identity;
+- normalizes MT5 release time to UTC;
+- maps only explicitly accepted event names;
+- calls MT5 values `provider_forecast`, **not** `consensus`;
+- matches against the official snapshot by provider family + release time + metric ID;
+- reports whether the value was captured before release;
+- can optionally write private local evidence JSON;
+- always reports `promotion_status = NOT_PROMOTED` until repeated cross-source evidence justifies promotion.
 
-Important constraint: calendar functions are native MQL5 terminal functions; the normal Python `MetaTrader5` package does not expose them. The intended bridge is a small MQL5 Service/EA that writes a private/local JSON or CSV file consumed by Python.
+## Immediate real-world canary opportunity
 
-See `docs/CONSENSUS_PROVIDER_AUDIT.md` for evidence and references.
+The current official snapshot schedules US CPI for **2026-09-11 20:30 Asia/Taipei**. This is a useful pre-release validation window.
 
-## Licensing / data-placement boundary
+Myfxbook currently exposes Consensus-labelled CPI expectations that can be used as a human cross-check. Those third-party values must **not** be committed to the public repo; retain cross-check evidence privately.
 
-Free access does not imply unrestricted redistribution.
+A successful first live canary should establish:
 
-Until redistribution rights for a third-party calendar are explicit:
+- MQL5 Service compiles in MetaEditor;
+- service can access calendar rows on the selected MT5 demo/broker terminal;
+- expected CPI rows are present with stable event/value IDs, units and release time;
+- forecast is captured before 20:30 TPE;
+- Python CLI matches the MT5 rows to `official-us-bls-cpi-2026-09-11`;
+- MT5 values can be compared privately with the same-release Myfxbook Consensus labels.
 
-- keep public `market-event-radar` snapshots official-source-only;
-- keep vendor forecast/consensus values in a **private runtime overlay** for personal use;
-- retain open-source mapping, normalization, Surprise semantics, and provider adapter code in the public repo where appropriate;
-- let the private `investment-dashboard` consume official public data plus the private overlay.
-
-Do not put vendor forecast values into `data/latest.json` merely because they are obtainable for free.
+One successful CPI match is useful evidence but is **not enough** to promote MT5 forecast to canonical survey consensus. Repeat across multiple releases/families before promotion.
 
 ## Provider status
 
 ### Trading Economics
 
-Best semantic benchmark: its docs explicitly define `Forecast` as consensus from a representative group of economists and separate proprietary `TEForecast`. Existing adapter/mapping/canary remain useful reference code. Paid access is not justified for the maintainer's personal deployment, but the adapter remains available for public users who choose to subscribe.
+Best semantic benchmark. Existing adapter/mapping/canary remains available for public BYO-subscription use; it is not required for the maintainer's personal runtime.
 
 ### MetaTrader 5
 
-Primary zero-cost canary candidate. Supported terminal API gives forecast/previous/actual/history fields. Survey methodology/provenance is not documented as precisely as TE, so validate before labelling values as `consensus`.
+Primary zero-cost machine canary. Parser/CLI/exporter source is merged. Real terminal compile/runtime verification is the current blocker.
 
 ### Myfxbook
 
-Useful free human-readable/export cross-check with an explicit `Consensus` column. Do not rely on undocumented internal endpoints for unattended production; the reviewed official API does not document Economic Calendar access.
+Free human-readable/export cross-check with explicit `Consensus` labels. Do not depend on undocumented internal endpoints for unattended production.
 
 ### Forex Factory
 
-Excluded from automated persistence/publication: its notices prohibit copying/republication/redistribution of the calendar/FEED compilation without written consent.
+Excluded from automated persistence/publication because its notices restrict copying/republication/redistribution of calendar/FEED compilation without permission.
 
 ### Finnhub
 
-Excluded from zero-cost path: Economic Calendar is documented as Premium Access Required.
+Excluded from zero-cost path because Economic Calendar requires Premium access.
 
 ### EODHD / FMP
 
-Remain secondary probes only. Current evidence does not establish both free-tier entitlement and survey-consensus provenance strongly enough to make either the primary path.
+Secondary probes only; free entitlement plus survey-consensus provenance remains insufficiently established.
 
 ## Hard boundaries
 
-- Consensus missing/provider failure must never degrade the official feed.
-- Only data captured before release may drive the original Surprise.
+- Consensus missing/provider failure must never degrade official feed health.
+- Only values captured before release may drive original Surprise.
 - Do not key Surprise semantics by metric ID alone.
 - Do not map metrics just because labels look similar.
-- Do not call a generic forecast `consensus` until validated.
+- Do not call MT5 `forecast` canonical market consensus until repeated validation supports it.
 - Do not publicly persist third-party compiled values without clear redistribution rights.
-- Do not place consensus retrieval into Streamlit reruns.
-- Do not require a paid provider for the maintainer's personal runtime while a validated zero-cost path remains viable.
+- Do not place consensus retrieval inside Streamlit reruns.
+- Do not require a paid provider for maintainer runtime while the zero-cost path remains viable.
 
-## Known debt
+## Known debt / blockers
 
-- No MT5 calendar bridge exists yet.
-- MT5 forecast-to-consensus equivalence still needs empirical validation.
-- Production/public snapshot schema still intentionally has no consensus/surprise fields.
-- A private overlay contract/consumer path has not yet been implemented.
-- Dashboard embedded live fallback lags the standalone producer.
-- Dashboard legacy rolling-21-day smoke gate can false-fail.
+- MQL5 Service has not yet been compiled in a real MetaEditor/MT5 installation.
+- No live MT5 Economic Calendar export has yet been captured.
+- MT5 forecast-to-survey-consensus equivalence still requires repeated cross-source evidence.
+- Private consensus/surprise overlay contract and dashboard consumer path are not yet implemented.
+- public snapshot intentionally has no third-party consensus/surprise values.
+- dashboard embedded live fallback lags standalone collector coverage.
+- dashboard legacy rolling-21-day smoke gate can false-fail.
 
 ## Exact next action
 
-Build an isolated **MetaTrader 5 / MQL5 Economic Calendar export canary** for the smallest useful high-signal set (CPI, PPI headline, Initial Claims). It must write only private/local canary output, preserve event/value IDs, forecast/previous/actual, unit, release time and capture time, and must not modify `data/latest.json`. Then compare upcoming pre-release MT5 forecasts against Myfxbook's explicitly labelled Consensus before promoting the source to the production/private Consensus layer.
+**Compile and run `mt5/Services/MarketEventRadarCalendarExport.mq5` in a real MetaTrader 5 terminal before the 2026-09-11 20:30 TPE CPI release, then run `scripts/canary_mt5_consensus.py` on the private/local export and preserve that pre-release evidence privately.**
