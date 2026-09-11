@@ -26,11 +26,27 @@ PRs #16-#19 remain green and merged. No implementation commits have occurred aft
 ## Product direction
 
 1. **Official layer** — stable.
-2. **Consensus layer** — provider-neutral contract/semantics exist; paid TE is no longer the active deployment target.
-3. **Surprise engine** — semantic foundation merged; production/private persistence remains.
+2. **Consensus layer** — provider-neutral contract/semantics exist; paid TE is no longer the active personal deployment target.
+3. **Surprise engine** — semantic foundation merged; private persistence remains.
 4. **Event Reaction layer** — later attach post-release market-price response.
 
 Coverage expansion remains secondary to interpretation depth.
+
+## Public / private provider policy — confirmed 2026-09-11
+
+The public project may keep **optional paid-provider adapters** such as Trading Economics. Users who want the strongest documented commercial consensus source may supply their own credentials and pay the provider themselves.
+
+The maintainer's personal deployment should **not incur recurring consensus-data fees while the strategy cannot economically justify them**. It will follow the zero-cost/private-overlay path instead.
+
+Therefore:
+
+- public repo: official-source data, provider-neutral contracts, Surprise logic, mapping code, and optional adapters for paid or free providers;
+- public repo does **not** subsidize or embed vendor credentials;
+- paid adapters remain opt-in and disabled without user-supplied credentials;
+- maintainer's private deployment: prefer zero-cost sources such as MT5, validated against free cross-checks, and keep vendor-derived values in a private overlay unless redistribution rights are explicit;
+- do not delete a useful paid-provider adapter merely because the maintainer does not personally subscribe to that provider.
+
+This allows the open-source project to remain useful to people willing to pay for premium data without forcing that cost onto the maintainer's own system.
 
 ## Zero-cost provider pivot — 2026-09-11
 
@@ -67,7 +83,7 @@ Do not put vendor forecast values into `data/latest.json` merely because they ar
 
 ### Trading Economics
 
-Best semantic benchmark: its docs explicitly define `Forecast` as consensus from a representative group of economists and separate proprietary `TEForecast`. Existing adapter/mapping/canary remain useful reference code. Paid access is not justified for this deployment.
+Best semantic benchmark: its docs explicitly define `Forecast` as consensus from a representative group of economists and separate proprietary `TEForecast`. Existing adapter/mapping/canary remain useful reference code. Paid access is not justified for the maintainer's personal deployment, but the adapter remains available for public users who choose to subscribe.
 
 ### MetaTrader 5
 
@@ -98,6 +114,7 @@ Remain secondary probes only. Current evidence does not establish both free-tier
 - Do not call a generic forecast `consensus` until validated.
 - Do not publicly persist third-party compiled values without clear redistribution rights.
 - Do not place consensus retrieval into Streamlit reruns.
+- Do not require a paid provider for the maintainer's personal runtime while a validated zero-cost path remains viable.
 
 ## Known debt
 
