@@ -47,6 +47,7 @@ jobs:
             market_event_radar/consensus_mapping.py \
             market_event_radar/surprise.py \
             market_event_radar/providers/trading_economics.py \
+            scripts/canary_trading_economics_consensus.py \
             scripts/refresh_gate.py \
             scripts/update_event_radar_snapshot.py \
             scripts/update_event_history.py \
@@ -55,6 +56,7 @@ jobs:
             scripts/test_release_metrics.py \
             scripts/test_consensus_surprise.py \
             scripts/test_consensus_mapping.py \
+            scripts/test_trading_economics_canary.py \
             scripts/test_us_phase2.py \
             scripts/test_us_claims.py \
             scripts/test_us_phase3.py \
@@ -67,6 +69,10 @@ jobs:
         run: python scripts/test_consensus_surprise.py
       - name: Test consensus provider mappings
         run: python scripts/test_consensus_mapping.py
+      - name: Test Trading Economics canary helpers
+        run: python scripts/test_trading_economics_canary.py
+      - name: Dry-run Trading Economics canary without credentials
+        run: python scripts/canary_trading_economics_consensus.py --snapshot data/latest.json --limit 10
       - name: Test Phase 2 US events
         run: python scripts/test_us_phase2.py
       - name: Test DOL claims PDF parser
