@@ -44,6 +44,7 @@ jobs:
             v2_event_official_us_phase4_resilience.py \
             v2_event_company_ir.py \
             market_event_radar/consensus.py \
+            market_event_radar/consensus_mapping.py \
             market_event_radar/surprise.py \
             market_event_radar/providers/trading_economics.py \
             scripts/refresh_gate.py \
@@ -53,6 +54,7 @@ jobs:
             scripts/check_event_official_backend.py \
             scripts/test_release_metrics.py \
             scripts/test_consensus_surprise.py \
+            scripts/test_consensus_mapping.py \
             scripts/test_us_phase2.py \
             scripts/test_us_claims.py \
             scripts/test_us_phase3.py \
@@ -63,6 +65,8 @@ jobs:
         run: python scripts/test_release_metrics.py
       - name: Test consensus and surprise layer
         run: python scripts/test_consensus_surprise.py
+      - name: Test consensus provider mappings
+        run: python scripts/test_consensus_mapping.py
       - name: Test Phase 2 US events
         run: python scripts/test_us_phase2.py
       - name: Test DOL claims PDF parser
