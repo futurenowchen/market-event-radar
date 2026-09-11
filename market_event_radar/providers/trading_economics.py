@@ -39,6 +39,7 @@ def observation_from_row(
     row: dict,
     *,
     event_key: str,
+    event_family: str,
     metric_id: str,
     release_time: datetime,
     fetched_at: datetime | None = None,
@@ -61,6 +62,7 @@ def observation_from_row(
 
     return ConsensusObservation(
         event_key=event_key,
+        event_family=event_family,
         metric_id=metric_id,
         consensus=raw,
         provider=PROVIDER_ID,
