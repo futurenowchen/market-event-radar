@@ -65,6 +65,20 @@ jobs:
             scripts/test_us_claims.py \
             scripts/test_us_phase3.py \
             scripts/test_us_phase4.py
+      - name: Parse Windows deployment helper
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path "scripts/install_mt5_canary.ps1"),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
       - name: Test event history ledger
         run: python scripts/test_event_history.py
       - name: Test release metric bundles
