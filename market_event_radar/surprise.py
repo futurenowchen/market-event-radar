@@ -8,7 +8,7 @@ from .consensus import ConsensusObservation
 
 @dataclass(frozen=True)
 class SurpriseRule:
-    family: str
+    semantic_family: str
     positive_direction: str
     negative_direction: str
     positive_impulse: str
@@ -21,6 +21,7 @@ class SurpriseRule:
 
 @dataclass(frozen=True)
 class SurpriseResult:
+    event_family: str
     metric_id: str
     actual: str
     consensus: str
@@ -33,19 +34,144 @@ class SurpriseResult:
     provider: str
 
 
-_RULES: dict[str, SurpriseRule] = {
-    "headline_yoy": SurpriseRule("inflation", "HOTTER_THAN_EXPECTED", "COOLER_THAN_EXPECTED", "inflation_up", "inflation_down", "HAWKISH", "DOVISH", 0.1, 0.2),
-    "headline_mom": SurpriseRule("inflation", "HOTTER_THAN_EXPECTED", "COOLER_THAN_EXPECTED", "inflation_up", "inflation_down", "HAWKISH", "DOVISH", 0.1, 0.2),
-    "core_yoy": SurpriseRule("inflation", "HOTTER_THAN_EXPECTED", "COOLER_THAN_EXPECTED", "inflation_up", "inflation_down", "HAWKISH", "DOVISH", 0.1, 0.2),
-    "core_mom": SurpriseRule("inflation", "HOTTER_THAN_EXPECTED", "COOLER_THAN_EXPECTED", "inflation_up", "inflation_down", "HAWKISH", "DOVISH", 0.1, 0.2),
-    "payroll_change": SurpriseRule("labor", "STRONGER_THAN_EXPECTED", "WEAKER_THAN_EXPECTED", "labor_tightness", "labor_weakness", "HAWKISH", "DOVISH", 50.0, 100.0),
-    "unemployment_rate": SurpriseRule("labor", "WEAKER_THAN_EXPECTED", "STRONGER_THAN_EXPECTED", "labor_weakness", "labor_tightness", "DOVISH", "HAWKISH", 0.1, 0.2),
-    "initial_claims": SurpriseRule("labor", "WEAKER_THAN_EXPECTED", "STRONGER_THAN_EXPECTED", "labor_weakness", "labor_tightness", "DOVISH", "HAWKISH", 10.0, 25.0),
-    "headline_retail_mom": SurpriseRule("growth", "STRONGER_THAN_EXPECTED", "WEAKER_THAN_EXPECTED", "growth_up", "growth_down", "HAWKISH", "DOVISH", 0.2, 0.5),
-    "gdp_qoq": SurpriseRule("growth", "STRONGER_THAN_EXPECTED", "WEAKER_THAN_EXPECTED", "growth_up", "growth_down", "HAWKISH", "DOVISH", 0.2, 0.5),
-    "comp_qoq": SurpriseRule("wages", "HOTTER_THAN_EXPECTED", "COOLER_THAN_EXPECTED", "wage_pressure_up", "wage_pressure_down", "HAWKISH", "DOVISH", 0.1, 0.3),
-    "wages_qoq": SurpriseRule("wages", "HOTTER_THAN_EXPECTED", "COOLER_THAN_EXPECTED", "wage_pressure_up", "wage_pressure_down", "HAWKISH", "DOVISH", 0.1, 0.3),
-}
+def _inflation_rule() -> SurpriseRule:
+    return SurpriseRule(
+        "inflation",
+        "HOTTER_THAN_EXPECTED",
+        "COOLER_THAN_EXPECTED",
+        "inflation_up",
+        "inflation_down",
+        "HAWKISH",
+        "DOVISH",
+        0.1,
+        0.2,
+    )
+
+
+def _growth_rule() -> SurpriseRule:
+    return SurpriseRule(
+        "growth",
+        "STRONGER_THAN_EXPECTED",
+        "WEAKER_THAN_EXPECTED",
+        "growth_up",
+        "growth_down",
+        "HAWKISH",
+        "DOVISH",
+        0.2,
+        0.5,
+    )
+
+
+_RULES: dict[tuple[str, str], SurpriseRule] = {}
+for event_family in ("cpi", "ppi", "pce"):
+    for metric_id in ("headline_yoy", "headline_mom", "core_yoy", "core_mom"):
+        _RULES[(event_family, metric_id)] = _inflation_rule()
+
+_RULES.update(
+    {
+        ("nfp", "payroll_change"): SurpriseRule(
+            "labor",
+            "STRONGER_THAN_EXPECTED",
+            "WEAKER_THAN_EXPECTED",
+            "labor_tightness",
+            "labor_weakness",
+            "HAWKISH",
+            "DOVISH",
+            50.0,
+            100.0,
+        ),
+        ("nfp", "unemployment_rate"): SurpriseRule(
+            "labor",
+            "WEAKER_THAN_EXPECTED",
+            "STRONGER_THAN_EXPECTED",
+            "labor_weakness",
+            "labor_tightness",
+            "DOVISH",
+            "HAWKISH",
+            0.1,
+            0.2,
+        ),
+        ("nfp", "avg_hourly_earnings_mom"): SurpriseRule(
+            "wages",
+            "HOTTER_THAN_EXPECTED",
+            "COOLER_THAN_EXPECTED",
+            "wage_pressure_up",
+            "wage_pressure_down",
+            "HAWKISH",
+            "DOVISH",
+            0.1,
+            0.2,
+        ),
+        ("nfp", "avg_hourly_earnings_yoy"): SurpriseRule(
+            "wages",
+            "HOTTER_THAN_EXPECTED",
+            "COOLER_THAN_EXPECTED",
+            "wage_pressure_up",
+            "wage_pressure_down",
+            "HAWKISH",
+            "DOVISH",
+            0.1,
+            0.2,
+        ),
+        ("claims", "initial_claims"): SurpriseRule(
+            "labor",
+            "WEAKER_THAN_EXPECTED",
+            "STRONGER_THAN_EXPECTED",
+            "labor_weakness",
+            "labor_tightness",
+            "DOVISH",
+            "HAWKISH",
+            10.0,
+            25.0,
+        ),
+        ("retail_sales", "headline_mom"): _growth_rule(),
+        ("retail_sales", "headline_yoy"): _growth_rule(),
+        ("eci", "compensation_qoq"): SurpriseRule(
+            "wages",
+            "HOTTER_THAN_EXPECTED",
+            "COOLER_THAN_EXPECTED",
+            "wage_pressure_up",
+            "wage_pressure_down",
+            "HAWKISH",
+            "DOVISH",
+            0.1,
+            0.3,
+        ),
+        ("eci", "wages_qoq"): SurpriseRule(
+            "wages",
+            "HOTTER_THAN_EXPECTED",
+            "COOLER_THAN_EXPECTED",
+            "wage_pressure_up",
+            "wage_pressure_down",
+            "HAWKISH",
+            "DOVISH",
+            0.1,
+            0.3,
+        ),
+        ("eci", "compensation_yoy"): SurpriseRule(
+            "wages",
+            "HOTTER_THAN_EXPECTED",
+            "COOLER_THAN_EXPECTED",
+            "wage_pressure_up",
+            "wage_pressure_down",
+            "HAWKISH",
+            "DOVISH",
+            0.1,
+            0.3,
+        ),
+        ("eci", "wages_yoy"): SurpriseRule(
+            "wages",
+            "HOTTER_THAN_EXPECTED",
+            "COOLER_THAN_EXPECTED",
+            "wage_pressure_up",
+            "wage_pressure_down",
+            "HAWKISH",
+            "DOVISH",
+            0.1,
+            0.3,
+        ),
+    }
+)
 
 
 def parse_numeric(value: str) -> tuple[float | None, str]:
@@ -59,10 +185,9 @@ def parse_numeric(value: str) -> tuple[float | None, str]:
         unit = "K"
         text = text[:-1]
     elif upper.endswith("M"):
-        unit = "M"
         multiplier = 1000.0
-        text = text[:-1]
         unit = "K"
+        text = text[:-1]
     elif text.endswith("%"):
         unit = "ppt"
         text = text[:-1]
@@ -84,20 +209,34 @@ def _magnitude(abs_surprise: float, rule: SurpriseRule) -> str:
 def evaluate_surprise(metric_id: str, actual: str, observation: ConsensusObservation) -> SurpriseResult | None:
     if not observation.eligible_for_surprise or observation.metric_id != metric_id:
         return None
+    event_family = observation.event_family.strip().lower()
+    rule = _RULES.get((event_family, metric_id))
+    if rule is None:
+        return None
     actual_num, actual_unit = parse_numeric(actual)
     consensus_num, consensus_unit = parse_numeric(observation.consensus)
     if actual_num is None or consensus_num is None:
         return None
     if actual_unit and consensus_unit and actual_unit != consensus_unit:
         return None
-    rule = _RULES.get(metric_id)
-    if rule is None:
-        return None
     delta = actual_num - consensus_num
     if abs(delta) < 1e-12:
-        return SurpriseResult(metric_id, actual, observation.consensus, 0.0, actual_unit or consensus_unit, "IN_LINE", "SMALL", "neutral", "NEUTRAL", observation.provider)
+        return SurpriseResult(
+            event_family,
+            metric_id,
+            actual,
+            observation.consensus,
+            0.0,
+            actual_unit or consensus_unit,
+            "IN_LINE",
+            "SMALL",
+            "neutral",
+            "NEUTRAL",
+            observation.provider,
+        )
     positive = delta > 0
     return SurpriseResult(
+        event_family=event_family,
         metric_id=metric_id,
         actual=actual,
         consensus=observation.consensus,
@@ -111,5 +250,10 @@ def evaluate_surprise(metric_id: str, actual: str, observation: ConsensusObserva
     )
 
 
-def supported_metric_ids() -> tuple[str, ...]:
+def supported_surprise_keys() -> tuple[tuple[str, str], ...]:
     return tuple(sorted(_RULES))
+
+
+def supported_metric_ids() -> tuple[str, ...]:
+    """Backward-compatible convenience list; semantics still require event_family."""
+    return tuple(sorted({metric_id for _, metric_id in _RULES}))
