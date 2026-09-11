@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "project": "market-event-radar",
+  "canonical_repository": "futurenowchen/market-event-radar",
+  "last_reconciled_tpe": "2026-09-11T10:05:00+08:00",
+  "verified_code_commit": "848dab220427efe0240ea2662c1f19d4b39ed1ce",
+  "phase": "consensus-surprise-layer",
+  "status": "READY_FOR_IMPLEMENTATION",
+  "completed": [
+    "official-source-first macro feed",
+    "snapshot schema v2",
+    "rich release metrics and history persistence",
+    "US high-signal coverage phases 1-4",
+    "dashboard rich-metrics consumer integration"
+  ],
+  "active_work": [
+    "provider-neutral consensus domain model",
+    "surprise semantics engine",
+    "opt-in Trading Economics consensus adapter"
+  ],
+  "blocked": [],
+  "known_debt": [
+    "dashboard legacy 21-day provider smoke gate can false-fail",
+    "dashboard embedded live fallback lags standalone collector coverage"
+  ],
+  "do_not_repeat": [
+    "expand macro coverage before consensus/surprise is proven",
+    "put consensus retrieval in Streamlit reruns",
+    "make consensus provider health affect official_macro_ready",
+    "treat unattributed estimates as survey consensus"
+  ],
+  "exact_next_action": "Implement provider-neutral consensus records and surprise semantics with deterministic tests; add an inert-without-credentials Trading Economics adapter."
+}
