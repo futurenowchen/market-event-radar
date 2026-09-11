@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-11T11:33:00+08:00",
-  "verified_code_commit": "e89c24f71ddbd0f493e40e19517c6ace57cb5c36",
-  "phase": "zero-cost-consensus-live-terminal-canary",
-  "status": "MT5_CANARY_IMPLEMENTATION_MERGED_GREEN",
+  "last_reconciled_tpe": "2026-09-11T11:39:00+08:00",
+  "verified_code_commit": "7dfcf7c4b63711f49a6e33bd92131bcde606acbb",
+  "phase": "zero-cost-consensus-company-windows-deployment",
+  "status": "WINDOWS_MT5_DEPLOYMENT_HELPER_MERGED_GREEN",
   "completed": [
     "official-source-first macro feed",
     "snapshot schema v2 and rich release metrics",
@@ -25,11 +25,17 @@
     "Core PPI deliberately fails closed for semantic definition mismatch",
     "PR #20 merged green",
     "PR #20 CI validates parser, CLI, regressions and live official-source probe",
+    "Windows PowerShell MT5 deployment helper merged",
+    "Windows deployment runbook merged",
+    "PR #21 merged green",
+    "PR #21 CI validates PowerShell parser, MT5 parser/CLI, regressions and live official-source probe",
     "public data/latest.json remains untouched by third-party forecast data"
   ],
   "active_work": [
-    "compile MQL5 Service in real MetaEditor/MT5 terminal",
-    "capture a pre-release US CPI MT5 export before 2026-09-11T20:30:00+08:00",
+    "deploy MT5 canary on company Windows computer",
+    "run scripts/install_mt5_canary.ps1 after MT5 has been started once",
+    "compile MQL5 Service in real MetaEditor and require 0 errors",
+    "start the MT5 Service and confirm private mt5_calendar_latest.json export",
     "run Python canary against the private export and official snapshot",
     "privately compare same-release MT5 provider_forecast values with Myfxbook Consensus",
     "repeat cross-source validation before promoting MT5 forecast to canonical consensus"
@@ -39,6 +45,11 @@
     "mt5_canary_merge_commit": "e89c24f71ddbd0f493e40e19517c6ace57cb5c36",
     "mt5_canary_workflow_run": 34558404985,
     "mt5_canary_ci_result": "success",
+    "windows_deployment_pr": 21,
+    "windows_deployment_merge_commit": "7dfcf7c4b63711f49a6e33bd92131bcde606acbb",
+    "windows_deployment_workflow_run": 34559135551,
+    "windows_deployment_ci_result": "success",
+    "powershell_parser": "passed",
     "mt5_parser_tests": "passed",
     "mt5_cli_tests": "passed",
     "prior_consensus_surprise_regressions": "passed",
@@ -48,7 +59,7 @@
     "mt5_consensus_equivalence": "not_promoted"
   },
   "blocked": [
-    "real MetaTrader 5 / MetaEditor environment is required to compile and execute the MQL5 Service",
+    "real company Windows MetaTrader 5 / MetaEditor environment is required to compile and execute the MQL5 Service",
     "MT5 forecast values cannot be promoted to canonical survey consensus until repeated pre-release cross-source evidence is collected",
     "third-party redistribution rights are not assumed; vendor values remain private/local until explicitly permitted"
   ],
@@ -72,5 +83,5 @@
     "put consensus retrieval in Streamlit reruns",
     "make consensus provider health affect official_macro_ready"
   ],
-  "exact_next_action": "Compile and run mt5/Services/MarketEventRadarCalendarExport.mq5 in a real MetaTrader 5 terminal before the 2026-09-11 20:30 TPE CPI release, then run scripts/canary_mt5_consensus.py on the private/local export and preserve the pre-release evidence privately."
+  "exact_next_action": "On the company Windows computer, install/start MetaTrader 5 once, clone or pull market-event-radar main, run powershell -ExecutionPolicy Bypass -File scripts\\install_mt5_canary.ps1, compile MarketEventRadarCalendarExport.mq5 in MetaEditor with 0 errors, start the Service, and run scripts/canary_mt5_consensus.py against the generated private JSON."
 }
