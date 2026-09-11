@@ -18,7 +18,9 @@
     "zero-cost provider audit completed",
     "MetaTrader 5 Economic Calendar selected as primary zero-cost machine canary",
     "Myfxbook selected as free Consensus-labelled cross-check",
-    "Trading Economics demoted to semantic/reference benchmark",
+    "Trading Economics demoted to semantic/reference benchmark for maintainer runtime",
+    "public paid-provider adapters retained as optional bring-your-own-credential integrations",
+    "maintainer personal deployment policy fixed to zero-cost private overlay while recurring provider fees are not economically justified",
     "Forex Factory excluded for automated persistence/redistribution",
     "Finnhub excluded from zero-cost path because Economic Calendar requires Premium access"
   ],
@@ -51,7 +53,8 @@
     "dashboard legacy rolling-21-day smoke gate can false-fail"
   ],
   "do_not_repeat": [
-    "pay for Trading Economics before zero-cost path is disproven",
+    "require Trading Economics or another paid provider for the maintainer personal runtime while a validated zero-cost path remains viable",
+    "delete useful paid-provider adapters merely because the maintainer does not subscribe",
     "call MT5 generic forecast survey consensus before empirical validation",
     "use current post-release forecast as proof of original pre-release consensus",
     "scrape undocumented internal endpoints when a supported terminal/export path exists",
