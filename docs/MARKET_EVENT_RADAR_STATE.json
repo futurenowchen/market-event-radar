@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-11T10:22:00+08:00",
+  "last_reconciled_tpe": "2026-09-11T10:26:00+08:00",
   "verified_code_commit": "1514cf89db3b73683ae6d4db09c0eeb2ac937ed9",
   "phase": "consensus-provider-mapping-canary",
-  "status": "FOUNDATION_MERGED_GREEN",
+  "status": "SEMANTIC_HARDENING_PR_IN_PROGRESS",
   "completed": [
     "official-source-first macro feed",
     "snapshot schema v2",
@@ -18,34 +18,28 @@
     "consensus provider audit selecting Trading Economics as first target",
     "provider-neutral ConsensusObservation contract",
     "strict pre-release/PIT surprise eligibility guard",
-    "deterministic per-metric surprise semantics engine",
+    "deterministic surprise foundation",
     "opt-in Trading Economics adapter using Forecast not TEForecast",
     "PR #16 merged after full GitHub Actions success"
   ],
   "active_work": [
-    "internal event/metric to Trading Economics identity mapping",
-    "credentialed Trading Economics canary design",
-    "future snapshot enrichment contract"
+    "PR #17 fix/surprise-semantic-family",
+    "disambiguate shared metric IDs by event_family + metric_id",
+    "align ECI compensation_qoq metric identity",
+    "internal event/metric to Trading Economics identity mapping after PR #17"
   ],
   "validation": {
-    "pr": 16,
-    "feature_head": "49c2f02135e6e7e811bca6fce425e69e89974ed8",
-    "merge_commit": "1514cf89db3b73683ae6d4db09c0eeb2ac937ed9",
-    "workflow_run": 34553881787,
-    "result": "success",
-    "snapshot_contract": "passed",
-    "compile": "passed",
-    "event_history": "passed",
-    "release_metrics": "passed",
-    "consensus_surprise": "passed",
-    "phase2": "passed",
-    "claims": "passed",
-    "phase3": "passed",
-    "phase4": "passed",
-    "package_smoke": "passed",
-    "official_source_probe": "passed"
+    "foundation_pr": 16,
+    "foundation_merge_commit": "1514cf89db3b73683ae6d4db09c0eeb2ac937ed9",
+    "foundation_result": "success",
+    "semantic_pr": 17,
+    "semantic_head": "b34888fb6df48c00ba70e6f313be87d103537f30",
+    "semantic_workflow_run": 34554223095,
+    "semantic_deterministic_tests": "passed",
+    "semantic_official_source_probe": "in_progress"
   },
   "blocked": [
+    "PR #17 must reach terminal green before merge",
     "credentialed Trading Economics canary requires a user-provided/API-secret credential before live consensus values can be validated"
   ],
   "known_debt": [
@@ -54,11 +48,12 @@
     "production snapshot schema does not yet persist consensus/surprise fields"
   ],
   "do_not_repeat": [
+    "key surprise semantics by metric_id alone",
     "expand macro coverage before consensus/surprise is proven",
     "put consensus retrieval in Streamlit reruns",
     "make consensus provider health affect official_macro_ready",
     "treat unattributed estimates as survey consensus",
     "use Trading Economics TEForecast as market consensus"
   ],
-  "exact_next_action": "Build and test deterministic mappings between the current high-signal internal event/metric identities and Trading Economics calendar identities without requiring credentials; then prepare a credentialed canary that remains isolated from production snapshots."
+  "exact_next_action": "Inspect PR #17 terminal CI; merge if green, update verified_code_commit, then build deterministic Trading Economics indicator mappings on a fresh branch."
 }
