@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-11",
-  "generated_at_tpe": "2026-09-11T22:21:37.164607+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-09-12",
+  "generated_at_tpe": "2026-09-12T01:52:39.188202+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 8,
+  "event_count": 11,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -26,13 +26,15 @@
     "us_ism": true
   },
   "provider_counts": {
+    "official-jp-boj": 1,
     "official-tw-cbc": 1,
     "official-us-bls-cpi": 1,
     "official-us-bls-ppi": 1,
     "official-us-census-housing": 1,
     "official-us-census-retail": 1,
     "official-us-dol-claims": 2,
-    "official-us-fed-fomc": 1
+    "official-us-fed-fomc": 2,
+    "official-us-fed-g17": 1
   },
   "events": [
     {
@@ -389,6 +391,105 @@
           "unit": "annualized units",
           "is_primary": false,
           "source_series": "Census/HUD New Residential Construction"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-fed-fomc-2026-09-17",
+      "time_tpe": "2026-09-18T02:00:00+08:00",
+      "title": "美國聯邦公開市場委員會（FOMC）利率決議",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "FOMC",
+        "Fed",
+        "利率",
+        "全球風險資產",
+        "含記者會",
+        "SEP"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Federal Reserve",
+      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-fed-fomc",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-jp-boj-2026-09-18",
+      "time_tpe": "2026-09-18T11:00:00+08:00",
+      "title": "日本銀行（BOJ）金融政策決定會合",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "日本",
+      "market_tags": [
+        "日本",
+        "BOJ",
+        "利率",
+        "日圓",
+        "全球風險資產"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Bank of Japan",
+      "source_url": "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm",
+      "status": "scheduled",
+      "expects_result": false,
+      "provider": "official-jp-boj",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-fed-g17-2026-09-18",
+      "time_tpe": "2026-09-18T21:15:00+08:00",
+      "title": "美國工業生產與產能利用率（G.17）",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "B",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "工業生產",
+        "產能利用率",
+        "景氣",
+        "Fed"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "0.2%",
+      "source": "Federal Reserve Board",
+      "source_url": "https://www.federalreserve.gov/releases/g17/",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-fed-g17",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "industrial_production_mom",
+          "label": "工業生產 MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.2%",
+          "unit": "%",
+          "is_primary": true,
+          "source_series": "Federal Reserve G.17 Total IP"
+        },
+        {
+          "metric_id": "capacity_utilization",
+          "label": "產能利用率",
+          "actual": "",
+          "forecast": "",
+          "previous": "76.3%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "Federal Reserve G.17 Table 7 Total industry"
         }
       ]
     }
