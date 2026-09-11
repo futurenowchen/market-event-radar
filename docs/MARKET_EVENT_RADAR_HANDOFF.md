@@ -19,6 +19,39 @@ At this baseline:
 - Latest observed public snapshot at reconciliation was healthy (`official_macro_ready=true`).
 - Dashboard PR #84 already consumes optional rich `metrics` bundles and renders a `關鍵讀數` column.
 
+## Active implementation: PR #16
+
+Branch: `feat/consensus-surprise-v1`
+Head at reconciliation: `49c2f02135e6e7e811bca6fce425e69e89974ed8`
+
+Implemented but not yet merged:
+
+- provider-neutral `ConsensusObservation` contract with provider id, provider event id, fetch time, optional PIT/as-of time, release time, raw consensus, unit, and source URL
+- strict pre-release eligibility guard for surprise computation
+- deterministic `SurpriseResult` engine with per-metric direction, impulse, policy implication, and magnitude thresholds
+- initial semantic coverage for inflation, payrolls, unemployment, claims, growth, and wage-pressure families
+- optional Trading Economics adapter using survey `Forecast` and explicitly not `TEForecast`
+- adapter returns an empty result when `TRADING_ECONOMICS_API_KEY` is absent; official feed health is untouched
+- deterministic tests and package exports
+- `docs/CONSENSUS_PROVIDER_AUDIT.md`
+
+Validation observed on PR #16 before this handoff update:
+
+- snapshot contract: passed
+- package/dependencies: passed
+- compile: passed
+- event history: passed
+- release metrics: passed
+- consensus/surprise tests: passed
+- Phase 2: passed
+- DOL claims parser: passed
+- Phase 3: passed
+- Phase 4: passed
+- package API smoke: passed
+- live official-source collector probe: still running at the last observation
+
+Do not merge PR #16 merely because the deterministic portion is green; first inspect the terminal CI result and distinguish a true regression from external-source flakiness if the live probe fails.
+
 ## Product direction now locked
 
 Coverage expansion is no longer the primary objective. The next value layer is:
@@ -34,15 +67,14 @@ Current preferred first integration target: **Trading Economics**.
 
 Reasoning:
 
-- TE documentation/API contract exposes economic-calendar `Forecast` separately from `Actual` and `Previous` and describes forecast/consensus values as survey-based expectations.
-- TE supports historical/point-in-time querying suitable for preserving what consensus was known before release.
-- This is materially preferable to treating an opaque provider `estimate` field as survey consensus.
+- TE documentation/API contract exposes economic-calendar `Forecast` separately from `Actual` and `Previous` and defines it as consensus from a representative group of economists.
+- `TEForecast` is TE's own model/analyst projection and must never be substituted for consensus.
+- TE supports historical/point-in-time calendar access suitable for preserving what consensus was known before release.
+- EODHD exposes an `estimate` field and remains a possible secondary provider, but the reviewed public documentation does not establish equivalent survey-consensus provenance.
 
-Secondary/fallback providers may be evaluated later, but must not be labelled `consensus` unless provenance and semantics are explicit.
+The detailed audit is persisted in `docs/CONSENSUS_PROVIDER_AUDIT.md` on PR #16.
 
 ## Consensus architecture requirements
-
-The first implementation must be provider-neutral and safe when no credentials exist.
 
 Required record-level provenance:
 
@@ -52,7 +84,7 @@ Required record-level provenance:
 - as-of / point-in-time timestamp when supported
 - raw consensus string/value
 - metric identity mapping
-- eligibility: must be captured before the official release cutoff for surprise computation
+- eligibility: only information known before the official release cutoff may drive surprise
 
 Hard rules:
 
@@ -60,13 +92,13 @@ Hard rules:
 - Provider errors must never flip `official_macro_ready` false.
 - Do not silently copy consensus into the official provider's source fields.
 - Preserve legacy `forecast` compatibility only through an explicit merge/enrichment step.
-- Never use a post-release revised consensus snapshot to compute the original surprise unless it can be proven to represent the pre-release consensus.
+- Never use a post-release revised consensus snapshot to compute the original surprise unless it can be proven to represent pre-release consensus.
 
 ## Surprise engine requirements
 
 Do not reduce surprise to a sign-only rule.
 
-At minimum retain:
+Retain at minimum:
 
 - numeric surprise in native units / percentage points where parseable
 - normalized direction vocabulary appropriate to the metric (`hotter/cooler`, `stronger/weaker`, `higher/lower than expected`)
@@ -74,7 +106,7 @@ At minimum retain:
 - policy implication where justified (`hawkish`, `dovish`, `mixed`, `neutral/unknown`)
 - magnitude bucket (`small`, `medium`, `large`) based on per-metric thresholds, not one global threshold
 
-Initial semantic families should prioritize CPI, PPI, Core PCE, NFP payrolls, unemployment rate, Initial Claims, Retail Sales, GDP, and ECI.
+Initial semantic families prioritize CPI, PPI, Core PCE, NFP payrolls, unemployment rate, Initial Claims, Retail Sales, GDP, and ECI.
 
 ## Known debt / caution
 
@@ -88,8 +120,9 @@ Initial semantic families should prioritize CPI, PPI, Core PCE, NFP payrolls, un
 - Do not move consensus retrieval into Streamlit/dashboard reruns.
 - Do not make Trading Economics or any paid/external provider a dependency of official feed health.
 - Do not infer consensus from Previous.
+- Do not use `TEForecast` as survey consensus.
 - Do not scrape unattributed finance-calendar numbers and call them market consensus.
 
 ## Exact next action
 
-Implement the provider-neutral consensus domain model + surprise semantics with deterministic tests, then add an opt-in Trading Economics adapter that is inert without credentials. Do not wire credentials or mutate production snapshots until the contract/tests are green.
+Inspect PR #16's terminal CI result. If the implementation is green, merge PR #16, update `verified_code_commit` in both handoff files to the merged implementation SHA, then begin deterministic internal-event ↔ Trading Economics event/metric mapping and a credentialed canary plan. Do not mutate production snapshots before that contract is proven.
