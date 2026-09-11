@@ -35,6 +35,55 @@ def fetch_calendar_rows(*, country: str, indicator: str, start: str, end: str, t
     return [dict(row) for row in payload if isinstance(row, dict)] if isinstance(payload, list) else []
 
 
+def parse_provider_datetime(value: object) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    # TE calendar examples expose UTC release times without an explicit offset
+    # (for example 13:30 for an 08:30 ET release). Canary matching treats those
+    # naive timestamps as UTC and verifies them against our timezone-aware event.
+    return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
+
+
+def _norm(value: object) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
+def select_matching_row(
+    rows: list[dict],
+    *,
+    indicator: str,
+    release_time: datetime,
+    tolerance_minutes: int = 10,
+) -> dict | None:
+    if release_time.tzinfo is None:
+        raise ValueError("release_time must be timezone-aware")
+    expected = release_time.astimezone(timezone.utc)
+    indicator_norm = _norm(indicator)
+    candidates: list[tuple[float, dict]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        category = _norm(row.get("Category"))
+        event = _norm(row.get("Event"))
+        if indicator_norm not in {category, event}:
+            continue
+        row_time = parse_provider_datetime(row.get("Date"))
+        if row_time is None:
+            continue
+        delta_seconds = abs((row_time - expected).total_seconds())
+        if delta_seconds <= tolerance_minutes * 60:
+            candidates.append((delta_seconds, row))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: item[0])
+    return dict(candidates[0][1])
+
+
 def observation_from_row(
     row: dict,
     *,
@@ -56,7 +105,7 @@ def observation_from_row(
         return None
 
     fetched_at = fetched_at or datetime.now(timezone.utc)
-    source_url = str(row.get("URL") or "").strip()
+    source_url = str(row.get("URL") or row.get("SourceURL") or "").strip()
     if source_url.startswith("/"):
         source_url = "https://tradingeconomics.com" + source_url
 
