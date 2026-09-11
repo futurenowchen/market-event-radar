@@ -8,93 +8,83 @@ Last reconciled: 2026-09-11 Asia/Taipei
 
 ## Verified implementation baseline
 
-Verified code commit: `1514cf89db3b73683ae6d4db09c0eeb2ac937ed9`
+Verified code commit: `e398e17ad39edf3fea06b41a4ab9d6342ee09f5b`
 
-At this baseline:
+The current merged implementation includes:
 
-- Official-source-first macro collection is production-capable for the current US/TW/JP/KR high-signal universe.
-- Snapshot schema v2 is live.
-- `EventMetric` rich release bundles are persisted through snapshots/history.
-- US expansion through Phase 4 is merged.
-- Dashboard PR #84 already consumes optional rich `metrics` bundles and renders a `關鍵讀數` column.
-- PR #16, **Add consensus and surprise foundation**, is merged.
+- official-source-first macro collection for the current US/TW/JP/KR high-signal universe
+- snapshot schema v2 and rich release `metrics`
+- US high-signal coverage through Phase 4
+- provider-neutral `ConsensusObservation` with explicit provenance and pre-release/PIT eligibility
+- deterministic Surprise engine with numeric surprise, semantic direction, magnitude, economic impulse, and policy implication
+- event-family + metric-id semantic keys, preventing shared IDs such as `headline_mom` from crossing inflation/growth meanings
+- opt-in Trading Economics adapter using survey `Forecast`, never `TEForecast`
+- conservative deterministic TE identity mapping for verified CPI, headline PPI, PCE, Employment Situation, Initial Claims, Retail Sales, and ECI metrics
+- deliberate non-mapping of core PPI because the official BLS series used by this radar excludes food, energy **and trade services**, while TE's common Core PPI definition is not semantically identical
 
-## Consensus / Surprise foundation now merged
+Dashboard PR #84 already consumes optional rich `metrics`; it does not yet consume consensus/surprise.
 
-PR #16 added:
+## Merge / validation evidence
 
-- provider-neutral `ConsensusObservation`
-- provider id / provider event id / fetch time / optional PIT-as-of / release time / raw consensus / unit / source URL provenance
-- strict rule that only information known before release is eligible for surprise computation
-- deterministic `SurpriseResult` with numeric surprise, direction, magnitude, economic impulse, and policy implication
-- initial semantic rules for inflation, payrolls, unemployment, claims, growth, and wage-pressure families
-- opt-in Trading Economics adapter
-- explicit use of TE `Forecast` as survey consensus and rejection of `TEForecast` as consensus
-- no-credential behavior that returns no consensus instead of degrading the official feed
-- deterministic consensus/surprise tests and public package exports
-- `docs/CONSENSUS_PROVIDER_AUDIT.md`
+### PR #16 — Consensus / Surprise foundation
 
-## Validation evidence
+- merge: `1514cf89db3b73683ae6d4db09c0eeb2ac937ed9`
+- CI run: `34553881787`
+- result: success, including live official-source probe
 
-PR #16 feature head: `49c2f02135e6e7e811bca6fce425e69e89974ed8`
-Merge commit: `1514cf89db3b73683ae6d4db09c0eeb2ac937ed9`
-GitHub Actions run: `34553881787`
-Result: **success**
+### PR #17 — Surprise semantic-family hardening
 
-Passed checks included:
+- merge: `d8fac316b1cb694bd981a6781354193edd464f62`
+- CI run: `34554223095`
+- result: success
+- regression coverage proves CPI/PPI/PCE and Retail Sales can reuse metric IDs without borrowing the wrong semantics; unknown family fails closed; ECI uses the collector's real `compensation_qoq` identity
 
-- snapshot contract
-- package/dependency install
-- compile
-- event history
-- release metrics
-- consensus/surprise tests
-- Phase 2 events
-- DOL claims parser
-- Phase 3 events
-- Phase 4 event policy
-- package API smoke
-- live official-source collector probe
+### PR #18 — Trading Economics mapping v1
+
+- merge: `e398e17ad39edf3fea06b41a4ab9d6342ee09f5b`
+- CI run: `34554463876`
+- result: success
+- mapping tests require every mapped metric to have an explicit Surprise semantic rule and preserve deliberate non-mappings
 
 ## Product direction
 
-Coverage expansion is no longer the primary objective. The next layers remain:
-
-1. **Official layer** — schedule, Actual, Previous, official release metrics. Stable.
-2. **Consensus layer** — separate optional provider with provenance/PIT controls. Foundation merged; live mapping/canary remains.
-3. **Surprise engine** — foundation merged; production enrichment remains.
+1. **Official layer** — stable: schedule, Actual, Previous, official release metrics.
+2. **Consensus layer** — contract + mapping foundation merged; credentialed canary remains.
+3. **Surprise engine** — semantic foundation merged; production snapshot enrichment remains.
 4. **Event Reaction layer** — later attach post-release market-price response.
+
+Coverage expansion is no longer the main objective. Interpretation depth is.
 
 ## Consensus provider decision
 
 First target: **Trading Economics**.
 
-Reasons:
-
 - TE documents `Forecast` as consensus from a representative group of economists.
-- TE keeps `TEForecast` separate as its own projection; never use it as consensus.
-- TE supports point-in-time calendar access for preserving pre-release information and avoiding look-ahead bias.
+- `TEForecast` is TE's own projection and must never be used as consensus.
+- TE offers point-in-time calendar access suitable for preventing look-ahead bias.
 - EODHD remains a possible secondary provider, but its documented `estimate` field has not yet been accepted as equivalent survey consensus.
 
-See `docs/CONSENSUS_PROVIDER_AUDIT.md`.
+See `docs/CONSENSUS_PROVIDER_AUDIT.md` and `market_event_radar/consensus_mapping.py`.
 
 ## Hard boundaries
 
 - Consensus disabled/missing must leave official snapshots valid.
 - Provider errors must never flip `official_macro_ready` false.
+- Only consensus known before release may drive the original Surprise.
 - Do not put consensus retrieval into Streamlit/dashboard reruns.
-- Do not infer consensus from Previous.
-- Do not use post-release consensus revisions for original surprise unless PIT evidence proves the value was known before release.
+- Do not key Surprise semantics by metric ID alone.
+- Do not map two metrics merely because their labels look similar.
 - Do not use `TEForecast` as survey consensus.
 - Do not resume broad macro coverage expansion before this interpretation layer is proven unless explicitly requested.
 
 ## Known debt
 
-- Dashboard legacy event-radar smoke checks can false-fail because they require periodic providers inside a rolling 21-day horizon.
-- Dashboard embedded live fallback lags standalone collector coverage.
 - Production snapshot schema does not yet persist consensus/surprise fields.
-- The collector runtime still has a legacy internal `MarketEvent` shape in some paths; avoid a large refactor unless required.
+- A credentialed live TE canary has not yet been run.
+- Some secondary metrics remain intentionally unmapped until semantic equivalence is verified.
+- Dashboard embedded live fallback lags the standalone producer.
+- Dashboard legacy event-radar smoke check can false-fail because it requires periodic providers inside a rolling 21-day horizon.
 
 ## Exact next action
 
-Build and test deterministic mappings between current high-signal internal event/metric identities and Trading Economics calendar identities. Then prepare a credentialed canary that remains isolated from production snapshots. Only after that canary is verified should consensus/surprise be persisted into the public snapshot and exposed in the dashboard.
+Run a credentialed **non-production Trading Economics canary** using the mapping registry. Verify returned event identity, units, release-time alignment, provider IDs, pre-release `Forecast`, and point-in-time behavior. Persist that evidence. Only after the canary is verified should consensus/surprise be added to the public snapshot contract and then rendered by the dashboard.
