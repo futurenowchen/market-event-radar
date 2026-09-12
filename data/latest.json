@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-12",
-  "generated_at_tpe": "2026-09-12T01:52:39.188202+08:00",
+  "snapshot_date_tpe": "2026-09-13",
+  "generated_at_tpe": "2026-09-13T00:34:24.395518+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 11,
+  "event_count": 10,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -29,129 +29,13 @@
     "official-jp-boj": 1,
     "official-tw-cbc": 1,
     "official-us-bls-cpi": 1,
-    "official-us-bls-ppi": 1,
     "official-us-census-housing": 1,
     "official-us-census-retail": 1,
-    "official-us-dol-claims": 2,
-    "official-us-fed-fomc": 2,
+    "official-us-dol-claims": 1,
+    "official-us-fed-fomc": 3,
     "official-us-fed-g17": 1
   },
   "events": [
-    {
-      "event_id": "official-us-bls-ppi-2026-09-10",
-      "time_tpe": "2026-09-10T20:30:00+08:00",
-      "title": "美國生產者物價指數（PPI）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "S",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "PPI",
-        "通膨",
-        "Fed",
-        "NASDAQ",
-        "台指"
-      ],
-      "actual": "5.4%",
-      "forecast": "",
-      "previous": "4.8%",
-      "source": "U.S. Bureau of Labor Statistics (BLS)",
-      "source_url": "https://www.bls.gov/schedule/news_release/ppi.htm",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-bls-ppi",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "headline_yoy",
-          "label": "Final Demand YoY",
-          "actual": "5.4%",
-          "forecast": "",
-          "previous": "4.8%",
-          "unit": "%",
-          "is_primary": true,
-          "source_series": "WPUFD4"
-        },
-        {
-          "metric_id": "headline_mom",
-          "label": "Final Demand MoM",
-          "actual": "0.4%",
-          "forecast": "",
-          "previous": "0.1%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "WPSFD4"
-        },
-        {
-          "metric_id": "core_yoy",
-          "label": "Core YoY（除食品/能源/貿易服務）",
-          "actual": "4.7%",
-          "forecast": "",
-          "previous": "4.7%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "WPUFD49116"
-        },
-        {
-          "metric_id": "core_mom",
-          "label": "Core MoM（除食品/能源/貿易服務）",
-          "actual": "0.3%",
-          "forecast": "",
-          "previous": "0.4%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "WPSFD49116"
-        }
-      ]
-    },
-    {
-      "event_id": "official-us-dol-claims-2026-09-10",
-      "time_tpe": "2026-09-10T20:30:00+08:00",
-      "title": "美國初領失業救濟金人數（Initial Claims）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "A",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "初領失業救濟",
-        "就業",
-        "Fed",
-        "美元"
-      ],
-      "actual": "206K",
-      "forecast": "",
-      "previous": "207K",
-      "source": "U.S. Department of Labor (ETA)",
-      "source_url": "https://www.dol.gov/newsroom/releases/eta",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-dol-claims",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "initial_claims",
-          "label": "初領失業救濟金",
-          "actual": "206K",
-          "forecast": "",
-          "previous": "207K",
-          "unit": "K",
-          "is_primary": true,
-          "source_series": "DOL UI Weekly Claims PDF"
-        },
-        {
-          "metric_id": "four_week_average",
-          "label": "4週移動平均",
-          "actual": "206K",
-          "forecast": "",
-          "previous": "",
-          "unit": "K",
-          "is_primary": false,
-          "source_series": "DOL UI Weekly Claims PDF"
-        }
-      ]
-    },
     {
       "event_id": "official-us-bls-cpi-2026-09-11",
       "time_tpe": "2026-09-11T20:30:00+08:00",
@@ -492,6 +376,33 @@
           "source_series": "Federal Reserve G.17 Table 7 Total industry"
         }
       ]
+    },
+    {
+      "event_id": "official-us-fed-fomc-2026-09-18",
+      "time_tpe": "2026-09-19T02:00:00+08:00",
+      "title": "美國聯邦公開市場委員會（FOMC）利率決議",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "FOMC",
+        "Fed",
+        "利率",
+        "全球風險資產",
+        "含記者會",
+        "SEP"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Federal Reserve",
+      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-fed-fomc",
+      "symbol": ""
     }
   ]
 }
