@@ -180,7 +180,7 @@ def _result_to_dict(result: SurpriseResult | None) -> dict[str, Any] | None:
         "metric_id": result.metric_id,
         "actual": result.actual,
         "reference_value": result.consensus,
-        "difference": result.surprise,
+        "difference": round(result.surprise, 12),
         "difference_unit": result.surprise_unit,
         "direction": result.direction,
         "magnitude": result.magnitude,
