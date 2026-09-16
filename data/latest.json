@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-16",
-  "generated_at_tpe": "2026-09-16T03:05:19.763078+08:00",
+  "snapshot_date_tpe": "2026-09-17",
+  "generated_at_tpe": "2026-09-17T02:19:11.533886+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
@@ -53,25 +53,13 @@
       ],
       "actual": "",
       "forecast": "",
-      "previous": "-0.6%",
+      "previous": "",
       "source": "U.S. Census Bureau",
       "source_url": "https://www.census.gov/retail/sales.html",
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-us-census-retail",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "headline_mom",
-          "label": "零售與餐飲銷售 MoM",
-          "actual": "",
-          "forecast": "",
-          "previous": "-0.6%",
-          "unit": "%",
-          "is_primary": true,
-          "source_series": "Census MARTS"
-        }
-      ]
+      "symbol": ""
     },
     {
       "event_id": "official-us-fed-fomc-2026-09-16",
