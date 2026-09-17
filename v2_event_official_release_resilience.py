@@ -10,13 +10,14 @@ import v2_event_radar as core
 
 
 CENSUS_ECON_WIDGET_URL = "https://www.census.gov/econwidget"
+RESULT_LOOKBACK = timedelta(hours=48)
 _BASE_RETAIL_METRICS = phase2._retail_metrics
 
 _MONTH_HEADING = (
     r"January|February|March|April|May|June|July|August|September|October|November|December|"
     r"Jan/Feb|Apr/May|Oct/Nov|Dec/Jan"
 )
-_RATE_TOKEN = r"(?:\d+(?:\.\d+)?(?:[-\s]\d+/\d+)?|\d+/\d+)"
+_RATE_TOKEN = r"(?:\d+(?:\.\d+)?(?:[-–—\s]\d+/\d+)?|\d+/\d+)"
 
 
 def _year_fomc_section(text: str, year: int) -> str:
@@ -30,13 +31,11 @@ def _year_fomc_section(text: str, year: int) -> str:
 
 
 def parse_fomc_meeting_days(text: str, year: int) -> list[date]:
-    """Parse only regular meeting date ranges, never minutes-release dates.
+    """Parse only regular meeting ranges, never minutes-release dates.
 
-    The Fed calendar also contains strings such as ``Released February 18, 2026``.
-    The old flattened-text parser treated those single dates as new meetings.  A
-    regular meeting row is represented by a month heading immediately followed by
-    a day range (for example ``September 15-16*``), so this parser requires the
-    range shape and thereby fails closed on release-note dates.
+    The Fed calendar contains strings such as ``Minutes Released February 18,
+    2026`` next to actual meeting rows. Requiring a two-day range keeps those
+    release-note dates from becoming fake FOMC decisions.
     """
 
     section = _year_fomc_section(text, year)
@@ -45,7 +44,7 @@ def parse_fomc_meeting_days(text: str, year: int) -> list[date]:
 
     result: list[date] = []
     pattern = re.compile(
-        rf"\b({_MONTH_HEADING})\s+(\d{{1,2}})-(\d{{1,2}})\*?\b",
+        rf"\b({_MONTH_HEADING})\s+(\d{{1,2}})\s*[-–—]\s*(\d{{1,2}})\*?\b",
         re.I,
     )
     for match in pattern.finditer(section):
@@ -59,9 +58,8 @@ def parse_fomc_meeting_days(text: str, year: int) -> list[date]:
             continue
         end_year = year + (1 if end_month < start_month else 0)
         try:
-            # We record the policy-decision day: the final day of the meeting.
+            date(year, start_month, start_day)
             meeting_day = date(end_year, end_month, end_day)
-            date(year, start_month, start_day)  # validate the opening day as well
         except ValueError:
             continue
         result.append(meeting_day)
@@ -99,15 +97,11 @@ def _fmt_rate(value: float) -> str:
 
 
 def parse_fed_target_range(text: str) -> str:
-    """Return a normalized federal-funds target range from statement prose.
-
-    Supports both decimal forms (``4.25 to 4.5``) and the Fed's mixed-fraction
-    forms (``3-3/4 to 4``).
-    """
+    """Normalize decimal or mixed-fraction federal-funds target ranges."""
 
     plain = backend._plain_text(text)
     match = re.search(
-        rf"target range for the federal funds rate.{{0,220}}?(?:at|to)\s+"
+        rf"target range for the federal funds rate.{{0,260}}?(?:at|to)\s+"
         rf"({_RATE_TOKEN})\s+to\s+({_RATE_TOKEN})\s+percent",
         plain,
         re.I,
@@ -172,11 +166,7 @@ def _us_fomc_events_resilient(
 
 
 def parse_census_retail_widget(html: str) -> tuple[date | None, dict[str, str]]:
-    """Parse the first-party Census Economic Indicators retail card.
-
-    The widget may expose values either as visible text or HTML input values, so
-    the parser inspects a narrow raw-HTML block as well as its plain-text form.
-    """
+    """Parse the first-party Census Economic Indicators retail card."""
 
     raw = str(html or "")
     marker = re.search(r"Advance Monthly Retail Sales", raw, re.I)
@@ -201,17 +191,18 @@ def parse_census_retail_widget(html: str) -> tuple[date | None, dict[str, str]]:
     reference = date(int(ref_match.group(2)), month, 1)
 
     sales_match = re.search(r"\$\s*([\d,.]+)\s*B\b", plain, re.I)
-    pct_match = re.search(r"([+-]?\d+(?:\.\d+)?)\s*%", plain)
+    pct_match = re.search(r"([+-]?)\s*(\d+(?:\.\d+)?)\s*%", plain)
     if not sales_match:
         sales_match = re.search(r"value=[\"']\s*\$?\s*([\d,.]+)\s*B\s*[\"']", block, re.I)
     if not pct_match:
-        pct_match = re.search(r"value=[\"']\s*([+-]?\d+(?:\.\d+)?)\s*%\s*[\"']", block, re.I)
+        pct_match = re.search(r"value=[\"']\s*([+-]?)\s*(\d+(?:\.\d+)?)\s*%\s*[\"']", block, re.I)
 
     values: dict[str, str] = {}
     if sales_match:
         values["sales_level"] = f"${float(sales_match.group(1).replace(',', '')):g}B"
     if pct_match:
-        values["headline_mom"] = backend._pct(pct_match.group(1))
+        signed = f"{pct_match.group(1)}{pct_match.group(2)}"
+        values["headline_mom"] = backend._pct(signed)
     return reference, values
 
 
@@ -274,13 +265,66 @@ def _retail_metrics_resilient(
     return _merge_retail_widget_metrics(base_metrics, values)
 
 
+def _load_event_radar_resilient(days: int = 7) -> core.RadarEvents:
+    """Build the producer feed with the same 48h released-result horizon as storage."""
+
+    now = datetime.now(backend.TPE)
+    start = now - RESULT_LOOKBACK
+    end = now + timedelta(days=days)
+    daily_token = f"official-daily-{now.date().isoformat()}"
+    macro, health = backend.collect_official_macro(start, end, daily_token)
+    companies = backend._company_events(start, end, daily_token)
+    raw = core._dedupe([*macro, *companies])
+    radar = core.RadarEvents(core._homepage_events(raw, days), raw)
+    radar.source_health = health
+    radar.official_macro_ready = backend._official_macro_ready(macro, health)
+    return radar
+
+
+def _smart_refresh_missing_resilient(
+    events: list[core.MarketEvent],
+    now: datetime | None = None,
+) -> list[core.MarketEvent]:
+    """Retry missing official results throughout the 48h snapshot-retention window."""
+
+    now = now or datetime.now(backend.TPE)
+    due = [
+        event
+        for event in events
+        if event.expects_result
+        and not event.actual
+        and now >= event.time_tpe + timedelta(minutes=5)
+        and now - event.time_tpe <= RESULT_LOOKBACK
+    ]
+    if not due:
+        return events
+
+    token = f"official-smart-{now:%Y%m%d-%H%M}"
+    start = now - RESULT_LOOKBACK
+    end = now + timedelta(days=1)
+    refreshed: list[core.MarketEvent] = []
+    if any(event.provider.startswith("official-") for event in due):
+        macro, _ = backend.collect_official_macro(start, end, token)
+        refreshed.extend(macro)
+
+    symbols = {event.symbol for event in due if event.provider == "yfinance" and event.symbol}
+    profiles = {profile.ticker: profile for profile in core.AI_COMPANIES}
+    for symbol in symbols:
+        profile = profiles.get(symbol)
+        if profile:
+            refreshed.extend(core._company_events(profile, token))
+    return core._dedupe([*events, *refreshed]) if refreshed else events
+
+
 def install() -> None:
-    # Runtime monkeypatches intentionally sit after the existing official-source
-    # modules. The public snapshot contract does not change; only first-party
-    # collection resilience is hardened.
+    # Import this module after the existing hardening modules so these final
+    # first-party resilience patches win without changing the public contract.
     backend._us_fomc_events = _us_fomc_events_resilient
     backend._fed_target_result = _fed_target_result_resilient
     phase2._retail_metrics = _retail_metrics_resilient
+    backend.load_event_radar = _load_event_radar_resilient
+    backend.smart_refresh_missing = _smart_refresh_missing_resilient
+    backend.load_event_radar.clear = backend.clear_event_caches
 
 
 install()
