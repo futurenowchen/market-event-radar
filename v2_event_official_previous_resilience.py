@@ -4,6 +4,7 @@ from dataclasses import replace
 from datetime import date, datetime
 from functools import lru_cache
 from io import BytesIO
+import re
 from urllib.request import Request, urlopen
 
 from pypdf import PdfReader
@@ -15,6 +16,7 @@ import v2_event_radar as core
 
 
 RETAIL_PDF_BASE = "https://www2.census.gov/retail/releases/historical/marts"
+RETAIL_ADJUSTED_TOTAL_URL = "https://www.census.gov/retail/marts/www/adv44X72.txt"
 _BASE_FOMC_EVENTS = backend._us_fomc_events
 _BASE_RETAIL_METRICS = phase2._retail_metrics
 
@@ -80,9 +82,52 @@ def _retail_pdf_values(reference_month: date) -> dict[str, str]:
     return values if reference == reference_month else {}
 
 
+def _parse_adjusted_total_series(text: str) -> dict[date, float]:
+    """Parse Census' first-party adjusted Retail & Food Services total series."""
+
+    result: dict[date, float] = {}
+    for line in str(text or "").splitlines():
+        match = re.match(r"^\s*(20\d{2})\s+(.+?)\s*$", line)
+        if not match:
+            continue
+        year = int(match.group(1))
+        values: list[float] = []
+        for token in match.group(2).split():
+            try:
+                values.append(float(token.replace(",", "")))
+            except ValueError:
+                break
+        if not values:
+            continue
+        for month, value in enumerate(values[:12], start=1):
+            result[date(year, month, 1)] = value
+    return result
+
+
+def _retail_timeseries_previous(reference_month: date, refresh_token: str) -> str:
+    """Derive the revised prior-month MoM from current official adjusted levels.
+
+    This is a fallback for release-day windows where the Economic Indicators
+    widget has updated but the archived release PDF has not propagated yet.
+    """
+
+    text = backend._fetch_text(RETAIL_ADJUSTED_TOTAL_URL, refresh_token)
+    series = _parse_adjusted_total_series(text)
+    previous_month = phase2._previous_month(reference_month)
+    two_months_back = phase2._previous_month(previous_month)
+    previous_level = series.get(previous_month)
+    earlier_level = series.get(two_months_back)
+    if previous_level is None or earlier_level in (None, 0):
+        return ""
+    change = (previous_level / earlier_level - 1.0) * 100.0
+    return backend._pct(f"{change:.1f}")
+
+
 def _merge_retail_previous(
     base_metrics: list[dict],
     values: dict[str, str],
+    *,
+    source_series: str = "Census MARTS release PDF",
 ) -> list[dict]:
     result = [dict(row) for row in base_metrics]
     by_id = {str(row.get("metric_id") or ""): row for row in result}
@@ -98,7 +143,7 @@ def _merge_retail_previous(
             previous=previous,
             unit="%",
             is_primary=True,
-            source_series="Census MARTS release PDF",
+            source_series=source_series,
         )
         result.append(primary)
         by_id["headline_mom"] = primary
@@ -107,7 +152,8 @@ def _merge_retail_previous(
             primary["actual"] = actual
         if previous:
             primary["previous"] = previous
-        primary["source_series"] = "Census MARTS release PDF"
+        if actual or previous:
+            primary["source_series"] = source_series
         primary["is_primary"] = True
 
     additions = (
@@ -125,7 +171,7 @@ def _merge_retail_previous(
                 label,
                 actual=value,
                 unit=unit,
-                source_series="Census MARTS release PDF",
+                source_series=source_series,
             )
             result.append(row)
             by_id[metric_id] = row
@@ -148,10 +194,26 @@ def _retail_metrics_with_previous(
     if not isinstance(reference, date) or now < event.time_tpe:
         return base_metrics
 
-    values = _retail_pdf_values(reference)
-    if not values:
-        return base_metrics
-    return _merge_retail_previous(base_metrics, values)
+    # Preferred post-release source: the current release PDF, because its prose
+    # explicitly carries the revised/unrevised prior-month change.
+    pdf_values = _retail_pdf_values(reference)
+    merged = _merge_retail_previous(base_metrics, pdf_values) if pdf_values else base_metrics
+    primary = next((row for row in merged if row.get("is_primary")), None)
+    if primary and primary.get("previous"):
+        return merged
+
+    # Release-day propagation can leave the archive PDF one step behind the
+    # already-current widget. In that narrow case, derive Previous from Census'
+    # current seasonally adjusted total series rather than using a stale initial
+    # value from last month's snapshot.
+    previous = _retail_timeseries_previous(reference, refresh_token)
+    if not previous:
+        return merged
+    return _merge_retail_previous(
+        merged,
+        {"previous_mom": previous},
+        source_series="Census MARTS adjusted total series",
+    )
 
 
 def clear_previous_value_caches() -> None:
