@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,6 +37,29 @@ def main() -> None:
     if not values.get("headline_mom"):
         raise SystemExit(f"Census retail widget has no headline MoM: {values}")
     print(f"Census retail widget: reference={reference}, values={values}")
+
+    # Exercise the real post-release fallback path, not just the widget parser.
+    retail_event = backend._event(
+        event_id="official-us-census-retail-2026-09-16",
+        dt=datetime.fromisoformat("2026-09-16T20:30:00+08:00"),
+        title="美國零售銷售（Retail Sales）",
+        country="美國",
+        tier="A",
+        tags=("美國", "零售銷售"),
+        source="U.S. Census Bureau",
+        source_url="https://www.census.gov/retail/sales.html",
+        provider="official-us-census-retail",
+    )
+    object.__setattr__(retail_event, "reference_month", date(2026, 8, 1))
+    metrics = resilience._retail_metrics_resilient(
+        retail_event,
+        datetime.now(backend.TPE),
+        "release-resilience-integrated",
+    )
+    primary = next((row for row in metrics if row.get("is_primary")), None)
+    if not primary or not primary.get("actual"):
+        raise SystemExit(f"Integrated Census retail fallback returned no primary actual: {metrics}")
+    print(f"Integrated Census retail actual: {primary['actual']}")
 
     print("Release resilience live probe passed")
 
