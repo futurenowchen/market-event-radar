@@ -23,6 +23,7 @@ import v2_event_official_us_claims  # noqa: F401  # reads weekly claims from off
 import v2_event_official_us_phase3  # noqa: F401  # installs G17/durable-goods/housing adapters
 import v2_event_official_us_phase4  # noqa: F401  # final US coverage/tier calibration
 import v2_event_official_us_phase4_resilience  # noqa: F401  # hardens Chair title matching
+import v2_event_official_release_resilience  # noqa: F401  # FOMC/retail result + 48h recovery hardening
 import v2_event_company_ir  # noqa: F401  # installs official company IR fallbacks
 import v2_event_semantics  # noqa: F401  # normalizes fallback categories/date-only semantics
 import v2_event_radar as er
