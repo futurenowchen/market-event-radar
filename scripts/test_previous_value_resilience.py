@@ -112,6 +112,26 @@ def main() -> None:
     finally:
         previous._fetch_retail_pdf_text = original_pdf_fetch
 
+    series_text = """
+RETAIL & FOOD SERVICES
+YEAR      JAN       FEB       MAR       APR       MAY       JUN       JUL       AUG
+2026   734503    741278    754013    759097    766876    768553    764710    773900
+
+SEASONAL FACTORS
+2026     0.914     0.882     1.011     0.998     1.043     1.008     1.033     1.015
+"""
+    parsed = previous._parse_adjusted_total_series(series_text)
+    assert parsed[date(2026, 6, 1)] == 768553
+    assert parsed[date(2026, 7, 1)] == 764710
+
+    original_fetch = backend._fetch_text
+    try:
+        backend._fetch_text = lambda url, token: series_text if url == previous.RETAIL_ADJUSTED_TOTAL_URL else ""
+        derived = previous._retail_timeseries_previous(date(2026, 8, 1), "test")
+        assert derived == "-0.5%"
+    finally:
+        backend._fetch_text = original_fetch
+
     print("Previous-value resilience tests passed")
 
 
