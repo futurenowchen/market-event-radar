@@ -83,10 +83,17 @@ def _retail_pdf_values(reference_month: date) -> dict[str, str]:
 
 
 def _parse_adjusted_total_series(text: str) -> dict[date, float]:
-    """Parse Census' first-party adjusted Retail & Food Services total series."""
+    """Parse only the adjusted Retail & Food Services level table.
+
+    The Census text file contains a later ``SEASONAL FACTORS`` section with its
+    own year-labelled rows. Stop before that section so factor rows can never
+    overwrite the monthly sales levels collected above.
+    """
 
     result: dict[date, float] = {}
     for line in str(text or "").splitlines():
+        if "SEASONAL FACTORS" in line.upper():
+            break
         match = re.match(r"^\s*(20\d{2})\s+(.+?)\s*$", line)
         if not match:
             continue
