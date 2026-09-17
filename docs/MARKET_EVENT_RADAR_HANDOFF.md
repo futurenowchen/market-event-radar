@@ -8,7 +8,7 @@ Last reconciled: 2026-09-17 Asia/Taipei
 
 ## Verified implementation baseline
 
-Verified code commit: `d7f2307a9d56aa88c8acf4e713e3ec46df7c09ce`
+Verified code commit: `fb1bb303761a32c47db703bd1943903f998c3e89`
 
 Later bot commits that only refresh `data/latest.json` / history are expected and do not change this implementation baseline.
 
@@ -21,42 +21,52 @@ Current merged implementation includes:
 - zero-cost MetaTrader 5 canary parser/private CLI and Windows deployment helper
 - PR #23 private overlay v1 with strict `survey_consensus` versus `provider_forecast` semantics
 - public `data/latest.json` remains official-source-only
-- PR #24 / #25 release-result resilience for FOMC and Census Retail Sales
+- PR #24 / #25 release-result resilience for FOMC and Census Retail Sales Actual values
+- PR #26 official Previous-value completion for FOMC and Retail Sales
 - official result retry / producer lookback aligned to the same 48-hour horizon used by snapshot retention and watchdog validation
 
 ## 2026-09-17 result-collector incident and recovery
 
 The dashboard-open trigger and GitHub Actions scheduler were not the root cause. A dashboard-open `workflow_dispatch` successfully ran the refresh gate and correctly detected a released FOMC event with missing Actual, but the collector returned `No provider values changed`. The scheduled watchdog also correctly failed on two overdue official results: 2026-09-16 Retail Sales and the 2026-09-16 FOMC decision.
 
-Root causes:
+Root causes fixed by PR #24 / #25:
 
-1. The FOMC calendar parser flattened the Fed calendar and accepted standalone month/day text, so `Minutes Released ...` dates could become fake FOMC decisions.
-2. The federal-funds result parser accepted decimal ranges only and missed mixed-fraction Fed statement text such as `3-3/4 to 4 percent`.
-3. Census `retail/sales.html` can lag the current release while the first-party Census Economic Indicators widget already exposes the current MARTS headline.
-4. Smart missing-result retries stopped after 12 hours while the public snapshot/watchdog retain releases for 48 hours, leaving a 12h–48h unrecoverable gap.
+1. FOMC calendar parsing could mistake `Minutes Released ...` dates for policy meetings.
+2. Fed target-range parsing did not support mixed-fraction statement text such as `3-3/4 to 4 percent`.
+3. Census `retail/sales.html` can lag the current release while the first-party Census Economic Indicators widget is already current.
+4. Missing-result retries stopped after 12 hours while snapshots/watchdog retain releases for 48 hours.
 
-PR #24 (`402c69f167f18373f0ec4cd9dce0d0f1ecd3259c`) added `v2_event_official_release_resilience.py` and:
+PR #24 merge: `402c69f167f18373f0ec4cd9dce0d0f1ecd3259c`.
+PR #25 merge: `d7f2307a9d56aa88c8acf4e713e3ec46df7c09ce`.
 
-- parses only genuine two-day FOMC meeting ranges, preventing minutes-release dates from becoming fake meetings;
-- parses decimal and mixed-fraction target ranges;
-- adds a first-party Census Economic Indicators fallback for released Retail Sales with exact reference-month validation;
-- expands producer/smart-refresh result recovery to 48 hours;
-- adds deterministic regression tests and a first-party live probe.
+## Previous-value completeness
 
-PR #25 (`d7f2307a9d56aa88c8acf4e713e3ec46df7c09ce`) fixed the final Retail runtime edge by using the canonical Census widget URL directly and upgraded the live probe to exercise the integrated `_retail_metrics_resilient()` path end-to-end.
+After Actual recovery, the production snapshot still exposed a second-layer completeness gap: Retail Sales and FOMC had valid Actual values but blank `previous` fields.
+
+PR #26 (`fb1bb303761a32c47db703bd1943903f998c3e89`) added `v2_event_official_previous_resilience.py` and fixes Previous without hard-coding production values:
+
+- FOMC Previous is read from the immediately preceding official FOMC policy statement. For the 2026-09-16 decision, the preceding 2026-07-29 statement yields `3.5–3.75%`.
+- Retail Sales prefers the same current Census MARTS release PDF because its prose carries the revised/unrevised prior-month change.
+- If the current historical release PDF has not propagated on release day, Retail Previous is derived from Census' first-party seasonally adjusted Retail & Food Services total series (`adv44X72.txt`) using the prior two official monthly levels.
+- The adjusted-series parser stops before the later `SEASONAL FACTORS` section so factor rows cannot overwrite sales levels.
+- If neither current first-party path can support the value, Previous remains blank rather than using a stale prior-release initial value.
+- Snapshot runtime installs this resilience layer, and code changes trigger an immediate production refresh.
 
 Validation evidence:
 
-- PR #24 Release Result Resilience Check run `35179237457`, job `105067613437`: success.
-- Live probe parsed the official 2026-09-16 FOMC target range as `3.75–4%` and the current Census widget successfully.
-- Post-PR #24 production refresh recovered FOMC and removed the spurious consecutive FOMC events.
-- PR #25 Release Result Resilience Check run `35179613482`, job `105068748995`: success.
-- PR #25 integrated live probe produced Retail Sales primary Actual `1.2%` for reference month August 2026.
-- Post-merge refresh run `35179685319`: success; snapshot validation, history persistence and bot commit all succeeded.
-- Production snapshot generated `2026-09-17T11:51:16+08:00` now contains:
-  - Retail Sales 2026-09-16: released, Actual `1.2%`, sales level `$773.9B`.
-  - FOMC 2026-09-16: released, Actual `3.75–4%`.
-  - no fake FOMC meetings on the minutes-release dates that previously polluted the horizon.
+- PR #26 Release Result Resilience Check run `35181315471`, job `105073856424`: success.
+- Deterministic release and Previous-value regressions: success.
+- First-party live probe:
+  - FOMC Actual `3.75–4%`, Previous `3.5–3.75%` from the 2026-07-29 Fed statement.
+  - Retail Sales Actual `1.2%`, Previous `-0.5%`, with release-day fallback source `Census MARTS adjusted total series`.
+- PR #26 merge-triggered production refresh run `35181398269`: success, including snapshot validation, history persistence and bot commit.
+- Post-merge broad Validate public feed run `35181398275`: success, including official-source collector probe.
+- Production data bot commit: `41a02abbc0b47a9d68df7bd667367b5bbe094d08`.
+- Production snapshot generated `2026-09-17T12:18:22+08:00` contains:
+  - Retail Sales 2026-09-16: Actual `1.2%`, Previous `-0.5%`, sales level `$773.9B`.
+  - FOMC 2026-09-16: Actual `3.75–4%`, Previous `3.5–3.75%`.
+  - Initial Claims and Housing releases retain their existing Previous values.
+  - `official_macro_ready = true` and all current source-health flags are true.
 
 ## Private overlay v1 contract
 
@@ -78,15 +88,17 @@ The downstream `investment-dashboard` private consumer and append-only ingestion
 - Do not place consensus retrieval inside Streamlit reruns.
 - Do not weaken watchdog/result requirements to hide collector failures.
 - Keep official release recovery aligned with the 48-hour public retention window unless the retention contract itself changes.
+- For revised economic data, prefer the value/current series published with the current release over a stale Previous copied from an older snapshot.
 
 ## Known debt / blockers
 
 - No unattended zero-cost source has earned `survey_consensus` status.
 - Authentic private pre-release evidence is still required for end-to-end canonical Surprise validation.
 - Historical/private MT5 evidence files are intentionally not committed to this public repository.
-- The broad official collector still depends on upstream first-party page structures; the new live release probe now covers the specific FOMC/Retail failure class.
+- Official collectors remain exposed to future first-party page/schema changes; dedicated live probes now cover the FOMC/Retail result and Previous failure class.
+- The next real released-result cycle is still useful as a broader post-fix regression observation.
 - Dashboard legacy rolling smoke checks can still false-fail independently of producer health.
 
 ## Exact next action
 
-Observe the next scheduled released-result cycle and watchdog (including the 2026-09-17 Taiwan CBC and U.S. evening releases) and verify that released events populate Actual within the 48-hour recovery contract without creating duplicate/spurious calendar events; once that stays green, resume authentic private-overlay evidence validation.
+Observe the 2026-09-17 Taiwan CBC and U.S. evening release cycle to verify Actual and available official Previous values populate without duplicate/spurious events; if green, resume authentic private pre-release overlay evidence validation.
