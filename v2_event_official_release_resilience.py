@@ -31,12 +31,7 @@ def _year_fomc_section(text: str, year: int) -> str:
 
 
 def parse_fomc_meeting_days(text: str, year: int) -> list[date]:
-    """Parse only regular meeting ranges, never minutes-release dates.
-
-    The Fed calendar contains strings such as ``Minutes Released February 18,
-    2026`` next to actual meeting rows. Requiring a two-day range keeps those
-    release-note dates from becoming fake FOMC decisions.
-    """
+    """Parse only regular meeting ranges, never minutes-release dates."""
 
     section = _year_fomc_section(text, year)
     if not section:
@@ -256,9 +251,10 @@ def _retail_metrics_resilient(
     if not isinstance(expected, date):
         return base_metrics
 
-    cache_bust = re.sub(r"[^A-Za-z0-9_-]", "", str(refresh_token or ""))[-48:]
-    widget_url = CENSUS_ECON_WIDGET_URL + (f"?_radar={cache_bust}" if cache_bust else "")
-    widget_html = backend._fetch_text(widget_url, refresh_token)
+    # _fetch_text already includes refresh_token in its cache key, so a query-string
+    # cache buster is unnecessary and can cause Census edge/CDN variants to return a
+    # different representation. Keep the canonical first-party widget URL stable.
+    widget_html = backend._fetch_text(CENSUS_ECON_WIDGET_URL, refresh_token)
     reference, values = parse_census_retail_widget(widget_html)
     if reference != expected or not values.get("headline_mom"):
         return base_metrics
@@ -266,8 +262,6 @@ def _retail_metrics_resilient(
 
 
 def _load_event_radar_resilient(days: int = 7) -> core.RadarEvents:
-    """Build the producer feed with the same 48h released-result horizon as storage."""
-
     now = datetime.now(backend.TPE)
     start = now - RESULT_LOOKBACK
     end = now + timedelta(days=days)
@@ -285,8 +279,6 @@ def _smart_refresh_missing_resilient(
     events: list[core.MarketEvent],
     now: datetime | None = None,
 ) -> list[core.MarketEvent]:
-    """Retry missing official results throughout the 48h snapshot-retention window."""
-
     now = now or datetime.now(backend.TPE)
     due = [
         event
@@ -317,8 +309,6 @@ def _smart_refresh_missing_resilient(
 
 
 def install() -> None:
-    # Import this module after the existing hardening modules so these final
-    # first-party resilience patches win without changing the public contract.
     backend._us_fomc_events = _us_fomc_events_resilient
     backend._fed_target_result = _fed_target_result_resilient
     phase2._retail_metrics = _retail_metrics_resilient
