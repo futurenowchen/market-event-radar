@@ -4,16 +4,22 @@ on:
   pull_request:
     paths:
       - "v2_event_official_release_resilience.py"
+      - "v2_event_official_previous_resilience.py"
       - "scripts/test_release_resilience.py"
+      - "scripts/test_previous_value_resilience.py"
       - "scripts/check_release_resilience_live.py"
+      - "scripts/check_previous_value_resilience_live.py"
       - "scripts/update_event_radar_snapshot.py"
       - ".github/workflows/release-resilience-pr-check.yml"
   push:
     branches: [main]
     paths:
       - "v2_event_official_release_resilience.py"
+      - "v2_event_official_previous_resilience.py"
       - "scripts/test_release_resilience.py"
+      - "scripts/test_previous_value_resilience.py"
       - "scripts/check_release_resilience_live.py"
+      - "scripts/check_previous_value_resilience_live.py"
       - "scripts/update_event_radar_snapshot.py"
       - ".github/workflows/release-resilience-pr-check.yml"
   workflow_dispatch:
@@ -42,10 +48,17 @@ jobs:
         run: |
           python -m py_compile \
             v2_event_official_release_resilience.py \
+            v2_event_official_previous_resilience.py \
             scripts/test_release_resilience.py \
+            scripts/test_previous_value_resilience.py \
             scripts/check_release_resilience_live.py \
+            scripts/check_previous_value_resilience_live.py \
             scripts/update_event_radar_snapshot.py
       - name: Run deterministic release regressions
-        run: python scripts/test_release_resilience.py
+        run: |
+          python scripts/test_release_resilience.py
+          python scripts/test_previous_value_resilience.py
       - name: Probe first-party release sources
-        run: python scripts/check_release_resilience_live.py
+        run: |
+          python scripts/check_release_resilience_live.py
+          python scripts/check_previous_value_resilience_live.py
