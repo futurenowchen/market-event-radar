@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-09-17",
-  "generated_at_tpe": "2026-09-17T11:45:55.375734+08:00",
+  "generated_at_tpe": "2026-09-17T11:51:16.375920+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
@@ -51,15 +51,37 @@
         "Fed",
         "NASDAQ"
       ],
-      "actual": "",
+      "actual": "1.2%",
       "forecast": "",
       "previous": "",
       "source": "U.S. Census Bureau",
       "source_url": "https://www.census.gov/retail/sales.html",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-census-retail",
-      "symbol": ""
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "headline_mom",
+          "label": "零售與餐飲銷售 MoM",
+          "actual": "1.2%",
+          "forecast": "",
+          "previous": "",
+          "unit": "%",
+          "is_primary": true,
+          "source_series": "Census Economic Indicators / MARTS"
+        },
+        {
+          "metric_id": "sales_level",
+          "label": "零售與餐飲銷售額",
+          "actual": "$773.9B",
+          "forecast": "",
+          "previous": "",
+          "unit": "USD billions",
+          "is_primary": false,
+          "source_series": "Census Economic Indicators / MARTS"
+        }
+      ]
     },
     {
       "event_id": "official-us-fed-fomc-2026-09-16",
