@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-18",
-  "generated_at_tpe": "2026-09-18T22:25:31.224280+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-09-19",
+  "generated_at_tpe": "2026-09-19T01:51:09.527413+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 7,
+  "event_count": 8,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -28,6 +28,7 @@
   "provider_counts": {
     "official-jp-boj": 1,
     "official-tw-cbc": 1,
+    "official-us-census-durable": 1,
     "official-us-census-housing": 1,
     "official-us-dol-claims": 2,
     "official-us-fed-fomc": 1,
@@ -241,35 +242,13 @@
       ],
       "actual": "",
       "forecast": "",
-      "previous": "0.2%",
+      "previous": "",
       "source": "Federal Reserve Board",
       "source_url": "https://www.federalreserve.gov/releases/g17/",
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-us-fed-g17",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "industrial_production_mom",
-          "label": "工業生產 MoM",
-          "actual": "",
-          "forecast": "",
-          "previous": "0.2%",
-          "unit": "%",
-          "is_primary": true,
-          "source_series": "Federal Reserve G.17 Total IP"
-        },
-        {
-          "metric_id": "capacity_utilization",
-          "label": "產能利用率",
-          "actual": "",
-          "forecast": "",
-          "previous": "76.3%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "Federal Reserve G.17 Table 7 Total industry"
-        }
-      ]
+      "symbol": ""
     },
     {
       "event_id": "official-us-dol-claims-2026-09-24",
@@ -307,6 +286,31 @@
           "source_series": "DOL UI Weekly Claims PDF"
         }
       ]
+    },
+    {
+      "event_id": "official-us-census-durable-2026-09-25",
+      "time_tpe": "2026-09-25T20:30:00+08:00",
+      "title": "美國耐久財訂單（Durable Goods Orders）",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "B",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "耐久財",
+        "製造業",
+        "景氣",
+        "資本支出"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "U.S. Census Bureau",
+      "source_url": "https://www.census.gov/manufacturing/m3/adv/current/index.html",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-census-durable",
+      "symbol": ""
     }
   ]
 }
