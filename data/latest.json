@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-20",
-  "generated_at_tpe": "2026-09-20T01:25:06.861909+08:00",
+  "snapshot_date_tpe": "2026-09-21",
+  "generated_at_tpe": "2026-09-21T00:27:24.992292+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 4,
+  "event_count": 2,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -26,62 +26,10 @@
     "us_ism": true
   },
   "provider_counts": {
-    "official-jp-boj": 1,
     "official-us-census-durable": 1,
-    "official-us-dol-claims": 1,
-    "official-us-fed-g17": 1
+    "official-us-dol-claims": 1
   },
   "events": [
-    {
-      "event_id": "official-jp-boj-2026-09-18",
-      "time_tpe": "2026-09-18T11:00:00+08:00",
-      "title": "日本銀行（BOJ）金融政策決定會合",
-      "category": "央行事件",
-      "importance": 3,
-      "tier": "S",
-      "country": "日本",
-      "market_tags": [
-        "日本",
-        "BOJ",
-        "利率",
-        "日圓",
-        "全球風險資產"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Bank of Japan",
-      "source_url": "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm",
-      "status": "scheduled",
-      "expects_result": false,
-      "provider": "official-jp-boj",
-      "symbol": ""
-    },
-    {
-      "event_id": "official-us-fed-g17-2026-09-18",
-      "time_tpe": "2026-09-18T21:15:00+08:00",
-      "title": "美國工業生產與產能利用率（G.17）",
-      "category": "總體經濟",
-      "importance": 2,
-      "tier": "B",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "工業生產",
-        "產能利用率",
-        "景氣",
-        "Fed"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Federal Reserve Board",
-      "source_url": "https://www.federalreserve.gov/releases/g17/",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-us-fed-g17",
-      "symbol": ""
-    },
     {
       "event_id": "official-us-dol-claims-2026-09-24",
       "time_tpe": "2026-09-24T20:30:00+08:00",
