@@ -80,7 +80,7 @@ def main() -> None:
                 """
             if url == backend.CBC_MEETING_URL:
                 return '<a href="/tw/cp-357-test.html">中央銀行理監事聯席會議決議新聞稿</a>'
-            if url.endswith("/tw/cp-test.html"):
+            if url.endswith("/tw/cp-357-test.html"):
                 return hold
             return ""
 
