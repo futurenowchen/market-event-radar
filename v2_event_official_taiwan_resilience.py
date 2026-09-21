@@ -158,18 +158,22 @@ def _cbc_decision_for_day(meeting_day: date, refresh_token: str) -> tuple[str, s
             continue
         for label, href in backend._links(listing, listing_url):
             normalized = " ".join(str(label or "").split())
-            if (
-                "/tw/cp-357-" in href
+            is_detail = "/tw/cp-357-" in href
+            is_decision_label = (
+                "中央銀行理監事聯席會議決議新聞稿" in normalized
                 or (
                     "理監事" in normalized
-                    and ("決議" in normalized or "新聞稿" in normalized)
+                    and "決議" in normalized
+                    and "新聞稿" in normalized
                 )
-            ):
+            )
+            if is_detail and is_decision_label:
                 candidates.append(href)
 
-    # A listing can repeat the same link through desktop/mobile markup. Limit
-    # network work to the newest policy pages exposed by the current listings.
-    for href in list(dict.fromkeys(candidates))[:24]:
+    # A listing can repeat the same link through desktop/mobile markup. Only
+    # detail pages are candidates; listing/navigation pages must never satisfy
+    # the meeting-date test by accident.
+    for href in list(dict.fromkeys(candidates))[:12]:
         html = backend._fetch_text(href, refresh_token)
         plain = backend._plain_text(html)
         if (
