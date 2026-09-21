@@ -15,6 +15,11 @@ import v2_event_official_taiwan_resilience as tw
 def main() -> None:
     backend.clear_event_caches()
 
+    listing_html = backend._fetch_text(backend.CBC_MEETING_URL, "tw-cbc-live-listing")
+    links = backend._links(listing_html, backend.CBC_MEETING_URL)
+    relevant = [(label, href) for label, href in links if "理監事" in label or "cp-357" in href]
+    print(f"CBC relevant listing links ({len(relevant)}): {relevant[:12]}")
+
     rate_html = backend._fetch_text(tw.CBC_RATE_URL, "tw-cbc-live-rate")
     rate_rows = tw._parse_cbc_rate_rows(rate_html)
     if not rate_rows:
