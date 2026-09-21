@@ -1,6 +1,6 @@
 # Market Event Radar Handoff
 
-Last reconciled: 2026-09-17 Asia/Taipei
+Last reconciled: 2026-09-21 Asia/Taipei
 
 ## Canonical role
 
@@ -8,7 +8,7 @@ Last reconciled: 2026-09-17 Asia/Taipei
 
 ## Verified implementation baseline
 
-Verified code commit: `fb1bb303761a32c47db703bd1943903f998c3e89`
+Verified code commit: `4dec039d06b10e25e878e12adf34a0829a3edff2`
 
 Later bot commits that only refresh `data/latest.json` / history are expected and do not change this implementation baseline.
 
@@ -23,6 +23,8 @@ Current merged implementation includes:
 - public `data/latest.json` remains official-source-only
 - PR #24 / #25 release-result resilience for FOMC and Census Retail Sales Actual values
 - PR #26 official Previous-value completion for FOMC and Retail Sales
+- PR #27 first-party Taiwan CBC decision-result resilience with live Actual/Previous verification
+- PR #28 first-party Taiwan CBC historical release backfill utility/workflow
 - official result retry / producer lookback aligned to the same 48-hour horizon used by snapshot retention and watchdog validation
 
 ## 2026-09-17 result-collector incident and recovery
@@ -68,6 +70,32 @@ Validation evidence:
   - Initial Claims and Housing releases retain their existing Previous values.
   - `official_macro_ready = true` and all current source-health flags are true.
 
+## 2026-09-21 Taiwan CBC release incident and recovery
+
+The 2026-09-17 Taiwan CBC event exposed another released-result gap. The dashboard-open dispatch and refresh gate were healthy: a workflow run correctly reported `1 released event(s) still missing actual value: 台灣中央銀行理監事會利率決議`, but the collector returned no changed provider values.
+
+PR #27 (`6a3ed2e7b151d098a7c2ca3bc2d701b8e8084cf6`) fixed the CBC result path without hard-coded rates:
+
+- the stable first-party discount-rate table is parsed for the strict pre-meeting Previous value;
+- the dedicated CBC policy-decision listing is searched only for real `cp-357` decision detail pages;
+- listing/navigation pages are excluded so they cannot satisfy the meeting-date match accidentally;
+- the exact meeting-date decision release is parsed for the discount rate and unchanged-policy wording;
+- a nearby newly-effective first-party rate-table row remains a fallback for changed-rate decisions;
+- insufficient first-party evidence still fails closed.
+
+Live validation on PR #27 succeeded in run `35585643845`, job `106288229860`:
+
+- event: `official-tw-cbc-2026-09-17`
+- Actual: `2%`
+- Previous: `2%`
+- decision source: `https://www.cbc.gov.tw/tw/cp-357-192864-4319f-1.html`
+
+Post-merge production refresh run `35585809837`, job `106288756822`, succeeded, and broad public-feed validation run `35585809858`, job `106288756656`, also succeeded.
+
+Because the fix landed after the 2026-09-17 event had already aged outside the normal 48-hour public snapshot window, PR #28 (`4dec039d06b10e25e878e12adf34a0829a3edff2`) added a generic first-party CBC history-backfill utility rather than hard-coding production values. PR dry-run validation `35586249698` / `106290170667` succeeded. The post-merge backfill run `35586412002` / `106290683027` re-resolved the official event and appended a `released` history row. Data commit `538b2d4e691b73730e46aa0996879f8085ceb6a6` now records Actual `2%`, Previous `2%`, status `released`, and the official decision URL.
+
+The current `data/latest.json` does not contain the 2026-09-17 CBC event because that is expected under the 48-hour retention contract; the append-only history ledger now preserves the corrected released state.
+
 ## Private overlay v1 contract
 
 `market_event_radar/private_overlay.py` remains the producer-side private expectation contract and does not alter the public snapshot.
@@ -96,9 +124,9 @@ The downstream `investment-dashboard` private consumer and append-only ingestion
 - Authentic private pre-release evidence is still required for end-to-end canonical Surprise validation.
 - Historical/private MT5 evidence files are intentionally not committed to this public repository.
 - Official collectors remain exposed to future first-party page/schema changes; dedicated live probes now cover the FOMC/Retail result and Previous failure class.
-- The next real released-result cycle is still useful as a broader post-fix regression observation.
+- CBC forward result collection is now live-verified, but all official collectors remain exposed to future first-party HTML/schema changes.
 - Dashboard legacy rolling smoke checks can still false-fail independently of producer health.
 
 ## Exact next action
 
-Observe the 2026-09-17 Taiwan CBC and U.S. evening release cycle to verify Actual and available official Previous values populate without duplicate/spurious events; if green, resume authentic private pre-release overlay evidence validation.
+Resume authentic private pre-release overlay evidence validation; use provider_forecast only as diagnostic evidence until a true pre-release survey_consensus source is available.
