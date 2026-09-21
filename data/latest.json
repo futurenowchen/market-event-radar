@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-09-21",
-  "generated_at_tpe": "2026-09-21T00:27:24.992292+08:00",
+  "generated_at_tpe": "2026-09-21T17:55:00.941763+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 2,
+  "event_count": 3,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -26,6 +26,7 @@
     "us_ism": true
   },
   "provider_counts": {
+    "official-jp-boj": 1,
     "official-us-census-durable": 1,
     "official-us-dol-claims": 1
   },
@@ -90,6 +91,31 @@
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-us-census-durable",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-jp-boj-2026-09-28",
+      "time_tpe": "2026-09-28T11:00:00+08:00",
+      "title": "日本銀行（BOJ）金融政策決定會合",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "日本",
+      "market_tags": [
+        "日本",
+        "BOJ",
+        "利率",
+        "日圓",
+        "全球風險資產"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Bank of Japan",
+      "source_url": "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm",
+      "status": "scheduled",
+      "expects_result": false,
+      "provider": "official-jp-boj",
       "symbol": ""
     }
   ]
