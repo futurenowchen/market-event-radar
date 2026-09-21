@@ -144,21 +144,39 @@ def _cbc_decision_holds_rate(text: str) -> bool:
 
 
 def _cbc_decision_for_day(meeting_day: date, refresh_token: str) -> tuple[str, str]:
-    """Return (decision_html, decision_url) for the requested CBC meeting day."""
-    listing = backend._fetch_text(backend.CBC_MEETING_URL, refresh_token)
-    if not listing:
-        return "", ""
+    """Return (decision_html, decision_url) for the requested CBC meeting day.
 
+    CBC listing markup can place the publication date outside the anchor text, so
+    do not depend only on link labels. Candidate cp-357 pages are already scoped
+    to the official policy-decision collection; the page itself must still match
+    the requested meeting date and contain the decision heading.
+    """
     candidates: list[str] = []
-    for label, href in backend._links(listing, backend.CBC_MEETING_URL):
-        normalized = " ".join(str(label or "").split())
-        if "理監事" in normalized and ("決議" in normalized or "新聞稿" in normalized):
-            candidates.append(href)
+    for listing_url in (backend.CBC_MEETING_URL, backend.CBC_HOME_URL):
+        listing = backend._fetch_text(listing_url, refresh_token)
+        if not listing:
+            continue
+        for label, href in backend._links(listing, listing_url):
+            normalized = " ".join(str(label or "").split())
+            if (
+                "/tw/cp-357-" in href
+                or (
+                    "理監事" in normalized
+                    and ("決議" in normalized or "新聞稿" in normalized)
+                )
+            ):
+                candidates.append(href)
 
-    # A listing can repeat the same link through desktop/mobile markup.
-    for href in dict.fromkeys(candidates):
+    # A listing can repeat the same link through desktop/mobile markup. Limit
+    # network work to the newest policy pages exposed by the current listings.
+    for href in list(dict.fromkeys(candidates))[:24]:
         html = backend._fetch_text(href, refresh_token)
-        if html and _cbc_decision_matches_day(backend._plain_text(html), meeting_day):
+        plain = backend._plain_text(html)
+        if (
+            html
+            and _cbc_decision_matches_day(plain, meeting_day)
+            and "中央銀行理監事聯席會議決議" in plain
+        ):
             return html, href
     return "", ""
 
