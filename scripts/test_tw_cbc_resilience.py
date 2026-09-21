@@ -29,7 +29,9 @@ def main() -> None:
 
     hold = """
     <article>
+      <h1>中央銀行理監事聯席會議決議新聞稿</h1>
       <div>發布日期：2026-09-17</div>
+      <p>中央銀行理監事聯席會議決議</p>
       <p>本行維持政策利率不變，重貼現率、擔保放款融通利率及短期融通利率
       分別維持年息2%、2.375%及4.25%。</p>
     </article>
@@ -77,7 +79,7 @@ def main() -> None:
                 </table>
                 """
             if url == backend.CBC_MEETING_URL:
-                return '<a href="/tw/cp-test.html">中央銀行理監事聯席會議決議新聞稿</a>'
+                return '<a href="/tw/cp-357-test.html">中央銀行理監事聯席會議決議新聞稿</a>'
             if url.endswith("/tw/cp-test.html"):
                 return hold
             return ""
@@ -85,7 +87,7 @@ def main() -> None:
         tw._ORIGINAL_TW_CBC_EVENTS = fake_events
         backend._fetch_text = fake_fetch
         backend._links = lambda html, base: [
-            ("中央銀行理監事聯席會議決議新聞稿", "https://www.cbc.gov.tw/tw/cp-test.html")
+            ("中央銀行理監事聯席會議決議新聞稿", "https://www.cbc.gov.tw/tw/cp-357-test.html")
         ]
         rows, ok = tw._tw_cbc_events_resilient(
             datetime.fromisoformat("2026-09-17T00:00:00+08:00"),
@@ -96,7 +98,7 @@ def main() -> None:
         assert rows[0].actual == "2%"
         assert rows[0].previous == "2%"
         assert rows[0].status == "released"
-        assert rows[0].source_url.endswith("/tw/cp-test.html")
+        assert rows[0].source_url.endswith("/tw/cp-357-test.html")
     finally:
         tw._ORIGINAL_TW_CBC_EVENTS = original
         backend._fetch_text = original_fetch
