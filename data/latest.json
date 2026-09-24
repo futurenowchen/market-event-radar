@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-24",
-  "generated_at_tpe": "2026-09-24T22:44:03.567080+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-09-25",
+  "generated_at_tpe": "2026-09-25T00:01:39.750223+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 6,
+  "event_count": 9,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -26,12 +26,13 @@
     "us_ism": true
   },
   "provider_counts": {
-    "official-jp-boj": 1,
+    "official-jp-boj": 2,
     "official-kr-mods-industry": 1,
     "official-us-bea-pce": 1,
     "official-us-bls-jolts": 1,
     "official-us-census-durable": 1,
-    "official-us-dol-claims": 1
+    "official-us-dol-claims": 2,
+    "official-us-ism-manufacturing": 1
   },
   "events": [
     {
@@ -268,6 +269,96 @@
           "source_series": "BEA PIO release"
         }
       ]
+    },
+    {
+      "event_id": "official-jp-boj-2026-10-01",
+      "time_tpe": "2026-10-01T11:00:00+08:00",
+      "title": "日本銀行（BOJ）金融政策決定會合",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "日本",
+      "market_tags": [
+        "日本",
+        "BOJ",
+        "利率",
+        "日圓",
+        "全球風險資產"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Bank of Japan",
+      "source_url": "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm",
+      "status": "scheduled",
+      "expects_result": false,
+      "provider": "official-jp-boj",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-dol-claims-2026-10-01",
+      "time_tpe": "2026-10-01T20:30:00+08:00",
+      "title": "美國初領失業救濟金人數（Initial Claims）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "初領失業救濟",
+        "就業",
+        "Fed",
+        "美元"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "197K",
+      "source": "U.S. Department of Labor (ETA)",
+      "source_url": "https://www.dol.gov/newsroom/releases/eta",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-dol-claims",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "initial_claims",
+          "label": "初領失業救濟金",
+          "actual": "",
+          "forecast": "",
+          "previous": "197K",
+          "unit": "K",
+          "is_primary": true,
+          "source_series": "DOL UI Weekly Claims PDF"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-ism-manufacturing-2026-10-01",
+      "time_tpe": "2026-10-01T22:00:00+08:00",
+      "title": "美國ISM製造業PMI",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "ISM",
+        "PMI",
+        "製造業",
+        "景氣",
+        "Fed",
+        "schedule-only",
+        "未接授權數值"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Institute for Supply Management (ISM)",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
+      "status": "scheduled",
+      "expects_result": false,
+      "provider": "official-us-ism-manufacturing",
+      "symbol": ""
     }
   ]
 }
