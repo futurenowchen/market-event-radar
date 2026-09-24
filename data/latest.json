@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-09-24",
-  "generated_at_tpe": "2026-09-24T00:48:35.225662+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-09-24T22:44:03.567080+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 6,
@@ -49,12 +49,12 @@
         "Fed",
         "美元"
       ],
-      "actual": "",
+      "actual": "197K",
       "forecast": "",
-      "previous": "196K",
+      "previous": "198K",
       "source": "U.S. Department of Labor (ETA)",
       "source_url": "https://www.dol.gov/newsroom/releases/eta",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-dol-claims",
       "symbol": "",
@@ -62,9 +62,9 @@
         {
           "metric_id": "initial_claims",
           "label": "初領失業救濟金",
-          "actual": "",
+          "actual": "197K",
           "forecast": "",
-          "previous": "196K",
+          "previous": "198K",
           "unit": "K",
           "is_primary": true,
           "source_series": "DOL UI Weekly Claims PDF"
