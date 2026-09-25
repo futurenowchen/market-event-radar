@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-25",
-  "generated_at_tpe": "2026-09-25T00:01:39.750223+08:00",
+  "snapshot_date_tpe": "2026-09-26",
+  "generated_at_tpe": "2026-09-26T01:56:01.251879+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 9,
+  "event_count": 11,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -27,9 +27,11 @@
   },
   "provider_counts": {
     "official-jp-boj": 2,
+    "official-kr-mods-cpi": 1,
     "official-kr-mods-industry": 1,
     "official-us-bea-pce": 1,
     "official-us-bls-jolts": 1,
+    "official-us-bls-nfp": 1,
     "official-us-census-durable": 1,
     "official-us-dol-claims": 2,
     "official-us-ism-manufacturing": 1
@@ -359,6 +361,98 @@
       "expects_result": false,
       "provider": "official-us-ism-manufacturing",
       "symbol": ""
+    },
+    {
+      "event_id": "official-kr-mods-cpi-2026-10-02",
+      "time_tpe": "2026-10-02T07:00:00+08:00",
+      "title": "韓國消費者物價指數（CPI）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "韓國",
+      "market_tags": [
+        "韓國",
+        "CPI",
+        "通膨",
+        "BOK",
+        "韓元"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Ministry of Data and Statistics, Korea",
+      "source_url": "https://mods.go.kr/cpiOaSchdlView.es?mid=b70203020000",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-kr-mods-cpi",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-bls-nfp-2026-10-02",
+      "time_tpe": "2026-10-02T20:30:00+08:00",
+      "title": "美國非農就業人數（NFP）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "就業",
+        "Fed",
+        "美元",
+        "NASDAQ"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "+162K",
+      "source": "U.S. Bureau of Labor Statistics (BLS)",
+      "source_url": "https://www.bls.gov/schedule/news_release/empsit.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bls-nfp",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "payroll_change",
+          "label": "非農新增就業",
+          "actual": "",
+          "forecast": "",
+          "previous": "+162K",
+          "unit": "K",
+          "is_primary": true,
+          "source_series": "CES0000000001"
+        },
+        {
+          "metric_id": "unemployment_rate",
+          "label": "失業率",
+          "actual": "",
+          "forecast": "",
+          "previous": "4.1%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "LNS14000000"
+        },
+        {
+          "metric_id": "avg_hourly_earnings_mom",
+          "label": "平均時薪 MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.3%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CES0500000003"
+        },
+        {
+          "metric_id": "avg_hourly_earnings_yoy",
+          "label": "平均時薪 YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "3.1%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CES0500000003"
+        }
+      ]
     }
   ]
 }
