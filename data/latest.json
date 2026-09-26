@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-26",
-  "generated_at_tpe": "2026-09-26T01:56:01.251879+08:00",
+  "snapshot_date_tpe": "2026-09-27",
+  "generated_at_tpe": "2026-09-27T01:58:52.788761+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 11,
+  "event_count": 10,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -33,47 +33,10 @@
     "official-us-bls-jolts": 1,
     "official-us-bls-nfp": 1,
     "official-us-census-durable": 1,
-    "official-us-dol-claims": 2,
+    "official-us-dol-claims": 1,
     "official-us-ism-manufacturing": 1
   },
   "events": [
-    {
-      "event_id": "official-us-dol-claims-2026-09-24",
-      "time_tpe": "2026-09-24T20:30:00+08:00",
-      "title": "美國初領失業救濟金人數（Initial Claims）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "A",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "初領失業救濟",
-        "就業",
-        "Fed",
-        "美元"
-      ],
-      "actual": "197K",
-      "forecast": "",
-      "previous": "198K",
-      "source": "U.S. Department of Labor (ETA)",
-      "source_url": "https://www.dol.gov/newsroom/releases/eta",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-dol-claims",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "initial_claims",
-          "label": "初領失業救濟金",
-          "actual": "197K",
-          "forecast": "",
-          "previous": "198K",
-          "unit": "K",
-          "is_primary": true,
-          "source_series": "DOL UI Weekly Claims PDF"
-        }
-      ]
-    },
     {
       "event_id": "official-us-census-durable-2026-09-25",
       "time_tpe": "2026-09-25T20:30:00+08:00",
