@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-28",
-  "generated_at_tpe": "2026-09-28T01:49:25.784604+08:00",
+  "snapshot_date_tpe": "2026-09-29",
+  "generated_at_tpe": "2026-09-29T01:03:44.818100+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 9,
+  "event_count": 10,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -33,7 +33,8 @@
     "official-us-bls-jolts": 1,
     "official-us-bls-nfp": 1,
     "official-us-dol-claims": 1,
-    "official-us-ism-manufacturing": 1
+    "official-us-ism-manufacturing": 1,
+    "official-us-ism-services": 1
   },
   "events": [
     {
@@ -390,6 +391,34 @@
           "source_series": "CES0500000003"
         }
       ]
+    },
+    {
+      "event_id": "official-us-ism-services-2026-10-05",
+      "time_tpe": "2026-10-05T22:00:00+08:00",
+      "title": "美國ISM服務業PMI",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "ISM",
+        "PMI",
+        "服務業",
+        "景氣",
+        "Fed",
+        "schedule-only",
+        "未接授權數值"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Institute for Supply Management (ISM)",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
+      "status": "scheduled",
+      "expects_result": false,
+      "provider": "official-us-ism-services",
+      "symbol": ""
     }
   ]
 }
