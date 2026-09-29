@@ -130,3 +130,29 @@ The downstream `investment-dashboard` private consumer and append-only ingestion
 ## Exact next action
 
 Resume authentic private pre-release overlay evidence validation; use provider_forecast only as diagnostic evidence until a true pre-release survey_consensus source is available.
+
+
+## BOJ meeting/result semantic repair (2026-09-29)
+
+Incident:
+- the BOJ official MPM page contains four date columns per row: meeting dates, Outlook release, Summary of Opinions release, and Minutes release;
+- the previous parser scanned every date in the whole year section;
+- this incorrectly emitted `2026-09-28` (Minutes for the July 30-31 meeting) and `2026-10-01` (Summary of Opinions for the Sept. 17-18 meeting) as new BOJ policy meetings;
+- those false events also had `expects_result=false`, so no Actual/Previous could ever appear.
+
+PR #29 repair:
+- parse only genuine two-day MPM ranges and use the second meeting day as the canonical event date;
+- adjacent single release dates can no longer become policy meetings;
+- BOJ policy meetings now set `expects_result=true`;
+- after release, fetch the first-party BOJ policy statement PDF;
+- canonical Actual is the statement's uncollateralized overnight call-rate guideline;
+- Previous is derived from the immediately preceding official MPM statement;
+- deterministic regressions cover the Sept. 17-18 / Sept. 28 / Oct. 1 distinction and policy-rate parsing.
+
+First-party verification:
+- BOJ's official 2026 table identifies Sept. 17-18 as the September MPM;
+- Sept. 28 is the Minutes release for July 30-31;
+- Oct. 1 is the Summary of Opinions release for Sept. 17-18;
+- the current BOJ guideline is around 1.25%, while the July 31 statement was around 1.0%.
+
+This repair does not alter consensus/private-provider semantics.
