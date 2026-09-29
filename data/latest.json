@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-09-29",
-  "generated_at_tpe": "2026-09-29T09:41:35.320204+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-09-29T23:08:45.962605+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 8,
@@ -51,12 +51,12 @@
         "Fed",
         "NASDAQ"
       ],
-      "actual": "",
+      "actual": "7.1M",
       "forecast": "",
       "previous": "7.3M",
       "source": "U.S. Bureau of Labor Statistics (BLS)",
       "source_url": "https://www.bls.gov/schedule/news_release/jolts.htm",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-bls-jolts",
       "symbol": "",
@@ -64,7 +64,7 @@
         {
           "metric_id": "job_openings",
           "label": "職缺數",
-          "actual": "",
+          "actual": "7.1M",
           "forecast": "",
           "previous": "7.3M",
           "unit": "level",
@@ -74,7 +74,7 @@
         {
           "metric_id": "hires",
           "label": "聘僱人數",
-          "actual": "",
+          "actual": "5.2M",
           "forecast": "",
           "previous": "5.1M",
           "unit": "level",
@@ -84,7 +84,7 @@
         {
           "metric_id": "quits",
           "label": "主動離職人數",
-          "actual": "",
+          "actual": "3.1M",
           "forecast": "",
           "previous": "3.1M",
           "unit": "level",
@@ -94,7 +94,7 @@
         {
           "metric_id": "layoffs",
           "label": "裁員與解僱人數",
-          "actual": "",
+          "actual": "1.6M",
           "forecast": "",
           "previous": "1.7M",
           "unit": "level",
