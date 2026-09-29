@@ -2,8 +2,8 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-21T18:05:00+08:00",
-  "verified_code_commit": "4dec039d06b10e25e878e12adf34a0829a3edff2",
+  "last_reconciled_tpe": "2026-09-29",
+  "verified_code_commit": "209c04ccc94b6a210cbec73cb45f93206dc78f99",
   "phase": "tw-cbc-release-resilience-live-verified",
   "status": "TW_CBC_ACTUAL_PREVIOUS_AND_HISTORY_LIVE_VERIFIED",
   "completed": [
@@ -25,7 +25,11 @@
     "PR #28 merged as 4dec039d06b10e25e878e12adf34a0829a3edff2",
     "generic first-party Taiwan CBC history backfill utility added; no production rate is hard-coded",
     "post-merge history backfill appended released CBC evidence for 2026-09-17",
-    "history data commit 538b2d4e691b73730e46aa0996879f8085ceb6a6 records CBC Actual 2%, Previous 2%, released status and official decision URL"
+    "history data commit 538b2d4e691b73730e46aa0996879f8085ceb6a6 records CBC Actual 2%, Previous 2%, released status and official decision URL",
+    "PR #29 repairs BOJ schedule semantics so Summary-of-Opinions and Minutes release dates cannot become false policy meetings",
+    "BOJ policy meetings now expect released results and parse the first-party overnight call-rate guideline as Actual",
+    "BOJ Previous is derived from the immediately preceding first-party MPM policy statement",
+    "BOJ deterministic regressions cover 2026-09-18 true MPM versus 2026-09-28 minutes and 2026-10-01 Summary of Opinions"
   ],
   "active_work": [
     "resume authentic private pre-release overlay evidence validation",
@@ -109,5 +113,5 @@
     "use the CBC homepage as the sole released-rate source",
     "hard-code historical CBC Actual or Previous values into data history"
   ],
-  "exact_next_action": "Resume authentic private pre-release overlay evidence validation; use provider_forecast only as diagnostic evidence until a true pre-release survey_consensus source is available."
+  "exact_next_action": "Merge PR #29 and observe the push-triggered public-feed refresh; accept only if false BOJ meetings on 2026-09-28 and 2026-10-01 disappear and the next real BOJ MPM schedule remains semantically correct."
 }
