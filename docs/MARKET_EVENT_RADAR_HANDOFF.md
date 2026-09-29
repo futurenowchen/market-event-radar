@@ -156,3 +156,16 @@ First-party verification:
 - the current BOJ guideline is around 1.25%, while the July 31 statement was around 1.0%.
 
 This repair does not alter consensus/private-provider semantics.
+
+
+## BOJ live acceptance (2026-09-29)
+
+PR #29 was merged and the push-triggered public-feed refresh completed as commit `7864c0d4dc4a51e1e64151c6d9daf032b0e7c349`.
+
+Acceptance evidence:
+- `data/latest.json` regenerated at `2026-09-29T09:41:35.320204+08:00`;
+- false BOJ policy-meeting events on 2026-09-28 (Minutes release) and 2026-10-01 (Summary of Opinions release) are absent from the public snapshot;
+- Work-PC `market-event-radar` checkout fast-forwarded from `63d2ff778480...` to `7864c0d4dc4a...`;
+- bounded `investment radar-validate` returned `INVESTMENT_RADAR_VALIDATE_PASS`: schema v2 with 8 valid events.
+
+Conclusion: BOJ schedule semantics are repaired in the canonical producer and the Work-PC backup checkout is reconciled. No downstream dashboard parser workaround is required.
