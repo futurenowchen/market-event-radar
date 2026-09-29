@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-09-29",
-  "generated_at_tpe": "2026-09-29T23:08:45.962605+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-09-30",
+  "generated_at_tpe": "2026-09-30T00:58:18.115411+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 8,
