@@ -1,7 +1,12 @@
 from __future__ import annotations
 
-import re
 from datetime import date, datetime, timedelta
+from functools import lru_cache
+from io import BytesIO
+import re
+from urllib.request import Request, urlopen
+
+from pypdf import PdfReader
 
 import v2_event_official as backend
 import v2_event_radar as core
@@ -148,55 +153,138 @@ def _jp_gdp_events(start: datetime, end: datetime, refresh_token: str) -> tuple[
     return core._dedupe(events), True
 
 
+def _boj_year_section(text: str, year: int) -> str:
+    plain = backend._plain_text(text)
+    match = re.search(
+        rf"Table\s*:\s*{year}(.*?)(?=Table\s*:\s*{year + 1}|$)",
+        plain,
+        re.I,
+    )
+    return match.group(1) if match else ""
+
+
+def parse_boj_meeting_days(text: str, year: int) -> list[date]:
+    """Parse only the second day of genuine two-day BOJ MPM ranges.
+
+    The official table also contains Outlook, Summary of Opinions and Minutes
+    release dates in adjacent columns. Those are single dates and must never be
+    promoted into new monetary-policy meetings.
+    """
+
+    section = _boj_year_section(text, year)
+    if not section:
+        return []
+
+    result: list[date] = []
+    pattern = re.compile(
+        r"\b(Jan|Feb|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)\.?"
+        r"\s+(\d{1,2})\s*\([^)]*\)\s*,\s*(\d{1,2})\s*\([^)]*\)",
+        re.I,
+    )
+    for match in pattern.finditer(section):
+        month = backend._month_number(match.group(1))
+        if month is None:
+            continue
+        try:
+            date(year, month, int(match.group(2)))
+            meeting_day = date(year, month, int(match.group(3)))
+        except ValueError:
+            continue
+        result.append(meeting_day)
+    return sorted(set(result))
+
+
+def parse_boj_policy_rate(text: str) -> str:
+    plain = " ".join(str(text or "").split())
+    match = re.search(
+        r"uncollateralized\s+overnight\s+call\s+rate"
+        r".{0,240}?around\s+(\d+(?:\.\d+)?)\s+percent",
+        plain,
+        re.I,
+    )
+    return backend._pct(match.group(1)) if match else ""
+
+
+@lru_cache(maxsize=24)
+def _fetch_boj_statement_pdf_text(meeting_day: date) -> str:
+    url = (
+        f"https://www.boj.or.jp/en/mopo/mpmdeci/mpr_{meeting_day.year}/"
+        f"k{meeting_day:%y%m%d}a.pdf"
+    )
+    request = Request(
+        url,
+        headers={"User-Agent": backend.USER_AGENT, "Accept": "application/pdf,*/*"},
+    )
+    try:
+        with urlopen(request, timeout=20) as response:
+            raw = response.read()
+        reader = PdfReader(BytesIO(raw))
+        return " ".join((page.extract_text() or "") for page in reader.pages)
+    except Exception:
+        return ""
+
+
+def _boj_policy_rate_for_day(meeting_day: date) -> str:
+    return parse_boj_policy_rate(_fetch_boj_statement_pdf_text(meeting_day))
+
+
+def _previous_boj_meeting_day(calendar_text: str, meeting_day: date) -> date | None:
+    days: list[date] = []
+    for year in (meeting_day.year - 1, meeting_day.year):
+        days.extend(parse_boj_meeting_days(calendar_text, year))
+    previous = [day for day in days if day < meeting_day]
+    return max(previous) if previous else None
+
+
 def _jp_boj_events(start: datetime, end: datetime, refresh_token: str) -> tuple[list[core.MarketEvent], bool]:
-    text = backend._plain_text(backend._fetch_text(backend.BOJ_MPM_URL, refresh_token))
-    if not text:
+    html = backend._fetch_text(backend.BOJ_MPM_URL, refresh_token)
+    if not html:
         return [], False
 
     events: list[core.MarketEvent] = []
-    for year in sorted({start.year, end.year}):
-        # The page has year navigation links before the tables. Anchor on "Table : YYYY"
-        # so those links cannot truncate the section.
-        section_match = re.search(
-            rf"Table\s*:\s*{year}(.*?)(?=Table\s*:\s*{year + 1}|$)",
-            text,
-            re.I,
-        )
-        section = section_match.group(1) if section_match else ""
-        for match in re.finditer(
-            r"\b(Jan|Mar|Apr|June|July|Sept|Oct|Dec)\.?(?:\s+\d{1,2}\s*\([^)]*\),)?\s*(\d{1,2})\s*\([^)]*\)",
-            section,
-            re.I,
-        ):
-            month = backend._month_number(match.group(1))
-            if month is None:
-                continue
-            try:
-                day = date(year, month, int(match.group(2)))
-            except ValueError:
-                continue
+    parsed_calendar = False
+    now = datetime.now(backend.TPE)
 
-            # BOJ states that the policy statement is released immediately after the MPM,
-            # without a fixed minute. Noon JST is only a display marker; no 5-minute polling.
-            dt = backend._dt_local(day, 12, 0, backend.JST)
+    for year in sorted({start.year, end.year}):
+        meeting_days = parse_boj_meeting_days(html, year)
+        parsed_calendar = parsed_calendar or bool(meeting_days)
+        for meeting_day in meeting_days:
+            # BOJ releases the policy statement immediately after the meeting,
+            # without a fixed minute. Noon JST remains only a display marker.
+            dt = backend._dt_local(meeting_day, 12, 0, backend.JST)
             if not backend._in_window(dt, start, end):
                 continue
+
+            actual = previous = ""
+            source_url = backend.BOJ_MPM_URL
+            if now >= dt + timedelta(minutes=5):
+                actual = _boj_policy_rate_for_day(meeting_day)
+                previous_day = _previous_boj_meeting_day(html, meeting_day)
+                previous = _boj_policy_rate_for_day(previous_day) if previous_day else ""
+                if actual:
+                    source_url = (
+                        f"https://www.boj.or.jp/en/mopo/mpmdeci/mpr_{meeting_day.year}/"
+                        f"k{meeting_day:%y%m%d}a.pdf"
+                    )
+
             events.append(
                 backend._event(
-                    event_id=f"official-jp-boj-{day.isoformat()}",
+                    event_id=f"official-jp-boj-{meeting_day.isoformat()}",
                     dt=dt,
                     title="日本銀行（BOJ）金融政策決定會合",
                     country="日本",
                     tier="S",
                     tags=("日本", "BOJ", "利率", "日圓", "全球風險資產"),
                     source="Bank of Japan",
-                    source_url=backend.BOJ_MPM_URL,
+                    source_url=source_url,
                     provider="official-jp-boj",
+                    actual=actual,
+                    previous=previous,
                     category="央行事件",
-                    expects_result=False,
+                    expects_result=True,
                 )
             )
-    return core._dedupe(events), True
+    return core._dedupe(events), parsed_calendar
 
 
 def install() -> None:
