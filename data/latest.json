@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-10-01",
-  "generated_at_tpe": "2026-10-01T21:32:14.578573+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-10-02",
+  "generated_at_tpe": "2026-10-02T00:38:57.021309+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 8,
@@ -29,80 +29,12 @@
     "official-kr-mods-cpi": 1,
     "official-kr-mods-industry": 1,
     "official-tw-dgbas-cpi": 1,
-    "official-us-bls-jolts": 1,
     "official-us-bls-nfp": 1,
-    "official-us-dol-claims": 1,
+    "official-us-dol-claims": 2,
     "official-us-ism-manufacturing": 1,
     "official-us-ism-services": 1
   },
   "events": [
-    {
-      "event_id": "official-us-bls-jolts-2026-09-29",
-      "time_tpe": "2026-09-29T22:00:00+08:00",
-      "title": "美國職缺與勞動力流動調查（JOLTS）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "A",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "JOLTS",
-        "就業",
-        "Fed",
-        "NASDAQ"
-      ],
-      "actual": "7.1M",
-      "forecast": "",
-      "previous": "7.3M",
-      "source": "U.S. Bureau of Labor Statistics (BLS)",
-      "source_url": "https://www.bls.gov/schedule/news_release/jolts.htm",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-bls-jolts",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "job_openings",
-          "label": "職缺數",
-          "actual": "7.1M",
-          "forecast": "",
-          "previous": "7.3M",
-          "unit": "level",
-          "is_primary": true,
-          "source_series": "JTS000000000000000JOL"
-        },
-        {
-          "metric_id": "hires",
-          "label": "聘僱人數",
-          "actual": "5.2M",
-          "forecast": "",
-          "previous": "5.1M",
-          "unit": "level",
-          "is_primary": false,
-          "source_series": "JTS000000000000000HIL"
-        },
-        {
-          "metric_id": "quits",
-          "label": "主動離職人數",
-          "actual": "3.1M",
-          "forecast": "",
-          "previous": "3.1M",
-          "unit": "level",
-          "is_primary": false,
-          "source_series": "JTS000000000000000QUL"
-        },
-        {
-          "metric_id": "layoffs",
-          "label": "裁員與解僱人數",
-          "actual": "1.6M",
-          "forecast": "",
-          "previous": "1.7M",
-          "unit": "level",
-          "is_primary": false,
-          "source_series": "JTS000000000000000LDL"
-        }
-      ]
-    },
     {
       "event_id": "official-kr-mods-industry-2026-09-30",
       "time_tpe": "2026-09-30T07:00:00+08:00",
@@ -346,6 +278,43 @@
       "expects_result": true,
       "provider": "official-tw-dgbas-cpi",
       "symbol": ""
+    },
+    {
+      "event_id": "official-us-dol-claims-2026-10-08",
+      "time_tpe": "2026-10-08T20:30:00+08:00",
+      "title": "美國初領失業救濟金人數（Initial Claims）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "初領失業救濟",
+        "就業",
+        "Fed",
+        "美元"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "197K",
+      "source": "U.S. Department of Labor (ETA)",
+      "source_url": "https://www.dol.gov/newsroom/releases/eta",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-dol-claims",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "initial_claims",
+          "label": "初領失業救濟金",
+          "actual": "",
+          "forecast": "",
+          "previous": "197K",
+          "unit": "K",
+          "is_primary": true,
+          "source_series": "DOL UI Weekly Claims PDF"
+        }
+      ]
     }
   ]
 }
