@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-10-02",
-  "generated_at_tpe": "2026-10-02T07:07:37.824529+08:00",
-  "update_mode": "smart",
+  "generated_at_tpe": "2026-10-02T20:33:08.039534+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 7,
@@ -149,12 +149,12 @@
         "美元",
         "NASDAQ"
       ],
-      "actual": "",
+      "actual": "+29K",
       "forecast": "",
-      "previous": "+162K",
+      "previous": "+133K",
       "source": "U.S. Bureau of Labor Statistics (BLS)",
       "source_url": "https://www.bls.gov/schedule/news_release/empsit.htm",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-bls-nfp",
       "symbol": "",
@@ -162,9 +162,9 @@
         {
           "metric_id": "payroll_change",
           "label": "非農新增就業",
-          "actual": "",
+          "actual": "+29K",
           "forecast": "",
-          "previous": "+162K",
+          "previous": "+133K",
           "unit": "K",
           "is_primary": true,
           "source_series": "CES0000000001"
@@ -172,7 +172,7 @@
         {
           "metric_id": "unemployment_rate",
           "label": "失業率",
-          "actual": "",
+          "actual": "4.2%",
           "forecast": "",
           "previous": "4.1%",
           "unit": "%",
@@ -182,7 +182,7 @@
         {
           "metric_id": "avg_hourly_earnings_mom",
           "label": "平均時薪 MoM",
-          "actual": "",
+          "actual": "0.1%",
           "forecast": "",
           "previous": "0.3%",
           "unit": "%",
@@ -192,7 +192,7 @@
         {
           "metric_id": "avg_hourly_earnings_yoy",
           "label": "平均時薪 YoY",
-          "actual": "",
+          "actual": "3%",
           "forecast": "",
           "previous": "3.1%",
           "unit": "%",
