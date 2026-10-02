@@ -17,6 +17,25 @@ from scripts import refresh_gate
 TPE = timezone(timedelta(hours=8))
 
 
+
+def test_kr_fetch_retries_after_cached_empty_response() -> None:
+    original = official._fetch_text
+    calls = []
+
+    def fake_fetch(url: str, token: str) -> str:
+        calls.append((url, token))
+        return "" if len(calls) == 1 else "<html>ok</html>"
+
+    official._fetch_text = fake_fetch
+    try:
+        result = official._kr_fetch_text("https://mods.example/test", "probe", attempts=3)
+    finally:
+        official._fetch_text = original
+
+    assert result == "<html>ok</html>"
+    assert [token for _url, token in calls] == ["probe", "probe-retry-1"]
+
+
 def test_kr_cpi_latest_uses_two_official_releases() -> None:
     assert "bid=213" in official.KR_CPI_LIST_URL
 
@@ -175,6 +194,7 @@ def test_refresh_gate_stops_after_retention_window() -> None:
 
 def main() -> None:
     tests = [
+        test_kr_fetch_retries_after_cached_empty_response,
         test_kr_cpi_latest_uses_two_official_releases,
         test_kr_cpi_previous_fails_closed_with_one_release,
         test_kr_cpi_current_javascript_title_link_normalizes_to_detail_url,
