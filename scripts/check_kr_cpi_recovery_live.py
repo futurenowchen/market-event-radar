@@ -13,6 +13,15 @@ import v2_event_official as official
 
 def main() -> None:
     token = f"kr-cpi-live-{datetime.now(official.TPE):%Y%m%d%H%M%S}"
+    listing = official._fetch_text(official.KR_CPI_LIST_URL, token)
+    links = official._kr_cpi_release_links(listing, official.KR_CPI_LIST_URL)
+    print(
+        "KR CPI live diagnostics: "
+        f"listing_len={len(listing)}, "
+        f"contains_title={'소비자물가동향' in listing}, "
+        f"resolved_links={len(links)}, "
+        f"list_nos={','.join(links[:3]) if links else 'none'}"
+    )
     actual, previous = official._kr_latest_result("cpi", token)
     if not actual:
         raise SystemExit("KR CPI live probe FAIL: latest official Actual is blank")
