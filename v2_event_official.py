@@ -9,6 +9,7 @@ from typing import Iterable
 from urllib.parse import urlencode, urljoin
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
+from xml.etree import ElementTree as ET
 
 import streamlit as st
 
@@ -48,6 +49,8 @@ BOJ_STATEMENTS_URL = "https://www.boj.or.jp/en/mopo/mpmdeci/state_2026/index.htm
 
 KR_RELEASE_PLAN_URL = "https://mods.go.kr/schedule.es?mid=a10308010000"
 KR_CPI_LIST_URL = "https://www.mods.go.kr/board.es?bid=213&mid=a10301040200"
+KR_CPI_RSS_URL = "https://mods.go.kr/board.es?bid=213&mid=a10301040200&act=rss"
+KR_PRESS_RSS_URL = "https://mods.go.kr/board.es?mid=a10301010000&bid=a103010100&act=rss"
 KR_INDUSTRY_LIST_URL = "https://mods.go.kr/board.es?mid=a10301050100&bid=216"
 BOK_POLICY_DATES_URL = "https://www.bok.or.kr/portal/singl/crncyPolicyDrcMtg/listYear.do?menuNo=200755&mtgSe=A"
 BOK_HOME_URL = "https://www.bok.or.kr/eng/main/main.do"
@@ -810,6 +813,32 @@ def _kr_cpi_detail_url(list_no: str) -> str:
     )
 
 
+def _kr_cpi_rss_release_links(payload: str) -> list[str]:
+    """Resolve CPI board detail links from official MODS RSS."""
+
+    if not payload:
+        return []
+    try:
+        root = ET.fromstring(payload)
+    except ET.ParseError:
+        return []
+
+    title_pattern = re.compile(r"^(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향$")
+    links: list[str] = []
+    for item in root.iter("item"):
+        title = " ".join((item.findtext("title") or "").split())
+        if not title_pattern.fullmatch(title):
+            continue
+        href = (item.findtext("link") or "").strip()
+        list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", href, re.I)
+        if not list_no:
+            continue
+        detail = _kr_cpi_detail_url(list_no.group(1))
+        if detail not in links:
+            links.append(detail)
+    return links
+
+
 def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
     """Resolve CPI detail pages from both old and current MODS listing layouts."""
 
@@ -852,16 +881,29 @@ def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
 
 
 def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
-    url = KR_CPI_LIST_URL if family == "cpi" else KR_INDUSTRY_LIST_URL
-    listing = _kr_fetch_text(url, refresh_token)
-    if not listing:
-        return "", ""
-
     if family == "cpi":
-        # MODS migrated the CPI newsroom to board bid=213 in 2026. Resolve the
-        # newest two official CPI releases from the live listing instead of
-        # pinning a production value or a release-specific list_no.
-        release_links = _kr_cpi_release_links(listing, url)[:2]
+        # Prefer the small official RSS surfaces for unattended discovery.
+        # The large board HTML remains a bounded fallback because MODS can
+        # intermittently time out from hosted runners.
+        release_links: list[str] = []
+        for rss_url in (KR_CPI_RSS_URL, KR_PRESS_RSS_URL):
+            rss = _kr_fetch_text(rss_url, f"{refresh_token}-rss")
+            for link in _kr_cpi_rss_release_links(rss):
+                if link not in release_links:
+                    release_links.append(link)
+                if len(release_links) >= 2:
+                    break
+            if len(release_links) >= 2:
+                break
+
+        listing = ""
+        if len(release_links) < 2:
+            listing = _kr_fetch_text(KR_CPI_LIST_URL, refresh_token)
+            for link in _kr_cpi_release_links(listing, KR_CPI_LIST_URL):
+                if link not in release_links:
+                    release_links.append(link)
+                if len(release_links) >= 2:
+                    break
 
         values: list[str] = []
         for link in release_links:
@@ -874,6 +916,11 @@ def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
         actual = values[0] if values else _kr_cpi_headline_yoy(listing)
         previous = values[1] if len(values) > 1 else ""
         return actual, previous
+
+    url = KR_INDUSTRY_LIST_URL
+    listing = _kr_fetch_text(url, refresh_token)
+    if not listing:
+        return "", ""
 
     link = ""
     for text, href in _links(listing, url):
