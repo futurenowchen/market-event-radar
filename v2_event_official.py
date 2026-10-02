@@ -793,24 +793,38 @@ def _kr_cpi_headline_yoy(text: str) -> str:
     return _pct(match.group(1)) if match else ""
 
 
+def _kr_cpi_detail_url(list_no: str) -> str:
+    return (
+        "https://www.mods.go.kr/board.es?act=view&bid=213"
+        f"&list_no={list_no}&mid=a10301040100"
+    )
+
+
 def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
     """Resolve CPI detail pages from both old and current MODS listing layouts."""
 
     release_links: list[str] = []
+    title_pattern = re.compile(r"^20\d{2}년\s+\d{1,2}월\s+소비자물가동향$")
 
-    # Older MODS layouts linked the release title directly.
+    # Current MODS uses javascript:addSearchParam(...) for the article title.
+    # Older layouts used a normal detail href. In either case, list_no is the
+    # stable board identifier; normalize it into one official detail URL.
     for text, href in _links(listing, base_url):
-        if "소비자물가동향" not in text or href in release_links:
+        if not title_pattern.fullmatch(" ".join(text.split())):
             continue
-        release_links.append(href)
+        list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", href, re.I)
+        if not list_no:
+            continue
+        detail = _kr_cpi_detail_url(list_no.group(1))
+        if detail not in release_links:
+            release_links.append(detail)
 
     if release_links:
         return release_links
 
-    # Current MODS listing renders the release title as plain text. The nearby
-    # preview/attachment links still carry the board list_no. Associate each
-    # CPI title block with the first list_no before the next CPI title, then
-    # construct the official detail URL without pinning a release-specific ID.
+    # Fallback for layouts where the title is plain text rather than an anchor.
+    # Associate each CPI title block with the first nearby list_no before the
+    # next CPI title; attachment/preview links all carry the same board id.
     title_matches = list(
         re.finditer(r"20\d{2}년\s+\d{1,2}월\s+소비자물가동향", listing)
     )
@@ -820,12 +834,9 @@ def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
         list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", segment, re.I)
         if not list_no:
             continue
-        href = (
-            "https://www.mods.go.kr/board.es?act=view&bid=213"
-            f"&list_no={list_no.group(1)}&mid=a10301040100"
-        )
-        if href not in release_links:
-            release_links.append(href)
+        detail = _kr_cpi_detail_url(list_no.group(1))
+        if detail not in release_links:
+            release_links.append(detail)
 
     return release_links
 
