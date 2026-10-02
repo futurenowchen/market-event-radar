@@ -13,7 +13,7 @@ import v2_event_official as official
 
 def main() -> None:
     token = f"kr-cpi-live-{datetime.now(official.TPE):%Y%m%d%H%M%S}"
-    listing = official._fetch_text(official.KR_CPI_LIST_URL, token)
+    listing = official._kr_fetch_text(official.KR_CPI_LIST_URL, token)
     links = official._kr_cpi_release_links(listing, official.KR_CPI_LIST_URL)
     print(
         "KR CPI live diagnostics: "
