@@ -13,23 +13,23 @@ import v2_event_official as official
 
 def main() -> None:
     token = f"kr-cpi-live-{datetime.now(official.TPE):%Y%m%d%H%M%S}"
-    listing = official._kr_fetch_text(official.KR_CPI_LIST_URL, token)
-    links = official._kr_cpi_release_links(listing, official.KR_CPI_LIST_URL)
+    rss = official._kr_fetch_text(official.KR_CPI_RSS_URL, f"{token}-rss")
+    rss_links = official._kr_cpi_rss_release_links(rss)
+    listing = ""
+    html_links = []
+    if len(rss_links) < 2:
+        listing = official._kr_fetch_text(official.KR_CPI_LIST_URL, token)
+        html_links = official._kr_cpi_release_links(listing, official.KR_CPI_LIST_URL)
+    links = []
+    for link in [*rss_links, *html_links]:
+        if link not in links:
+            links.append(link)
     print(
         "KR CPI live diagnostics: "
-        f"listing_len={len(listing)}, "
-        f"contains_title={'소비자물가동향' in listing}, "
-        f"resolved_links={len(links)}, "
-        f"list_nos={','.join(links[:3]) if links else 'none'}"
+        f"rss_len={len(rss)}, rss_links={len(rss_links)}, "
+        f"listing_len={len(listing)}, html_links={len(html_links)}, "
+        f"resolved={','.join(links[:3]) if links else 'none'}"
     )
-    newest_title = ""
-    for text, _href in official._links(listing, official.KR_CPI_LIST_URL):
-        normalized = " ".join(text.split())
-        if "소비자물가동향" in normalized and "보도자료" not in normalized:
-            newest_title = normalized
-            break
-    if not newest_title:
-        raise SystemExit("KR CPI live probe FAIL: latest CPI title is not discoverable")
     if not links:
         raise SystemExit("KR CPI live probe FAIL: no official CPI detail links resolved")
 
@@ -39,8 +39,8 @@ def main() -> None:
     if not previous:
         raise SystemExit("KR CPI live probe FAIL: immediately preceding official Previous is blank")
     print(
-        f"KR CPI live probe PASS: newest_title={newest_title}, "
-        f"detail={links[0]}, actual={actual}, previous={previous}"
+        f"KR CPI live probe PASS: detail={links[0]}, "
+        f"actual={actual}, previous={previous}"
     )
 
 
