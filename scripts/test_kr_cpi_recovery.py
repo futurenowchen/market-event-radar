@@ -18,6 +18,25 @@ TPE = timezone(timedelta(hours=8))
 
 
 
+
+def test_kr_cpi_rss_resolves_current_and_previous_release_links() -> None:
+    rss = """<?xml version="1.0" encoding="UTF-8"?>
+    <rss version="2.0"><channel>
+      <item>
+        <title>2026년 9월 소비자물가동향</title>
+        <link>https://mods.go.kr/board.es?act=view&amp;bid=213&amp;list_no=447322&amp;mid=a10301040100</link>
+      </item>
+      <item>
+        <title>2026년 8월 소비자물가동향</title>
+        <link>https://mods.go.kr/board.es?act=view&amp;bid=213&amp;list_no=446746&amp;mid=a10301040100</link>
+      </item>
+    </channel></rss>"""
+    assert official._kr_cpi_rss_release_links(rss) == [
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=447322&mid=a10301040100",
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=446746&mid=a10301040100",
+    ]
+
+
 def test_kr_fetch_retries_after_cached_empty_response() -> None:
     original = official._fetch_text
     calls = []
@@ -194,6 +213,7 @@ def test_refresh_gate_stops_after_retention_window() -> None:
 
 def main() -> None:
     tests = [
+        test_kr_cpi_rss_resolves_current_and_previous_release_links,
         test_kr_fetch_retries_after_cached_empty_response,
         test_kr_cpi_latest_uses_two_official_releases,
         test_kr_cpi_previous_fails_closed_with_one_release,
