@@ -48,6 +48,7 @@ BOJ_MPM_URL = "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm"
 BOJ_STATEMENTS_URL = "https://www.boj.or.jp/en/mopo/mpmdeci/state_2026/index.htm"
 
 KR_RELEASE_PLAN_URL = "https://mods.go.kr/schedule.es?mid=a10308010000"
+KOSIS_NEWS_URL = "https://kosis.kr/serviceInfo/newsList.do"
 KR_CPI_LIST_URL = "https://www.mods.go.kr/board.es?bid=213&mid=a10301040200"
 KR_CPI_RSS_URL = "https://mods.go.kr/board.es?bid=213&mid=a10301040200&act=rss"
 KR_PRESS_RSS_URL = "https://mods.go.kr/board.es?mid=a10301010000&bid=a103010100&act=rss"
@@ -813,6 +814,59 @@ def _kr_cpi_detail_url(list_no: str) -> str:
     )
 
 
+def _kr_cpi_title_matches(text: str) -> bool:
+    normalized = " ".join(str(text or "").split())
+    return bool(
+        re.fullmatch(
+            r"(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향(?:\s*새글)?",
+            normalized,
+        )
+    )
+
+
+def _kr_cpi_kosis_release_links(refresh_token: str, max_pages: int = 4) -> list[str]:
+    """Discover recent MODS CPI detail links through first-party KOSIS news."""
+
+    pending = [KOSIS_NEWS_URL]
+    seen_pages: set[str] = set()
+    release_links: list[str] = []
+
+    while pending and len(seen_pages) < max(1, max_pages):
+        page_url = pending.pop(0)
+        if page_url in seen_pages:
+            continue
+        seen_pages.add(page_url)
+        html = _kr_fetch_text(page_url, f"{refresh_token}-kosis-{len(seen_pages)}")
+        if not html:
+            continue
+
+        for text, href in _links(html, page_url):
+            if _kr_cpi_title_matches(text):
+                list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", href, re.I)
+                if list_no:
+                    detail = _kr_cpi_detail_url(list_no.group(1))
+                    if detail not in release_links:
+                        release_links.append(detail)
+                        if len(release_links) >= 2:
+                            return release_links
+
+        # KOSIS pagination is itself first-party. Follow only small numbered
+        # pages from the press-release listing and never crawl arbitrary links.
+        for text, href in _links(html, page_url):
+            label = " ".join(text.split())
+            if not label.isdigit():
+                continue
+            page_no = int(label)
+            if not (2 <= page_no <= max_pages):
+                continue
+            if "kosis.kr" not in href or "newsList.do" not in href:
+                continue
+            if href not in seen_pages and href not in pending:
+                pending.append(href)
+
+    return release_links
+
+
 def _kr_cpi_rss_release_links(payload: str) -> list[str]:
     """Resolve CPI board detail links from official MODS RSS."""
 
@@ -885,7 +939,7 @@ def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
         # Prefer the small official RSS surfaces for unattended discovery.
         # The large board HTML remains a bounded fallback because MODS can
         # intermittently time out from hosted runners.
-        release_links: list[str] = []
+        release_links: list[str] = _kr_cpi_kosis_release_links(refresh_token)
         for rss_url in (KR_CPI_RSS_URL, KR_PRESS_RSS_URL):
             rss = _kr_fetch_text(rss_url, f"{refresh_token}-rss")
             for link in _kr_cpi_rss_release_links(rss):
