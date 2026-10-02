@@ -19,6 +19,41 @@ TPE = timezone(timedelta(hours=8))
 
 
 
+
+def test_kr_cpi_kosis_discovery_follows_bounded_pages() -> None:
+    page1 = """
+    <html><body>
+      <a href="https://mods.go.kr/board.es?act=view&bid=213&list_no=447322&mid=a10301040100">
+        2026년 9월 소비자물가동향
+      </a>
+      <a href="https://kosis.kr/serviceInfo/newsList.do?pageNo=2">2</a>
+    </body></html>
+    """
+    page2 = """
+    <html><body>
+      <a href="https://mods.go.kr/board.es?act=view&bid=213&list_no=446746&mid=a10301040100">
+        2026년 8월 소비자물가동향
+      </a>
+    </body></html>
+    """
+    original = official._kr_fetch_text
+
+    def fake_fetch(url: str, _token: str, attempts: int = 3) -> str:
+        del attempts
+        return page2 if "pageNo=2" in url else page1
+
+    official._kr_fetch_text = fake_fetch
+    try:
+        links = official._kr_cpi_kosis_release_links("test", max_pages=4)
+    finally:
+        official._kr_fetch_text = original
+
+    assert links == [
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=447322&mid=a10301040100",
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=446746&mid=a10301040100",
+    ]
+
+
 def test_kr_cpi_rss_resolves_current_and_previous_release_links() -> None:
     rss = """<?xml version="1.0" encoding="UTF-8"?>
     <rss version="2.0"><channel>
@@ -213,6 +248,7 @@ def test_refresh_gate_stops_after_retention_window() -> None:
 
 def main() -> None:
     tests = [
+        test_kr_cpi_kosis_discovery_follows_bounded_pages,
         test_kr_cpi_rss_resolves_current_and_previous_release_links,
         test_kr_fetch_retries_after_cached_empty_response,
         test_kr_cpi_latest_uses_two_official_releases,
