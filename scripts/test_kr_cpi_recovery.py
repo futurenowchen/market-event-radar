@@ -83,6 +83,32 @@ def test_kr_cpi_previous_fails_closed_with_one_release() -> None:
 
 
 
+
+def test_kr_cpi_current_javascript_title_link_normalizes_to_detail_url() -> None:
+    listing = """
+    <ul>
+      <li>
+        <a href="javascript:addSearchParam('/board.es?mid=a10301040200&bid=213&act=view&list_no=447322&tag=&nPage=1&ref_bid=');">
+          2026년 9월 소비자물가동향
+        </a>
+        <a href="/boardDownload.es?bid=213&list_no=447322&seq=2">
+          2026년 9월 소비자물가동향(보도자료).pdf
+        </a>
+      </li>
+      <li>
+        <a href="javascript:addSearchParam('/board.es?mid=a10301040200&bid=213&act=view&list_no=446746&tag=&nPage=1&ref_bid=');">
+          2026년 8월 소비자물가동향
+        </a>
+      </li>
+    </ul>
+    """
+    links = official._kr_cpi_release_links(listing, official.KR_CPI_LIST_URL)
+    assert links == [
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=447322&mid=a10301040100",
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=446746&mid=a10301040100",
+    ]
+
+
 def test_kr_cpi_current_listing_resolves_plain_title_preview_links() -> None:
     listing = """
     <ul>
@@ -151,6 +177,7 @@ def main() -> None:
     tests = [
         test_kr_cpi_latest_uses_two_official_releases,
         test_kr_cpi_previous_fails_closed_with_one_release,
+        test_kr_cpi_current_javascript_title_link_normalizes_to_detail_url,
         test_kr_cpi_current_listing_resolves_plain_title_preview_links,
         test_refresh_gate_retries_missing_result_inside_48h,
         test_refresh_gate_stops_after_retention_window,
