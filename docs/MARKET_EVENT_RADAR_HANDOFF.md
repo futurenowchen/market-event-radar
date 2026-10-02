@@ -169,3 +169,59 @@ Acceptance evidence:
 - bounded `investment radar-validate` returned `INVESTMENT_RADAR_VALIDATE_PASS`: schema v2 with 8 valid events.
 
 Conclusion: BOJ schedule semantics are repaired in the canonical producer and the Work-PC backup checkout is reconciled. No downstream dashboard parser workaround is required.
+
+
+## Korea CPI result-recovery incident — 2026-10-02
+
+Incident:
+- the 2026-10-02 Korea CPI event remained `scheduled` with blank Actual/Previous long after its 07:00 TPE release;
+- watchdog correctly failed on the overdue Tier-S result, but the smart refresh gate stopped retrying after 12 hours even though released-event retention/watchdog obligations last 48 hours;
+- while still inside the old 12-hour window, smart refresh did run but the Korea collector returned no changed values;
+- the MODS CPI newsroom had migrated to board `bid=213`, and its current listing uses JavaScript title links / attachment links rather than the older stable title-anchor shape;
+- the large MODS listing endpoint was also intermittently unavailable from GitHub hosted runners, including repeated 12-second timeouts.
+
+PR #31 merged as `d011e9d8f2ac5b0ff46901c6b4b8e2992e649472`:
+- aligned smart missing-result recovery with the existing 48-hour released-event retention contract;
+- moved the Korea CPI result path to the current MODS board;
+- added deterministic Korea CPI and recovery-window regressions.
+This restored the repair loop but did not yet close the collector incident: the first post-merge production refresh still left Korea CPI blank.
+
+PR #32 merged as `067654012a33a2f36c5a481ee8f2b4542591b1ed`:
+- normalizes current MODS JavaScript/plain-title CPI listing layouts through stable `list_no` extraction;
+- accepts the MODS newest-item marker without confusing attachment titles with release titles;
+- uses bounded retry with fresh cache tokens so an empty cached response cannot freeze the same process;
+- prefers first-party KOSIS press-release discovery, then MODS RSS, with the large MODS board HTML retained only as fallback;
+- KOSIS is discovery only; released values still come from the official MODS release detail pages;
+- Actual is parsed from the newest official CPI release; Previous is parsed from the immediately preceding official CPI release;
+- no production release value or release-specific `list_no` is hard-coded;
+- added dedicated deterministic regressions plus a live first-party Korea CPI probe to the broad validation workflow.
+
+Live validation:
+- PR #32 Validate public feed run `37018125812`: SUCCESS;
+- Korea CPI deterministic recovery regressions: 9 PASS;
+- live discovery resolved current detail `list_no=447322` and previous detail `list_no=446746`;
+- live probe returned Actual `2.9%` and Previous `3.1%`;
+- all official-source collector probes passed;
+- post-merge Validate public feed run `37018384010`: SUCCESS;
+- post-merge production refresh run `37018383976`: SUCCESS;
+- production data commit `496949693c049040d5c8543d1ce61d9a12acab0d`;
+- production snapshot generated `2026-10-02T22:14:01.954029+08:00`;
+- `official-kr-mods-cpi-2026-10-02` is now `released`, Actual `2.9%`, Previous `3.1%`;
+- the append-only October history ledger records the same released state;
+- `official_macro_ready = true`;
+- the simultaneously released US NFP bundle remained intact, confirming this was not a broad feed regression.
+
+Operational conclusion:
+- the Event Radar producer is healthy again;
+- this incident was an upstream result-recovery/source-resilience failure, not a dashboard presentation failure;
+- dashboard consumer semantics did not require a workaround or contract change.
+
+Hard boundaries added by this incident:
+- missing-result smart recovery must not expire earlier than the watchdog/released-retention contract;
+- do not assume a first-party newsroom title is a normal anchor URL;
+- do not depend exclusively on a large first-party HTML listing when the same authority exposes a lighter first-party discovery surface;
+- non-empty values from an older release are not sufficient live acceptance: the newest release identity must be verified;
+- never hard-code a current Actual/Previous or release-specific board ID to close an incident.
+
+Exact next action:
+- return to the pre-existing consensus/surprise roadmap; preserve Korea CPI release recovery as a live regression and let the next scheduled watchdog validate normal unattended operation.
