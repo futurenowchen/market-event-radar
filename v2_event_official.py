@@ -9,6 +9,7 @@ from typing import Iterable
 from urllib.parse import urlencode, urljoin
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
+from xml.etree import ElementTree as ET
 
 import streamlit as st
 
@@ -47,7 +48,10 @@ BOJ_MPM_URL = "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm"
 BOJ_STATEMENTS_URL = "https://www.boj.or.jp/en/mopo/mpmdeci/state_2026/index.htm"
 
 KR_RELEASE_PLAN_URL = "https://mods.go.kr/schedule.es?mid=a10308010000"
-KR_CPI_LIST_URL = "https://mods.go.kr/board.es?mid=b70203010000&bid=213"
+KOSIS_NEWS_URL = "https://kosis.kr/serviceInfo/newsList.do"
+KR_CPI_LIST_URL = "https://www.mods.go.kr/board.es?bid=213&mid=a10301040200"
+KR_CPI_RSS_URL = "https://mods.go.kr/board.es?bid=213&mid=a10301040200&act=rss"
+KR_PRESS_RSS_URL = "https://mods.go.kr/board.es?mid=a10301010000&bid=a103010100&act=rss"
 KR_INDUSTRY_LIST_URL = "https://mods.go.kr/board.es?mid=a10301050100&bid=216"
 BOK_POLICY_DATES_URL = "https://www.bok.or.kr/portal/singl/crncyPolicyDrcMtg/listYear.do?menuNo=200755&mtgSe=A"
 BOK_HOME_URL = "https://www.bok.or.kr/eng/main/main.do"
@@ -776,6 +780,16 @@ def _kr_mods_events(start: datetime, end: datetime, refresh_token: str) -> tuple
     return core._dedupe(events), health
 
 
+def _kr_fetch_text(url: str, refresh_token: str, attempts: int = 3) -> str:
+    """Bounded KR official-source retry that bypasses cached empty responses."""
+    for attempt in range(max(1, attempts)):
+        token = refresh_token if attempt == 0 else f"{refresh_token}-retry-{attempt}"
+        text = _fetch_text(url, token)
+        if text:
+            return text
+    return ""
+
+
 def _kr_cpi_headline_yoy(text: str) -> str:
     """Parse the headline all-items CPI YoY from one official MODS release page."""
     plain = _plain_text(text)
@@ -793,29 +807,161 @@ def _kr_cpi_headline_yoy(text: str) -> str:
     return _pct(match.group(1)) if match else ""
 
 
-def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
-    url = KR_CPI_LIST_URL if family == "cpi" else KR_INDUSTRY_LIST_URL
-    listing = _fetch_text(url, refresh_token)
-    if not listing:
-        return "", ""
+def _kr_cpi_detail_url(list_no: str) -> str:
+    return (
+        "https://www.mods.go.kr/board.es?act=view&bid=213"
+        f"&list_no={list_no}&mid=a10301040100"
+    )
 
+
+def _kr_cpi_title_matches(text: str) -> bool:
+    normalized = " ".join(str(text or "").split())
+    return bool(
+        re.fullmatch(
+            r"(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향(?:\s*새글)?",
+            normalized,
+        )
+    )
+
+
+def _kr_cpi_kosis_release_links(refresh_token: str, max_pages: int = 4) -> list[str]:
+    """Discover recent MODS CPI detail links through first-party KOSIS news."""
+
+    pending = [KOSIS_NEWS_URL]
+    seen_pages: set[str] = set()
+    release_links: list[str] = []
+
+    while pending and len(seen_pages) < max(1, max_pages):
+        page_url = pending.pop(0)
+        if page_url in seen_pages:
+            continue
+        seen_pages.add(page_url)
+        html = _kr_fetch_text(page_url, f"{refresh_token}-kosis-{len(seen_pages)}")
+        if not html:
+            continue
+
+        for text, href in _links(html, page_url):
+            if _kr_cpi_title_matches(text):
+                list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", href, re.I)
+                if list_no:
+                    detail = _kr_cpi_detail_url(list_no.group(1))
+                    if detail not in release_links:
+                        release_links.append(detail)
+                        if len(release_links) >= 2:
+                            return release_links
+
+        # KOSIS pagination is itself first-party. Follow only small numbered
+        # pages from the press-release listing and never crawl arbitrary links.
+        for text, href in _links(html, page_url):
+            label = " ".join(text.split())
+            if not label.isdigit():
+                continue
+            page_no = int(label)
+            if not (2 <= page_no <= max_pages):
+                continue
+            if "kosis.kr" not in href or "newsList.do" not in href:
+                continue
+            if href not in seen_pages and href not in pending:
+                pending.append(href)
+
+    return release_links
+
+
+def _kr_cpi_rss_release_links(payload: str) -> list[str]:
+    """Resolve CPI board detail links from official MODS RSS."""
+
+    if not payload:
+        return []
+    try:
+        root = ET.fromstring(payload)
+    except ET.ParseError:
+        return []
+
+    title_pattern = re.compile(r"^(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향$")
+    links: list[str] = []
+    for item in root.iter("item"):
+        title = " ".join((item.findtext("title") or "").split())
+        if not title_pattern.fullmatch(title):
+            continue
+        href = (item.findtext("link") or "").strip()
+        list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", href, re.I)
+        if not list_no:
+            continue
+        detail = _kr_cpi_detail_url(list_no.group(1))
+        if detail not in links:
+            links.append(detail)
+    return links
+
+
+def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
+    """Resolve CPI detail pages from both old and current MODS listing layouts."""
+
+    release_links: list[str] = []
+    title_pattern = re.compile(r"^(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향$")
+
+    # Current MODS uses javascript:addSearchParam(...) for the article title.
+    # Older layouts used a normal detail href. In either case, list_no is the
+    # stable board identifier; normalize it into one official detail URL.
+    for text, href in _links(listing, base_url):
+        if not title_pattern.fullmatch(" ".join(text.split())):
+            continue
+        list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", href, re.I)
+        if not list_no:
+            continue
+        detail = _kr_cpi_detail_url(list_no.group(1))
+        if detail not in release_links:
+            release_links.append(detail)
+
+    if release_links:
+        return release_links
+
+    # Fallback for layouts where the title is plain text rather than an anchor.
+    # Associate each CPI title block with the first nearby list_no before the
+    # next CPI title; attachment/preview links all carry the same board id.
+    title_matches = list(
+        re.finditer(r"(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향", listing)
+    )
+    for index, match in enumerate(title_matches):
+        end = title_matches[index + 1].start() if index + 1 < len(title_matches) else len(listing)
+        segment = listing[match.end():end]
+        list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", segment, re.I)
+        if not list_no:
+            continue
+        detail = _kr_cpi_detail_url(list_no.group(1))
+        if detail not in release_links:
+            release_links.append(detail)
+
+    return release_links
+
+
+def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
     if family == "cpi":
-        # MODS migrated the CPI newsroom to board bid=213 in 2026. Resolve the
-        # newest two official CPI releases from the live listing instead of
-        # pinning a production value or a release-specific list_no.
-        release_links: list[str] = []
-        for text, href in _links(listing, url):
-            if "소비자물가동향" not in text:
-                continue
-            if href in release_links:
-                continue
-            release_links.append(href)
+        # Prefer the small official RSS surfaces for unattended discovery.
+        # The large board HTML remains a bounded fallback because MODS can
+        # intermittently time out from hosted runners.
+        release_links: list[str] = _kr_cpi_kosis_release_links(refresh_token)
+        for rss_url in (KR_CPI_RSS_URL, KR_PRESS_RSS_URL):
+            rss = _kr_fetch_text(rss_url, f"{refresh_token}-rss")
+            for link in _kr_cpi_rss_release_links(rss):
+                if link not in release_links:
+                    release_links.append(link)
+                if len(release_links) >= 2:
+                    break
             if len(release_links) >= 2:
                 break
 
+        listing = ""
+        if len(release_links) < 2:
+            listing = _kr_fetch_text(KR_CPI_LIST_URL, refresh_token)
+            for link in _kr_cpi_release_links(listing, KR_CPI_LIST_URL):
+                if link not in release_links:
+                    release_links.append(link)
+                if len(release_links) >= 2:
+                    break
+
         values: list[str] = []
         for link in release_links:
-            value = _kr_cpi_headline_yoy(_fetch_text(link, refresh_token))
+            value = _kr_cpi_headline_yoy(_kr_fetch_text(link, refresh_token))
             if value:
                 values.append(value)
 
@@ -825,12 +971,17 @@ def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
         previous = values[1] if len(values) > 1 else ""
         return actual, previous
 
+    url = KR_INDUSTRY_LIST_URL
+    listing = _kr_fetch_text(url, refresh_token)
+    if not listing:
+        return "", ""
+
     link = ""
     for text, href in _links(listing, url):
         if "산업활동동향" in text:
             link = href
             break
-    body = _plain_text(_fetch_text(link, refresh_token)) if link else _plain_text(listing)
+    body = _plain_text(_kr_fetch_text(link, refresh_token)) if link else _plain_text(listing)
     values = re.findall(r"전산업[^%]{0,100}?전월대비[^%]{0,60}?([+-]?\d+(?:\.\d+)?)\s*%", body)
     return (_pct(values[0]) if values else "", _pct(values[1]) if len(values) > 1 else "")
 
