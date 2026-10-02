@@ -68,7 +68,8 @@ jobs:
             scripts/test_us_claims.py \
             scripts/test_us_phase3.py \
             scripts/test_us_phase4.py \
-            scripts/test_kr_cpi_recovery.py
+            scripts/test_kr_cpi_recovery.py \
+            scripts/check_kr_cpi_recovery_live.py
       - name: Parse Windows deployment helper
         shell: pwsh
         run: |
@@ -111,6 +112,8 @@ jobs:
         run: python scripts/test_us_phase4.py
       - name: Test Korea CPI release recovery
         run: python scripts/test_kr_cpi_recovery.py
+      - name: Probe Korea CPI official release path
+        run: python scripts/check_kr_cpi_recovery_live.py
       - name: Smoke test package API
         run: |
           python - <<'PY'
