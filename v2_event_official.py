@@ -47,10 +47,7 @@ BOJ_MPM_URL = "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm"
 BOJ_STATEMENTS_URL = "https://www.boj.or.jp/en/mopo/mpmdeci/state_2026/index.htm"
 
 KR_RELEASE_PLAN_URL = "https://mods.go.kr/schedule.es?mid=a10308010000"
-KR_CPI_LIST_URL = (
-    "https://mods.go.kr/board.es?mid=a10301040100&bid=a103010401&"
-    "ref_bid=213,215,214,11860,11695"
-)
+KR_CPI_LIST_URL = "https://mods.go.kr/board.es?mid=b70203010000&bid=213"
 KR_INDUSTRY_LIST_URL = "https://mods.go.kr/board.es?mid=a10301050100&bid=216"
 BOK_POLICY_DATES_URL = "https://www.bok.or.kr/portal/singl/crncyPolicyDrcMtg/listYear.do?menuNo=200755&mtgSe=A"
 BOK_HOME_URL = "https://www.bok.or.kr/eng/main/main.do"
@@ -779,23 +776,61 @@ def _kr_mods_events(start: datetime, end: datetime, refresh_token: str) -> tuple
     return core._dedupe(events), health
 
 
+def _kr_cpi_headline_yoy(text: str) -> str:
+    """Parse the headline all-items CPI YoY from one official MODS release page."""
+    plain = _plain_text(text)
+    match = re.search(
+        r"소비자물가지수[^%％]{0,160}?전년동월대비\s*([+-]?\d+(?:\.\d+)?)\s*[％%]",
+        plain,
+        re.I,
+    )
+    if not match:
+        match = re.search(
+            r"전년동월대비[^%％]{0,80}?([+-]?\d+(?:\.\d+)?)\s*[％%]",
+            plain,
+            re.I,
+        )
+    return _pct(match.group(1)) if match else ""
+
+
 def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
     url = KR_CPI_LIST_URL if family == "cpi" else KR_INDUSTRY_LIST_URL
     listing = _fetch_text(url, refresh_token)
     if not listing:
         return "", ""
+
+    if family == "cpi":
+        # MODS migrated the CPI newsroom to board bid=213 in 2026. Resolve the
+        # newest two official CPI releases from the live listing instead of
+        # pinning a production value or a release-specific list_no.
+        release_links: list[str] = []
+        for text, href in _links(listing, url):
+            if "소비자물가동향" not in text:
+                continue
+            if href in release_links:
+                continue
+            release_links.append(href)
+            if len(release_links) >= 2:
+                break
+
+        values: list[str] = []
+        for link in release_links:
+            value = _kr_cpi_headline_yoy(_fetch_text(link, refresh_token))
+            if value:
+                values.append(value)
+
+        # Fail closed on Previous if only the current official release is
+        # available. Never use a second metric from the same page as Previous.
+        actual = values[0] if values else _kr_cpi_headline_yoy(listing)
+        previous = values[1] if len(values) > 1 else ""
+        return actual, previous
+
     link = ""
     for text, href in _links(listing, url):
-        if family == "cpi" and "소비자물가동향" in text:
-            link = href
-            break
-        if family == "industry" and "산업활동동향" in text:
+        if "산업활동동향" in text:
             link = href
             break
     body = _plain_text(_fetch_text(link, refresh_token)) if link else _plain_text(listing)
-    if family == "cpi":
-        values = re.findall(r"전년동월대비[^%]{0,80}?([+-]?\d+(?:\.\d+)?)\s*%", body)
-        return (_pct(values[0]) if values else "", _pct(values[1]) if len(values) > 1 else "")
     values = re.findall(r"전산업[^%]{0,100}?전월대비[^%]{0,60}?([+-]?\d+(?:\.\d+)?)\s*%", body)
     return (_pct(values[0]) if values else "", _pct(values[1]) if len(values) > 1 else "")
 
