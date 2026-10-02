@@ -776,6 +776,16 @@ def _kr_mods_events(start: datetime, end: datetime, refresh_token: str) -> tuple
     return core._dedupe(events), health
 
 
+def _kr_fetch_text(url: str, refresh_token: str, attempts: int = 3) -> str:
+    """Bounded KR official-source retry that bypasses cached empty responses."""
+    for attempt in range(max(1, attempts)):
+        token = refresh_token if attempt == 0 else f"{refresh_token}-retry-{attempt}"
+        text = _fetch_text(url, token)
+        if text:
+            return text
+    return ""
+
+
 def _kr_cpi_headline_yoy(text: str) -> str:
     """Parse the headline all-items CPI YoY from one official MODS release page."""
     plain = _plain_text(text)
@@ -843,7 +853,7 @@ def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
 
 def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
     url = KR_CPI_LIST_URL if family == "cpi" else KR_INDUSTRY_LIST_URL
-    listing = _fetch_text(url, refresh_token)
+    listing = _kr_fetch_text(url, refresh_token)
     if not listing:
         return "", ""
 
@@ -855,7 +865,7 @@ def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
 
         values: list[str] = []
         for link in release_links:
-            value = _kr_cpi_headline_yoy(_fetch_text(link, refresh_token))
+            value = _kr_cpi_headline_yoy(_kr_fetch_text(link, refresh_token))
             if value:
                 values.append(value)
 
@@ -870,7 +880,7 @@ def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
         if "산업활동동향" in text:
             link = href
             break
-    body = _plain_text(_fetch_text(link, refresh_token)) if link else _plain_text(listing)
+    body = _plain_text(_kr_fetch_text(link, refresh_token)) if link else _plain_text(listing)
     values = re.findall(r"전산업[^%]{0,100}?전월대비[^%]{0,60}?([+-]?\d+(?:\.\d+)?)\s*%", body)
     return (_pct(values[0]) if values else "", _pct(values[1]) if len(values) > 1 else "")
 
