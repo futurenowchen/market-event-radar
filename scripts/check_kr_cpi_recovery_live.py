@@ -13,6 +13,7 @@ import v2_event_official as official
 
 def main() -> None:
     token = f"kr-cpi-live-{datetime.now(official.TPE):%Y%m%d%H%M%S}"
+    kosis_links = official._kr_cpi_kosis_release_links(token)
     rss = official._kr_fetch_text(official.KR_CPI_RSS_URL, f"{token}-rss")
     rss_links = official._kr_cpi_rss_release_links(rss)
     listing = ""
@@ -21,11 +22,12 @@ def main() -> None:
         listing = official._kr_fetch_text(official.KR_CPI_LIST_URL, token)
         html_links = official._kr_cpi_release_links(listing, official.KR_CPI_LIST_URL)
     links = []
-    for link in [*rss_links, *html_links]:
+    for link in [*kosis_links, *rss_links, *html_links]:
         if link not in links:
             links.append(link)
     print(
         "KR CPI live diagnostics: "
+        f"kosis_links={len(kosis_links)}, "
         f"rss_len={len(rss)}, rss_links={len(rss_links)}, "
         f"listing_len={len(listing)}, html_links={len(html_links)}, "
         f"resolved={','.join(links[:3]) if links else 'none'}"
