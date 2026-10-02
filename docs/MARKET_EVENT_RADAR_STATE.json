@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-09-29",
-  "verified_code_commit": "d71bfa95c0061de46b6abd55080d76e7f7a73618",
-  "phase": "tw-cbc-release-resilience-live-verified",
-  "status": "TW_CBC_ACTUAL_PREVIOUS_AND_HISTORY_LIVE_VERIFIED",
+  "last_reconciled_tpe": "2026-10-02",
+  "verified_code_commit": "067654012a33a2f36c5a481ee8f2b4542591b1ed",
+  "phase": "kr-cpi-release-resilience-live-verified",
+  "status": "KR_CPI_RESULT_RECOVERY_LIVE_VERIFIED",
   "completed": [
     "official-source-first macro feed with snapshot schema v2 and rich release metrics",
     "provider-neutral ConsensusObservation and event_family + metric_id Surprise semantics",
@@ -31,7 +31,19 @@
     "BOJ Previous is derived from the immediately preceding first-party MPM policy statement",
     "BOJ deterministic regressions cover 2026-09-18 true MPM versus 2026-09-28 minutes and 2026-10-01 Summary of Opinions",
     "BOJ repaired snapshot regenerated as data refresh commit 7864c0d4dc4a; false 2026-09-28 and 2026-10-01 policy meetings removed",
-    "Work-PC market-event-radar fast-forwarded to 7864c0d4dc4a and bounded radar validation passed with schema v2 / 8 valid events"
+    "Work-PC market-event-radar fast-forwarded to 7864c0d4dc4a and bounded radar validation passed with schema v2 / 8 valid events",
+    "PR #31 merged as d011e9d8f2ac5b0ff46901c6b4b8e2992e649472 aligning missing-result smart recovery with the 48-hour released-event retention contract",
+    "PR #32 merged as 067654012a33a2f36c5a481ee8f2b4542591b1ed hardening Korea CPI first-party release discovery and result parsing",
+    "Korea CPI discovery now prefers first-party KOSIS press-release discovery, then MODS RSS, with the large MODS board HTML retained only as fallback",
+    "current MODS javascript/plain-title layouts are normalized through stable list_no extraction without hard-coded production board IDs",
+    "bounded Korea source retries bypass cached empty responses with fresh cache tokens",
+    "Korea CPI deterministic recovery suite passed 9 tests on PR #32",
+    "PR #32 live first-party probe resolved current detail list_no 447322 and previous detail list_no 446746 and returned Actual 2.9% / Previous 3.1%",
+    "PR #32 Validate public feed run 37018125812 succeeded including all official-source collector probes",
+    "post-merge Validate public feed run 37018384010 succeeded",
+    "post-merge production refresh run 37018383976 succeeded",
+    "production data commit 496949693c049040d5c8543d1ce61d9a12acab0d records Korea CPI 2026-10-02 as released with Actual 2.9% / Previous 3.1%",
+    "October append-only history ledger records the Korea CPI released state and production official_macro_ready remains true"
   ],
   "active_work": [
     "resume authentic private pre-release overlay evidence validation",
@@ -86,7 +98,22 @@
     "tw_cbc_history_backfill_push_job": 106290683027,
     "tw_cbc_history_data_commit": "538b2d4e691b73730e46aa0996879f8085ceb6a6",
     "tw_cbc_history_released_row_present": true,
-    "current_snapshot_retention_hours": 48
+    "current_snapshot_retention_hours": 48,
+    "kr_cpi_recovery_pr": 31,
+    "kr_cpi_recovery_merge_commit": "d011e9d8f2ac5b0ff46901c6b4b8e2992e649472",
+    "kr_cpi_discovery_pr": 32,
+    "kr_cpi_discovery_merge_commit": "067654012a33a2f36c5a481ee8f2b4542591b1ed",
+    "kr_cpi_pr_validate_run": 37018125812,
+    "kr_cpi_pr_validate_result": "success",
+    "kr_cpi_post_merge_validate_run": 37018384010,
+    "kr_cpi_post_merge_validate_result": "success",
+    "kr_cpi_post_merge_refresh_run": 37018383976,
+    "kr_cpi_post_merge_refresh_result": "success",
+    "kr_cpi_production_data_commit": "496949693c049040d5c8543d1ce61d9a12acab0d",
+    "kr_cpi_snapshot_generated_at_tpe": "2026-10-02T22:14:01.954029+08:00",
+    "kr_cpi_2026_10_02_actual": "2.9%",
+    "kr_cpi_2026_10_02_previous": "3.1%",
+    "kr_cpi_history_released_row_present": true
   },
   "blocked": [
     "no unattended zero-cost source has yet earned survey_consensus status",
@@ -96,7 +123,8 @@
   "known_debt": [
     "official collectors remain exposed to future first-party HTML/schema changes",
     "MT5 forecast-to-survey-consensus equivalence still requires repeated empirical evidence",
-    "dashboard legacy rolling live probe can false-fail independently of producer health"
+    "dashboard legacy rolling live probe can false-fail independently of producer health",
+    "MODS large newsroom HTML can intermittently time out from GitHub hosted runners; Korea CPI now has KOSIS/RSS discovery fallbacks but future first-party endpoint changes still require live regression observation."
   ],
   "do_not_repeat": [
     "treat dashboard-open dispatch failure as the cause when refresh gate and workflow dispatch are healthy",
@@ -113,7 +141,12 @@
     "weaken watchdog result expectations merely to hide collector failures",
     "treat CBC listing/navigation pages as policy decision detail pages",
     "use the CBC homepage as the sole released-rate source",
-    "hard-code historical CBC Actual or Previous values into data history"
+    "hard-code historical CBC Actual or Previous values into data history",
+    "make the missing-result smart recovery window shorter than the watchdog/released-event retention contract",
+    "assume MODS CPI release titles always use normal href anchors",
+    "depend exclusively on the large MODS CPI listing when lighter first-party KOSIS/RSS discovery is available",
+    "accept non-empty Korea CPI values without verifying that the newest release identity was resolved",
+    "hard-code current Korea CPI Actual/Previous values or release-specific list_no identifiers to close a production incident"
   ],
-  "exact_next_action": "No BOJ incident action remains. Continue the pre-existing consensus/surprise roadmap; preserve BOJ meeting/result semantics as regression coverage."
+  "exact_next_action": "Resume the pre-existing consensus/surprise roadmap while preserving Korea CPI result recovery as a live regression; let the next scheduled watchdog confirm normal unattended operation."
 }
