@@ -102,7 +102,7 @@ def test_refresh_gate_retries_missing_result_inside_48h() -> None:
         mode, reason = refresh_gate.decide(
             path,
             False,
-            now=event_time + timedelta(hours=20),
+            now=event_time + timedelta(hours=13),
         )
     assert mode == "smart"
     assert "missing actual value" in reason
