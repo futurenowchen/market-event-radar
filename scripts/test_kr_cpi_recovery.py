@@ -22,8 +22,14 @@ def test_kr_cpi_latest_uses_two_official_releases() -> None:
 
     listing = """
     <html><body>
-      <a href="/board.es?act=view&bid=213&list_no=447322">2026년 9월 소비자물가동향</a>
-      <a href="/board.es?act=view&bid=213&list_no=446900">2026년 8월 소비자물가동향</a>
+      <li>
+        <strong>2026년 9월 소비자물가동향</strong>
+        <a href="/attachPreview.es?bid=213&list_no=447322&seq=2">미리보기</a>
+      </li>
+      <li>
+        <strong>2026년 8월 소비자물가동향</strong>
+        <a href="/attachPreview.es?bid=213&list_no=446746&seq=2">미리보기</a>
+      </li>
     </body></html>
     """
     current = "9월 소비자물가지수는 전월대비 0.3%, 전년동월대비 2.9% 각각 상승"
@@ -34,7 +40,7 @@ def test_kr_cpi_latest_uses_two_official_releases() -> None:
     def fake_fetch(url: str, _token: str) -> str:
         if "list_no=447322" in url:
             return current
-        if "list_no=446900" in url:
+        if "list_no=446746" in url:
             return previous
         if "bid=213" in url:
             return listing
@@ -53,7 +59,8 @@ def test_kr_cpi_latest_uses_two_official_releases() -> None:
 def test_kr_cpi_previous_fails_closed_with_one_release() -> None:
     listing = """
     <html><body>
-      <a href="/board.es?act=view&bid=213&list_no=447322">2026년 9월 소비자물가동향</a>
+      <strong>2026년 9월 소비자물가동향</strong>
+      <a href="/attachPreview.es?bid=213&list_no=447322&seq=2">미리보기</a>
     </body></html>
     """
     current = "9월 소비자물가지수는 전월대비 0.3%, 전년동월대비 2.9% 각각 상승"
@@ -73,6 +80,23 @@ def test_kr_cpi_previous_fails_closed_with_one_release() -> None:
 
     assert actual == "2.9%"
     assert prior == ""
+
+
+
+def test_kr_cpi_current_listing_resolves_plain_title_preview_links() -> None:
+    listing = """
+    <ul>
+      <li><span>2026년 9월 소비자물가동향</span>
+          <a href="/attachPreview.es?bid=213&list_no=447322&seq=2">미리보기</a></li>
+      <li><span>2026년 8월 소비자물가동향</span>
+          <a href="/attachPreview.es?bid=213&list_no=446746&seq=2">미리보기</a></li>
+    </ul>
+    """
+    links = official._kr_cpi_release_links(listing, official.KR_CPI_LIST_URL)
+    assert links == [
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=447322&mid=a10301040100",
+        "https://www.mods.go.kr/board.es?act=view&bid=213&list_no=446746&mid=a10301040100",
+    ]
 
 
 def _snapshot(event_time: datetime) -> dict:
@@ -127,6 +151,7 @@ def main() -> None:
     tests = [
         test_kr_cpi_latest_uses_two_official_releases,
         test_kr_cpi_previous_fails_closed_with_one_release,
+        test_kr_cpi_current_listing_resolves_plain_title_preview_links,
         test_refresh_gate_retries_missing_result_inside_48h,
         test_refresh_gate_stops_after_retention_window,
     ]
