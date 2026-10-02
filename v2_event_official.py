@@ -804,7 +804,7 @@ def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
     """Resolve CPI detail pages from both old and current MODS listing layouts."""
 
     release_links: list[str] = []
-    title_pattern = re.compile(r"^20\d{2}년\s+\d{1,2}월\s+소비자물가동향$")
+    title_pattern = re.compile(r"^(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향$")
 
     # Current MODS uses javascript:addSearchParam(...) for the article title.
     # Older layouts used a normal detail href. In either case, list_no is the
@@ -826,7 +826,7 @@ def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
     # Associate each CPI title block with the first nearby list_no before the
     # next CPI title; attachment/preview links all carry the same board id.
     title_matches = list(
-        re.finditer(r"20\d{2}년\s+\d{1,2}월\s+소비자물가동향", listing)
+        re.finditer(r"(?:새글\s*)?20\d{2}년\s+\d{1,2}월\s+소비자물가동향", listing)
     )
     for index, match in enumerate(title_matches):
         end = title_matches[index + 1].start() if index + 1 < len(title_matches) else len(listing)
