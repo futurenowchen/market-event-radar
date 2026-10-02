@@ -47,7 +47,7 @@ BOJ_MPM_URL = "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm"
 BOJ_STATEMENTS_URL = "https://www.boj.or.jp/en/mopo/mpmdeci/state_2026/index.htm"
 
 KR_RELEASE_PLAN_URL = "https://mods.go.kr/schedule.es?mid=a10308010000"
-KR_CPI_LIST_URL = "https://mods.go.kr/board.es?mid=b70203010000&bid=213"
+KR_CPI_LIST_URL = "https://www.mods.go.kr/board.es?bid=213&mid=a10301040200"
 KR_INDUSTRY_LIST_URL = "https://mods.go.kr/board.es?mid=a10301050100&bid=216"
 BOK_POLICY_DATES_URL = "https://www.bok.or.kr/portal/singl/crncyPolicyDrcMtg/listYear.do?menuNo=200755&mtgSe=A"
 BOK_HOME_URL = "https://www.bok.or.kr/eng/main/main.do"
@@ -793,6 +793,43 @@ def _kr_cpi_headline_yoy(text: str) -> str:
     return _pct(match.group(1)) if match else ""
 
 
+def _kr_cpi_release_links(listing: str, base_url: str) -> list[str]:
+    """Resolve CPI detail pages from both old and current MODS listing layouts."""
+
+    release_links: list[str] = []
+
+    # Older MODS layouts linked the release title directly.
+    for text, href in _links(listing, base_url):
+        if "소비자물가동향" not in text or href in release_links:
+            continue
+        release_links.append(href)
+
+    if release_links:
+        return release_links
+
+    # Current MODS listing renders the release title as plain text. The nearby
+    # preview/attachment links still carry the board list_no. Associate each
+    # CPI title block with the first list_no before the next CPI title, then
+    # construct the official detail URL without pinning a release-specific ID.
+    title_matches = list(
+        re.finditer(r"20\d{2}년\s+\d{1,2}월\s+소비자물가동향", listing)
+    )
+    for index, match in enumerate(title_matches):
+        end = title_matches[index + 1].start() if index + 1 < len(title_matches) else len(listing)
+        segment = listing[match.end():end]
+        list_no = re.search(r"(?:list_no=|list_no%3D)(\d+)", segment, re.I)
+        if not list_no:
+            continue
+        href = (
+            "https://www.mods.go.kr/board.es?act=view&bid=213"
+            f"&list_no={list_no.group(1)}&mid=a10301040100"
+        )
+        if href not in release_links:
+            release_links.append(href)
+
+    return release_links
+
+
 def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
     url = KR_CPI_LIST_URL if family == "cpi" else KR_INDUSTRY_LIST_URL
     listing = _fetch_text(url, refresh_token)
@@ -803,15 +840,7 @@ def _kr_latest_result(family: str, refresh_token: str) -> tuple[str, str]:
         # MODS migrated the CPI newsroom to board bid=213 in 2026. Resolve the
         # newest two official CPI releases from the live listing instead of
         # pinning a production value or a release-specific list_no.
-        release_links: list[str] = []
-        for text, href in _links(listing, url):
-            if "소비자물가동향" not in text:
-                continue
-            if href in release_links:
-                continue
-            release_links.append(href)
-            if len(release_links) >= 2:
-                break
+        release_links = _kr_cpi_release_links(listing, url)[:2]
 
         values: list[str] = []
         for link in release_links:
