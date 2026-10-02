@@ -67,7 +67,8 @@ jobs:
             scripts/test_us_phase2.py \
             scripts/test_us_claims.py \
             scripts/test_us_phase3.py \
-            scripts/test_us_phase4.py
+            scripts/test_us_phase4.py \
+            scripts/test_kr_cpi_recovery.py
       - name: Parse Windows deployment helper
         shell: pwsh
         run: |
@@ -108,6 +109,8 @@ jobs:
         run: python scripts/test_us_phase3.py
       - name: Test Phase 4 US event policy
         run: python scripts/test_us_phase4.py
+      - name: Test Korea CPI release recovery
+        run: python scripts/test_kr_cpi_recovery.py
       - name: Smoke test package API
         run: |
           python - <<'PY'

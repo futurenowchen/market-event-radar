@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 TPE = timezone(timedelta(hours=8))
+RESULT_RECOVERY_HOURS = 48
 
 
 def parse_bool(value: str) -> bool:
@@ -64,7 +65,10 @@ def decide(snapshot: Path, force_daily: bool, now: datetime | None = None) -> tu
         event_time = parse_time(str(event.get("time_tpe") or ""))
         if event_time is None:
             continue
-        if now >= event_time + timedelta(minutes=5) and now - event_time <= timedelta(hours=12):
+        if (
+            now >= event_time + timedelta(minutes=5)
+            and now - event_time <= timedelta(hours=RESULT_RECOVERY_HOURS)
+        ):
             due.append(event)
     if due:
         labels = ", ".join(str(e.get("title") or e.get("event_id") or "event") for e in due[:3])
