@@ -89,7 +89,7 @@ def test_kr_cpi_current_javascript_title_link_normalizes_to_detail_url() -> None
     <ul>
       <li>
         <a href="javascript:addSearchParam('/board.es?mid=a10301040200&bid=213&act=view&list_no=447322&tag=&nPage=1&ref_bid=');">
-          2026년 9월 소비자물가동향
+          새글 2026년 9월 소비자물가동향
         </a>
         <a href="/boardDownload.es?bid=213&list_no=447322&seq=2">
           2026년 9월 소비자물가동향(보도자료).pdf
