@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "market-event-radar",
   "canonical_repository": "futurenowchen/market-event-radar",
-  "last_reconciled_tpe": "2026-10-02",
+  "last_reconciled_tpe": "2026-10-07",
   "verified_code_commit": "067654012a33a2f36c5a481ee8f2b4542591b1ed",
-  "phase": "kr-cpi-release-resilience-live-verified",
-  "status": "KR_CPI_RESULT_RECOVERY_LIVE_VERIFIED",
+  "phase": "release-recovery-live-verified-with-ism-license-boundary",
+  "status": "TW_CPI_RECOVERY_VERIFIED_ISM_SCHEDULE_ONLY_CONFIRMED",
   "completed": [
     "official-source-first macro feed with snapshot schema v2 and rich release metrics",
     "provider-neutral ConsensusObservation and event_family + metric_id Surprise semantics",
@@ -43,7 +43,10 @@
     "post-merge Validate public feed run 37018384010 succeeded",
     "post-merge production refresh run 37018383976 succeeded",
     "production data commit 496949693c049040d5c8543d1ce61d9a12acab0d records Korea CPI 2026-10-02 as released with Actual 2.9% / Previous 3.1%",
-    "October append-only history ledger records the Korea CPI released state and production official_macro_ready remains true"
+    "October append-only history ledger records the Korea CPI released state and production official_macro_ready remains true",
+    "2026-10-07 dashboard-assisted refresh run 37594189687 successfully recovered Taiwan CPI into the canonical snapshot",
+    "Taiwan CPI 2026-10-07 canonical event is released with Actual 2.73% and Previous 2.04% in data commit 52ae15dbbc43ae79a8ea13fc845326a0d8e0b259",
+    "PR #33 was closed without merge after confirming the existing ISM schedule-only policy is an authorization/redistribution boundary rather than a missing collector implementation"
   ],
   "active_work": [
     "resume authentic private pre-release overlay evidence validation",
@@ -118,12 +121,12 @@
   "blocked": [
     "no unattended zero-cost source has yet earned survey_consensus status",
     "authentic private pre-release evidence is still required for canonical Surprise end-to-end validation",
-    "third-party redistribution rights are not assumed; vendor values remain private/local"
+    "third-party redistribution rights are not assumed; vendor values remain private/local",
+    "public ISM PMI Actual/Previous redistribution remains blocked without an authorized/licensed data path or written permission"
   ],
   "known_debt": [
     "official collectors remain exposed to future first-party HTML/schema changes",
     "MT5 forecast-to-survey-consensus equivalence still requires repeated empirical evidence",
-    "dashboard legacy rolling live probe can false-fail independently of producer health",
     "MODS large newsroom HTML can intermittently time out from GitHub hosted runners; Korea CPI now has KOSIS/RSS discovery fallbacks but future first-party endpoint changes still require live regression observation."
   ],
   "do_not_repeat": [
@@ -146,7 +149,28 @@
     "assume MODS CPI release titles always use normal href anchors",
     "depend exclusively on the large MODS CPI listing when lighter first-party KOSIS/RSS discovery is available",
     "accept non-empty Korea CPI values without verifying that the newest release identity was resolved",
-    "hard-code current Korea CPI Actual/Previous values or release-specific list_no identifiers to close a production incident"
+    "hard-code current Korea CPI Actual/Previous values or release-specific list_no identifiers to close a production incident",
+    "remove ISM schedule-only / 未接授權數值 tags or publish ISM PMI values into the public snapshot without confirming redistribution authorization"
   ],
-  "exact_next_action": "Resume the pre-existing consensus/surprise roadmap while preserving Korea CPI result recovery as a live regression; let the next scheduled watchdog confirm normal unattended operation."
+  "exact_next_action": "Preserve the public ISM schedule-only boundary and resume the consensus/surprise roadmap unless an authorized ISM data source or written redistribution permission is supplied.",
+  "evidence": {
+    "tw_cpi_recovery_20261007": {
+      "workflow_dispatch_run": 37594189687,
+      "result": "success",
+      "snapshot_generated_at_tpe": "2026-10-07T16:30:45.620956+08:00",
+      "data_commit": "52ae15dbbc43ae79a8ea13fc845326a0d8e0b259",
+      "event_id": "official-tw-dgbas-cpi-20261007",
+      "status": "released",
+      "actual": "2.73%",
+      "previous": "2.04%"
+    },
+    "ism_schedule_only_authorization_20261007": {
+      "event_id": "official-us-ism-services-2026-10-05",
+      "expects_result": false,
+      "public_snapshot_values_intentionally_omitted": true,
+      "pr_attempt": 33,
+      "pr_merged": false,
+      "disposition": "CLOSED_WITHOUT_MERGE_DUE_TO_REDISTRIBUTION_AUTHORIZATION_BOUNDARY"
+    }
+  }
 }
