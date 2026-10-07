@@ -23,6 +23,25 @@ def main() -> None:
     assert (date(2026, 9, 1), "manufacturing") in parsed_ism
     assert (date(2026, 9, 3), "services") in parsed_ism
 
+    services_text = """
+    Services PMI registered 54.9 percent, a decrease of 0.5 percentage point
+    compared to August’s figure of 55.4 percent.
+    """
+    actual, previous = phase4.parse_ism_report(services_text, "services")
+    assert actual == "54.9%"
+    assert previous == "55.4%"
+
+    manufacturing_text = """
+    Manufacturing PMI registered 54.5 percent in September, 0.1 percentage
+    point below the August figure of 54.6 percent.
+    """
+    actual, previous = phase4.parse_ism_report(manufacturing_text, "manufacturing")
+    assert actual == "54.5%"
+    assert previous == "54.6%"
+
+    assert phase4._ism_report_url("services", date(2026, 10, 5)).endswith("/services/september/")
+    assert phase4._ism_report_url("manufacturing", date(2026, 10, 1)).endswith("/pmi/september/")
+
     advance = official._event(
         event_id="gdp-advance",
         dt=datetime(2026, 10, 29, 20, 30, tzinfo=official.TPE),
