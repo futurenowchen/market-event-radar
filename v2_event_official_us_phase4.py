@@ -12,6 +12,7 @@ import v2_event_radar as core
 
 
 ISM_CALENDAR_URL = "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+ISM_REPORT_BASE = "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports"
 BLS_PRODUCTIVITY_SCHEDULE_URL = "https://www.bls.gov/schedule/news_release/prod2.htm"
 FED_CALENDAR_BASE = "https://www.federalreserve.gov/newsevents"
 
@@ -172,33 +173,124 @@ def _ism_schedule(refresh_token: str) -> tuple[list[tuple[date, str]], bool]:
     return (rows if rows else list(ISM_2026), bool(rows))
 
 
+def _ism_reference_month(release_day: date) -> date:
+    return (release_day.replace(day=1) - timedelta(days=1)).replace(day=1)
+
+
+def _ism_report_url(family: str, release_day: date) -> str:
+    reference = _ism_reference_month(release_day)
+    month_slug = reference.strftime("%B").lower()
+    family_slug = "pmi" if family == "manufacturing" else "services"
+    return f"{ISM_REPORT_BASE}/{family_slug}/{month_slug}/"
+
+
+def parse_ism_report(text: str, family: str) -> tuple[str, str]:
+    """Parse headline Actual/Previous from the public first-party ISM report."""
+
+    plain = backend._plain_text(text)
+    if not plain:
+        return "", ""
+
+    label = "Manufacturing" if family == "manufacturing" else "Services"
+    headline = re.search(
+        rf"\b{label}\s+PMI(?:\s*®)?\b.{{0,220}}?registered\s+"
+        rf"(\d+(?:\.\d+)?)\s+percent\b",
+        plain,
+        re.I,
+    )
+    if not headline:
+        headline = re.search(
+            rf"\b{label}\s+PMI(?:\s*®)?\b.{{0,120}}?\bat\s+"
+            rf"(\d+(?:\.\d+)?)\s*%",
+            plain,
+            re.I,
+        )
+    if not headline:
+        return "", ""
+
+    actual = f"{float(headline.group(1)):g}%"
+    context = plain[headline.start() : headline.start() + 900]
+    previous_patterns = (
+        r"(?:previous month(?:'s|’s)?|[A-Za-z]+(?:'s|’s)?)\s+figure\s+of\s+(\d+(?:\.\d+)?)\s+percent\b",
+        r"(?:previous month(?:'s|’s)?|[A-Za-z]+(?:'s|’s)?)\s+reading\s+of\s+(\d+(?:\.\d+)?)\s+percent\b",
+        r"from\s+[A-Za-z]+(?:'s|’s)?\s+reading\s+of\s+(\d+(?:\.\d+)?)\s+percent\b",
+    )
+    previous = ""
+    for pattern in previous_patterns:
+        match = re.search(pattern, context, re.I)
+        if match:
+            previous = f"{float(match.group(1)):g}%"
+            break
+    return actual, previous
+
+
+def _ism_result(
+    family: str,
+    release_day: date,
+    event_time: datetime,
+    now: datetime,
+    refresh_token: str,
+) -> tuple[str, str, str]:
+    report_url = _ism_report_url(family, release_day)
+    if now < event_time + timedelta(minutes=5):
+        return "", "", report_url
+    html = backend._fetch_text(
+        report_url,
+        f"{refresh_token}-ism-result-{family}-{release_day.isoformat()}",
+    )
+    actual, previous = parse_ism_report(html, family)
+    return actual, previous, report_url
+
+
 def _ism_events(start: datetime, end: datetime, refresh_token: str) -> tuple[list[core.MarketEvent], bool]:
     schedule, live_ok = _ism_schedule(refresh_token)
+    now = datetime.now(backend.TPE)
     events: list[core.MarketEvent] = []
     for release_day, family in schedule:
         dt = backend._dt_local(release_day, 10, 0, backend.NY)
         if not backend._in_window(dt, start, end):
             continue
         manufacturing = family == "manufacturing"
-        events.append(
-            backend._event(
-                event_id=f"official-us-ism-{family}-{release_day.isoformat()}",
-                dt=dt,
-                title="美國ISM製造業PMI" if manufacturing else "美國ISM服務業PMI",
-                country="美國",
-                tier="A",
-                tags=(
-                    "美國", "ISM", "PMI", "製造業" if manufacturing else "服務業",
-                    "景氣", "Fed", "schedule-only", "未接授權數值",
-                ),
-                source="Institute for Supply Management (ISM)",
-                source_url=ISM_CALENDAR_URL,
-                provider=f"official-us-ism-{family}",
-                category="總體經濟",
-                importance=2,
-                expects_result=False,
-            )
+        actual, previous, report_url = _ism_result(
+            family,
+            release_day,
+            dt,
+            now,
+            refresh_token,
         )
+        metric_id = "manufacturing_pmi" if manufacturing else "services_pmi"
+        label = "ISM製造業PMI" if manufacturing else "ISM服務業PMI"
+        metrics = [
+            _metric(
+                metric_id,
+                label,
+                actual=actual,
+                previous=previous,
+                unit="index",
+                is_primary=True,
+                source_series="ISM Manufacturing PMI" if manufacturing else "ISM Services PMI",
+            )
+        ] if (actual or previous) else []
+        event = backend._event(
+            event_id=f"official-us-ism-{family}-{release_day.isoformat()}",
+            dt=dt,
+            title="美國ISM製造業PMI" if manufacturing else "美國ISM服務業PMI",
+            country="美國",
+            tier="A",
+            tags=(
+                "美國", "ISM", "PMI", "製造業" if manufacturing else "服務業",
+                "景氣", "Fed", "官方數值",
+            ),
+            source="Institute for Supply Management (ISM)",
+            source_url=report_url if actual else ISM_CALENDAR_URL,
+            provider=f"official-us-ism-{family}",
+            category="總體經濟",
+            importance=2,
+            actual=actual,
+            previous=previous,
+            expects_result=True,
+        )
+        events.append(_with_metrics(event, metrics) if metrics else event)
     return events, bool(live_ok or ISM_2026)
 
 
