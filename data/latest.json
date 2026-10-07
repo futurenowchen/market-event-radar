@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-10-07",
-  "generated_at_tpe": "2026-10-07T16:30:45.620956+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-10-08",
+  "generated_at_tpe": "2026-10-08T03:55:21.153671+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 3,
@@ -27,38 +27,10 @@
   },
   "provider_counts": {
     "official-tw-dgbas-cpi": 1,
-    "official-us-dol-claims": 1,
-    "official-us-ism-services": 1
+    "official-us-bls-cpi": 1,
+    "official-us-dol-claims": 1
   },
   "events": [
-    {
-      "event_id": "official-us-ism-services-2026-10-05",
-      "time_tpe": "2026-10-05T22:00:00+08:00",
-      "title": "美國ISM服務業PMI",
-      "category": "總體經濟",
-      "importance": 2,
-      "tier": "A",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "ISM",
-        "PMI",
-        "服務業",
-        "景氣",
-        "Fed",
-        "schedule-only",
-        "未接授權數值"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Institute for Supply Management (ISM)",
-      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
-      "status": "scheduled",
-      "expects_result": false,
-      "provider": "official-us-ism-services",
-      "symbol": ""
-    },
     {
       "event_id": "official-tw-dgbas-cpi-20261007",
       "time_tpe": "2026-10-07T16:00:00+08:00",
@@ -118,6 +90,73 @@
           "unit": "K",
           "is_primary": true,
           "source_series": "DOL UI Weekly Claims PDF"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-bls-cpi-2026-10-14",
+      "time_tpe": "2026-10-14T20:30:00+08:00",
+      "title": "美國消費者物價指數（CPI）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "通膨",
+        "Fed",
+        "NASDAQ",
+        "台指"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "3.4%",
+      "source": "U.S. Bureau of Labor Statistics (BLS)",
+      "source_url": "https://www.bls.gov/schedule/news_release/cpi.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bls-cpi",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "headline_yoy",
+          "label": "Headline YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "3.4%",
+          "unit": "%",
+          "is_primary": true,
+          "source_series": "CUUR0000SA0"
+        },
+        {
+          "metric_id": "headline_mom",
+          "label": "Headline MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.4%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUSR0000SA0"
+        },
+        {
+          "metric_id": "core_yoy",
+          "label": "Core YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "2.4%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUUR0000SA0L1E"
+        },
+        {
+          "metric_id": "core_mom",
+          "label": "Core MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.3%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUSR0000SA0L1E"
         }
       ]
     }
