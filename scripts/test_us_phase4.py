@@ -42,6 +42,17 @@ def main() -> None:
     assert phase4._ism_report_url("services", date(2026, 10, 5)).endswith("/services/september/")
     assert phase4._ism_report_url("manufacturing", date(2026, 10, 1)).endswith("/pmi/september/")
 
+    roundup_text = """
+    The Services PMI of 54.9 percent missed analysts expectations and was down
+    0.5 percentage point from the previous month.
+    """
+    actual, previous = phase4.parse_ism_roundup(roundup_text, "services")
+    assert actual == "54.9%"
+    assert previous == "55.4%"
+    assert phase4._ism_roundup_url("services", date(2026, 10, 5)).endswith(
+        "/2026/2026-10/ism-pmi-reports-roundup-september-2026-services/"
+    )
+
     advance = official._event(
         event_id="gdp-advance",
         dt=datetime(2026, 10, 29, 20, 30, tzinfo=official.TPE),
