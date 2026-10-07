@@ -225,3 +225,31 @@ Hard boundaries added by this incident:
 
 Exact next action:
 - return to the pre-existing consensus/surprise roadmap; preserve Korea CPI release recovery as a live regression and let the next scheduled watchdog validate normal unattended operation.
+
+
+## 2026-10-07｜Taiwan CPI live recovery accepted; ISM remains schedule-only by authorization boundary
+
+Taiwan CPI incident closure:
+- dashboard-assisted workflow_dispatch run 37594189687 completed successfully;
+- canonical snapshot regenerated at `2026-10-07T16:30:45.620956+08:00`;
+- event `official-tw-dgbas-cpi-20261007` is now `released`;
+- Actual = `2.73%`;
+- Previous = `2.04%`;
+- producer data commit = `52ae15dbbc43ae79a8ea13fc845326a0d8e0b259`.
+This proves the release-aware orchestration repair successfully woke the producer and the Taiwan CPI first-party collector recovered the released value.
+
+ISM clarification:
+- `official-us-ism-services-2026-10-05` remains intentionally schedule-only in the public canonical snapshot;
+- current event contract remains `expects_result=false` with tags `schedule-only` and `未接授權數值`;
+- investigation confirmed this is not a broken missing-result collector: the existing policy deliberately avoids redistributing ISM PMI index values without an authorized data path;
+- PR #33 attempted a first-party result parser but was CLOSED WITHOUT MERGE after live validation surfaced ISM's explicit restriction against recreating/distributing/incorporating PMI index content without written authorization;
+- do not publish ISM Actual/Previous into the public repository merely because the values are visible on the ISM website;
+- if the user later supplies an authorized/licensed feed or written redistribution permission, implement it as a separately reviewed data-rights-aware path.
+
+Downstream presentation:
+- investment-dashboard PR #214 moves the detailed Financial Event Radar into the timed Streamlit fragment and runs the release-aware assist from both 戰情中心 and 股票模組 live fragments;
+- this fixes the consumer-side symptom where canonical CPI had already changed but the detailed radar remained visually stale until a full app rerun;
+- downstream presentation should explicitly label ISM rows as schedule-only/authorization-limited instead of making them look like failed data retrieval.
+
+Exact next action:
+Preserve the public ISM schedule-only boundary; continue with the pre-existing consensus/surprise roadmap unless an authorized ISM data source is supplied.
