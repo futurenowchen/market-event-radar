@@ -193,14 +193,14 @@ def parse_ism_report(text: str, family: str) -> tuple[str, str]:
 
     label = "Manufacturing" if family == "manufacturing" else "Services"
     headline = re.search(
-        rf"\b{label}\s+PMI(?:\s*®)?\b.{{0,220}}?registered\s+"
+        rf"\b{label}\s+PMI(?:\s*®)?.{{0,220}}?registered\s+"
         rf"(\d+(?:\.\d+)?)\s+percent\b",
         plain,
         re.I,
     )
     if not headline:
         headline = re.search(
-            rf"\b{label}\s+PMI(?:\s*®)?\b.{{0,120}}?\bat\s+"
+            rf"\b{label}\s+PMI(?:\s*®)?.{{0,120}}?\bat\s+"
             rf"(\d+(?:\.\d+)?)\s*%",
             plain,
             re.I,
