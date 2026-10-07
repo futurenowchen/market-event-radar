@@ -150,10 +150,20 @@ def main() -> None:
         raise SystemExit("Extended US schedules missing providers: " + ", ".join(missing_extended))
 
     ism_events = [event for event in macro if event.provider.startswith("official-us-ism-")]
-    if not ism_events or any(event.expects_result for event in ism_events):
-        raise SystemExit("ISM schedule-only policy missing or expects_result is enabled")
-    if any(event.actual or event.previous or event.forecast for event in ism_events):
-        raise SystemExit("ISM licensed values leaked into official-free feed")
+    if not ism_events or any(not event.expects_result for event in ism_events):
+        raise SystemExit("ISM official result-recovery policy missing or expects_result is disabled")
+    if any("schedule-only" in event.market_tags or "未接授權數值" in event.market_tags for event in ism_events):
+        raise SystemExit("Legacy ISM schedule-only tags remain in official feed")
+    due_ism = [
+        event for event in ism_events
+        if now >= event.time_tpe + timedelta(minutes=5)
+        and now - event.time_tpe <= timedelta(hours=48)
+    ]
+    if due_ism and any(not event.actual for event in due_ism):
+        labels = ", ".join(event.title for event in due_ism if not event.actual)
+        raise SystemExit("Released ISM official result is still missing: " + labels)
+    if any(event.forecast for event in ism_events):
+        raise SystemExit("Unlicensed ISM forecast values leaked into official-free feed")
 
     rich = [
         event for event in macro
