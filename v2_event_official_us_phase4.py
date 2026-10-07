@@ -184,6 +184,64 @@ def _ism_report_url(family: str, release_day: date) -> str:
     return f"{ISM_REPORT_BASE}/{family_slug}/{month_slug}/"
 
 
+def _ism_roundup_url(family: str, release_day: date) -> str:
+    reference = _ism_reference_month(release_day)
+    month_slug = reference.strftime("%B").lower()
+    return (
+        "https://www.ismworld.org/supply-management-news-and-reports/"
+        "news-publications/inside-supply-management-magazine/blog/"
+        f"{release_day.year}/{release_day:%Y-%m}/"
+        f"ism-pmi-reports-roundup-{month_slug}-{reference.year}-{family}/"
+    )
+
+
+def parse_ism_roundup(text: str, family: str) -> tuple[str, str]:
+    plain = backend._plain_text(text)
+    if not plain:
+        return "", ""
+    label = "Manufacturing" if family == "manufacturing" else "Services"
+    match = re.search(
+        rf"\b{label}\s+PMI(?:\s*®)?\s+(?:of|at)\s+(\d+(?:\.\d+)?)\s*(?:percent|%)",
+        plain,
+        re.I,
+    )
+    if not match:
+        return "", ""
+    actual_value = float(match.group(1))
+    actual = f"{actual_value:g}%"
+    context = plain[match.start() : match.start() + 700]
+
+    explicit = re.search(
+        r"(?:previous month(?:'s|’s)?|[A-Za-z]+(?:'s|’s)?)\s+(?:figure|reading)\s+of\s+"
+        r"(\d+(?:\.\d+)?)\s+percent\b",
+        context,
+        re.I,
+    )
+    if explicit:
+        return actual, f"{float(explicit.group(1)):g}%"
+
+    delta = re.search(
+        r"\b(an increase|an? decrease|up|down)\s+of?\s*(\d+(?:\.\d+)?)\s+"
+        r"percentage point(?:s)?(?:\s+compared to|\s+from)?\s+(?:the\s+)?previous month\b",
+        context,
+        re.I,
+    )
+    if not delta:
+        delta = re.search(
+            r"\b(up|down)\s+(\d+(?:\.\d+)?)\s+percentage point(?:s)?\s+"
+            r"from\s+(?:the\s+)?previous month\b",
+            context,
+            re.I,
+        )
+    if not delta:
+        return actual, ""
+
+    direction = delta.group(1).lower()
+    change = float(delta.group(2))
+    previous_value = actual_value - change if ("increase" in direction or direction == "up") else actual_value + change
+    return actual, f"{previous_value:g}%"
+
+
 def parse_ism_report(text: str, family: str) -> tuple[str, str]:
     """Parse headline Actual/Previous from the public first-party ISM report."""
 
@@ -239,7 +297,16 @@ def _ism_result(
         f"{refresh_token}-ism-result-{family}-{release_day.isoformat()}",
     )
     actual, previous = parse_ism_report(html, family)
-    return actual, previous, report_url
+    if actual:
+        return actual, previous, report_url
+
+    roundup_url = _ism_roundup_url(family, release_day)
+    roundup = backend._fetch_text(
+        roundup_url,
+        f"{refresh_token}-ism-roundup-{family}-{release_day.isoformat()}",
+    )
+    actual, previous = parse_ism_roundup(roundup, family)
+    return actual, previous, roundup_url if actual else report_url
 
 
 def _ism_events(start: datetime, end: datetime, refresh_token: str) -> tuple[list[core.MarketEvent], bool]:
