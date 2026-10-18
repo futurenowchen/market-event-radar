@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-10-18",
-  "generated_at_tpe": "2026-10-18T12:58:20.600364+08:00",
+  "generated_at_tpe": "2026-10-18T16:31:22.681612+08:00",
   "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 5,
+  "event_count": 4,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -27,37 +27,11 @@
   },
   "provider_counts": {
     "official-jp-stat-cpi": 1,
-    "official-tw-cbc": 1,
     "official-us-census-housing": 1,
     "official-us-dol-claims": 1,
     "official-us-fed-g17": 1
   },
   "events": [
-    {
-      "event_id": "official-tw-cbc-2026-10-16",
-      "time_tpe": "2026-10-16T16:30:00+08:00",
-      "title": "台灣中央銀行理監事會利率決議",
-      "category": "央行事件",
-      "importance": 3,
-      "tier": "S",
-      "country": "台灣",
-      "market_tags": [
-        "台灣",
-        "央行",
-        "利率",
-        "台幣",
-        "台股"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "中央銀行",
-      "source_url": "https://www.cbc.gov.tw/tw/lp-357-1-1-60.html",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-tw-cbc",
-      "symbol": ""
-    },
     {
       "event_id": "official-us-fed-g17-2026-10-16",
       "time_tpe": "2026-10-16T21:15:00+08:00",
