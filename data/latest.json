@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-10-20",
-  "generated_at_tpe": "2026-10-20T20:35:32.651198+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-10-21",
+  "generated_at_tpe": "2026-10-21T00:00:45.040826+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 3,
+  "event_count": 4,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -27,6 +27,7 @@
   },
   "provider_counts": {
     "official-jp-stat-cpi": 1,
+    "official-us-census-durable": 1,
     "official-us-census-housing": 1,
     "official-us-dol-claims": 1
   },
@@ -159,6 +160,31 @@
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-jp-stat-cpi",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-census-durable-2026-10-27",
+      "time_tpe": "2026-10-27T20:30:00+08:00",
+      "title": "美國耐久財訂單（Durable Goods Orders）",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "B",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "耐久財",
+        "製造業",
+        "景氣",
+        "資本支出"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "U.S. Census Bureau",
+      "source_url": "https://www.census.gov/manufacturing/m3/adv/current/index.html",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-census-durable",
       "symbol": ""
     }
   ]
