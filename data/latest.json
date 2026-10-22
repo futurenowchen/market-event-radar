@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-10-22",
-  "generated_at_tpe": "2026-10-22T00:00:35.549592+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-10-22T20:35:27.615981+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 4,
+  "event_count": 3,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -28,78 +28,9 @@
   "provider_counts": {
     "official-jp-stat-cpi": 1,
     "official-us-census-durable": 1,
-    "official-us-census-housing": 1,
     "official-us-dol-claims": 1
   },
   "events": [
-    {
-      "event_id": "official-us-census-housing-2026-10-20",
-      "time_tpe": "2026-10-20T20:30:00+08:00",
-      "title": "美國新屋開工與建築許可（Housing Starts / Permits）",
-      "category": "總體經濟",
-      "importance": 2,
-      "tier": "B",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "房市",
-        "新屋開工",
-        "建築許可",
-        "景氣",
-        "利率"
-      ],
-      "actual": "1.221M",
-      "forecast": "",
-      "previous": "1.288M",
-      "source": "U.S. Census Bureau / HUD",
-      "source_url": "https://www.census.gov/construction/nrc/current/",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-census-housing",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "housing_starts_saar",
-          "label": "新屋開工 SAAR",
-          "actual": "1.221M",
-          "forecast": "",
-          "previous": "1.288M",
-          "unit": "annualized units",
-          "is_primary": true,
-          "source_series": "Census/HUD New Residential Construction"
-        },
-        {
-          "metric_id": "housing_starts_mom",
-          "label": "新屋開工 MoM",
-          "actual": "-5.2%",
-          "forecast": "",
-          "previous": "",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "Census/HUD New Residential Construction"
-        },
-        {
-          "metric_id": "building_permits_saar",
-          "label": "建築許可 SAAR",
-          "actual": "1.400M",
-          "forecast": "",
-          "previous": "1.403M",
-          "unit": "annualized units",
-          "is_primary": false,
-          "source_series": "Census/HUD New Residential Construction"
-        },
-        {
-          "metric_id": "building_permits_mom",
-          "label": "建築許可 MoM",
-          "actual": "-0.2%",
-          "forecast": "",
-          "previous": "",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "Census/HUD New Residential Construction"
-        }
-      ]
-    },
     {
       "event_id": "official-us-dol-claims-2026-10-22",
       "time_tpe": "2026-10-22T20:30:00+08:00",
@@ -115,12 +46,12 @@
         "Fed",
         "美元"
       ],
-      "actual": "",
+      "actual": "194K",
       "forecast": "",
-      "previous": "199K",
+      "previous": "200K",
       "source": "U.S. Department of Labor (ETA)",
       "source_url": "https://www.dol.gov/newsroom/releases/eta",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-dol-claims",
       "symbol": "",
@@ -128,9 +59,9 @@
         {
           "metric_id": "initial_claims",
           "label": "初領失業救濟金",
-          "actual": "",
+          "actual": "194K",
           "forecast": "",
-          "previous": "199K",
+          "previous": "200K",
           "unit": "K",
           "is_primary": true,
           "source_series": "DOL UI Weekly Claims PDF"
