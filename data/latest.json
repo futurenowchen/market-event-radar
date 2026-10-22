@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-10-22",
-  "generated_at_tpe": "2026-10-22T20:35:27.615981+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-10-23",
+  "generated_at_tpe": "2026-10-23T00:00:36.186313+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 3,
+  "event_count": 7,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -27,8 +27,11 @@
   },
   "provider_counts": {
     "official-jp-stat-cpi": 1,
+    "official-us-bea-gdp": 1,
+    "official-us-bea-pce": 1,
     "official-us-census-durable": 1,
-    "official-us-dol-claims": 1
+    "official-us-dol-claims": 2,
+    "official-us-fed-fomc": 1
   },
   "events": [
     {
@@ -117,6 +120,161 @@
       "expects_result": true,
       "provider": "official-us-census-durable",
       "symbol": ""
+    },
+    {
+      "event_id": "official-us-fed-fomc-2026-10-28",
+      "time_tpe": "2026-10-29T02:00:00+08:00",
+      "title": "美國聯邦公開市場委員會（FOMC）利率決議",
+      "category": "央行事件",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "FOMC",
+        "Fed",
+        "利率",
+        "全球風險資產"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "3.75–4%",
+      "source": "Federal Reserve",
+      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-fed-fomc",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-bea-gdp-20261029",
+      "time_tpe": "2026-10-29T20:30:00+08:00",
+      "title": "美國國內生產毛額（GDP）－(Advance Estimate), 3rd Quarter 2026",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "GDP",
+        "景氣",
+        "利率",
+        "美股",
+        "GDP初值"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "U.S. Bureau of Economic Analysis (BEA)",
+      "source_url": "https://www.bea.gov/news/schedule",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bea-gdp",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-bea-pce-20261029",
+      "time_tpe": "2026-10-29T20:30:00+08:00",
+      "title": "美國個人消費支出物價指數（PCE）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "PCE",
+        "Fed",
+        "利率",
+        "NASDAQ"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "3.4%",
+      "source": "U.S. Bureau of Economic Analysis (BEA)",
+      "source_url": "https://www.bea.gov/news/schedule",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bea-pce",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "headline_yoy",
+          "label": "Headline YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "3.4%",
+          "unit": "%",
+          "is_primary": true,
+          "source_series": "BEA PIO release"
+        },
+        {
+          "metric_id": "headline_mom",
+          "label": "Headline MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.3%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "BEA PIO release"
+        },
+        {
+          "metric_id": "core_yoy",
+          "label": "Core PCE YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "3%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "BEA PIO release"
+        },
+        {
+          "metric_id": "core_mom",
+          "label": "Core PCE MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.2%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "BEA PIO release"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-dol-claims-2026-10-29",
+      "time_tpe": "2026-10-29T20:30:00+08:00",
+      "title": "美國初領失業救濟金人數（Initial Claims）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "初領失業救濟",
+        "就業",
+        "Fed",
+        "美元"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "194K",
+      "source": "U.S. Department of Labor (ETA)",
+      "source_url": "https://www.dol.gov/newsroom/releases/eta",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-dol-claims",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "initial_claims",
+          "label": "初領失業救濟金",
+          "actual": "",
+          "forecast": "",
+          "previous": "194K",
+          "unit": "K",
+          "is_primary": true,
+          "source_series": "DOL UI Weekly Claims PDF"
+        }
+      ]
     }
   ]
 }
