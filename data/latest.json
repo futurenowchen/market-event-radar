@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-10-24",
-  "generated_at_tpe": "2026-10-24T20:30:38.696990+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-10-25",
+  "generated_at_tpe": "2026-10-25T00:01:33.049609+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 10,
@@ -333,55 +333,13 @@
       ],
       "actual": "",
       "forecast": "",
-      "previous": "0.9%",
+      "previous": "",
       "source": "U.S. Bureau of Labor Statistics (BLS)",
       "source_url": "https://www.bls.gov/schedule/news_release/eci.htm",
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-us-bls-eci",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "compensation_qoq",
-          "label": "總薪酬 QoQ",
-          "actual": "",
-          "forecast": "",
-          "previous": "0.9%",
-          "unit": "%",
-          "is_primary": true,
-          "source_series": "CIS1010000000000Q"
-        },
-        {
-          "metric_id": "wages_qoq",
-          "label": "薪資與工資 QoQ",
-          "actual": "",
-          "forecast": "",
-          "previous": "0.9%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "CIS1020000000000Q"
-        },
-        {
-          "metric_id": "compensation_yoy",
-          "label": "總薪酬 YoY",
-          "actual": "",
-          "forecast": "",
-          "previous": "3.4%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "CIU1010000000000A"
-        },
-        {
-          "metric_id": "wages_yoy",
-          "label": "薪資與工資 YoY",
-          "actual": "",
-          "forecast": "",
-          "previous": "3.2%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "CIU1020000000000A"
-        }
-      ]
+      "symbol": ""
     }
   ]
 }
