@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-10-29",
-  "generated_at_tpe": "2026-10-29T02:06:34.194937+08:00",
+  "generated_at_tpe": "2026-10-29T20:37:30.271548+08:00",
   "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 13,
+  "event_count": 12,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -34,38 +34,12 @@
     "official-us-bea-pce": 1,
     "official-us-bls-eci": 1,
     "official-us-bls-jolts": 1,
-    "official-us-census-durable": 1,
     "official-us-dol-claims": 1,
     "official-us-fed-fomc": 1,
     "official-us-ism-manufacturing": 1,
     "official-us-ism-services": 1
   },
   "events": [
-    {
-      "event_id": "official-us-census-durable-2026-10-27",
-      "time_tpe": "2026-10-27T20:30:00+08:00",
-      "title": "美國耐久財訂單（Durable Goods Orders）",
-      "category": "總體經濟",
-      "importance": 2,
-      "tier": "B",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "耐久財",
-        "製造業",
-        "景氣",
-        "資本支出"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "U.S. Census Bureau",
-      "source_url": "https://www.census.gov/manufacturing/m3/adv/current/index.html",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-us-census-durable",
-      "symbol": ""
-    },
     {
       "event_id": "official-us-fed-fomc-2026-10-28",
       "time_tpe": "2026-10-29T02:00:00+08:00",
@@ -199,12 +173,12 @@
         "Fed",
         "美元"
       ],
-      "actual": "",
+      "actual": "194K",
       "forecast": "",
-      "previous": "194K",
+      "previous": "195K",
       "source": "U.S. Department of Labor (ETA)",
       "source_url": "https://www.dol.gov/newsroom/releases/eta",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-dol-claims",
       "symbol": "",
@@ -212,11 +186,21 @@
         {
           "metric_id": "initial_claims",
           "label": "初領失業救濟金",
-          "actual": "",
+          "actual": "194K",
           "forecast": "",
-          "previous": "194K",
+          "previous": "195K",
           "unit": "K",
           "is_primary": true,
+          "source_series": "DOL UI Weekly Claims PDF"
+        },
+        {
+          "metric_id": "four_week_average",
+          "label": "4週移動平均",
+          "actual": "196.8K",
+          "forecast": "",
+          "previous": "",
+          "unit": "K",
+          "is_primary": false,
           "source_series": "DOL UI Weekly Claims PDF"
         }
       ]
