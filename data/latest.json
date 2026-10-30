@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-10-30",
-  "generated_at_tpe": "2026-10-30T16:07:37.109535+08:00",
+  "generated_at_tpe": "2026-10-30T20:40:30.971501+08:00",
   "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
@@ -200,12 +200,12 @@
         "通膨",
         "Fed"
       ],
-      "actual": "",
+      "actual": "0.8%",
       "forecast": "",
       "previous": "0.9%",
       "source": "U.S. Bureau of Labor Statistics (BLS)",
       "source_url": "https://www.bls.gov/schedule/news_release/eci.htm",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-bls-eci",
       "symbol": "",
@@ -213,7 +213,7 @@
         {
           "metric_id": "compensation_qoq",
           "label": "總薪酬 QoQ",
-          "actual": "",
+          "actual": "0.8%",
           "forecast": "",
           "previous": "0.9%",
           "unit": "%",
@@ -223,7 +223,7 @@
         {
           "metric_id": "wages_qoq",
           "label": "薪資與工資 QoQ",
-          "actual": "",
+          "actual": "0.7%",
           "forecast": "",
           "previous": "0.9%",
           "unit": "%",
@@ -233,7 +233,7 @@
         {
           "metric_id": "compensation_yoy",
           "label": "總薪酬 YoY",
-          "actual": "",
+          "actual": "3.4%",
           "forecast": "",
           "previous": "3.4%",
           "unit": "%",
@@ -243,7 +243,7 @@
         {
           "metric_id": "wages_yoy",
           "label": "薪資與工資 YoY",
-          "actual": "",
+          "actual": "3.1%",
           "forecast": "",
           "previous": "3.2%",
           "unit": "%",
