@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-10-30",
-  "generated_at_tpe": "2026-10-30T12:06:34.660747+08:00",
+  "generated_at_tpe": "2026-10-30T16:07:37.109535+08:00",
   "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
@@ -175,12 +175,12 @@
         "景氣",
         "台股"
       ],
-      "actual": "",
+      "actual": "13.48%",
       "forecast": "",
-      "previous": "",
+      "previous": "5.7%",
       "source": "行政院主計總處",
       "source_url": "https://www.stat.gov.tw/News_NoticeCalendar.aspx?Dept=315000000H&n=3717",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-tw-dgbas-gdp",
       "symbol": ""
