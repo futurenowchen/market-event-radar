@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-10-31",
-  "generated_at_tpe": "2026-10-31T00:10:27.489045+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-10-31T02:07:23.573070+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 14,
+  "event_count": 13,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -36,36 +36,10 @@
     "official-us-bls-nfp": 1,
     "official-us-bls-productivity": 1,
     "official-us-dol-claims": 2,
-    "official-us-fed-fomc": 1,
     "official-us-ism-manufacturing": 1,
     "official-us-ism-services": 1
   },
   "events": [
-    {
-      "event_id": "official-us-fed-fomc-2026-10-28",
-      "time_tpe": "2026-10-29T02:00:00+08:00",
-      "title": "美國聯邦公開市場委員會（FOMC）利率決議",
-      "category": "央行事件",
-      "importance": 3,
-      "tier": "S",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "FOMC",
-        "Fed",
-        "利率",
-        "全球風險資產"
-      ],
-      "actual": "3.75–4%",
-      "forecast": "",
-      "previous": "3.75–4%",
-      "source": "Federal Reserve",
-      "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-fed-fomc",
-      "symbol": ""
-    },
     {
       "event_id": "official-us-dol-claims-2026-10-29",
       "time_tpe": "2026-10-29T20:30:00+08:00",
