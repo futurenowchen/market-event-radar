@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-11-03",
-  "generated_at_tpe": "2026-11-03T07:05:24.401418+08:00",
+  "generated_at_tpe": "2026-11-03T23:05:33.518777+08:00",
   "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
@@ -104,12 +104,12 @@
         "Fed",
         "NASDAQ"
       ],
-      "actual": "",
+      "actual": "7.5M",
       "forecast": "",
-      "previous": "7.1M",
+      "previous": "7.2M",
       "source": "U.S. Bureau of Labor Statistics (BLS)",
       "source_url": "https://www.bls.gov/schedule/news_release/jolts.htm",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-bls-jolts",
       "symbol": "",
@@ -117,9 +117,9 @@
         {
           "metric_id": "job_openings",
           "label": "職缺數",
-          "actual": "",
+          "actual": "7.5M",
           "forecast": "",
-          "previous": "7.1M",
+          "previous": "7.2M",
           "unit": "level",
           "is_primary": true,
           "source_series": "JTS000000000000000JOL"
@@ -127,9 +127,9 @@
         {
           "metric_id": "hires",
           "label": "聘僱人數",
-          "actual": "",
+          "actual": "5.4M",
           "forecast": "",
-          "previous": "5.2M",
+          "previous": "5.3M",
           "unit": "level",
           "is_primary": false,
           "source_series": "JTS000000000000000HIL"
@@ -137,9 +137,9 @@
         {
           "metric_id": "quits",
           "label": "主動離職人數",
-          "actual": "",
+          "actual": "3.4M",
           "forecast": "",
-          "previous": "3.1M",
+          "previous": "3.0M",
           "unit": "level",
           "is_primary": false,
           "source_series": "JTS000000000000000QUL"
@@ -147,9 +147,9 @@
         {
           "metric_id": "layoffs",
           "label": "裁員與解僱人數",
-          "actual": "",
+          "actual": "1.6M",
           "forecast": "",
-          "previous": "1.6M",
+          "previous": "1.8M",
           "unit": "level",
           "is_primary": false,
           "source_series": "JTS000000000000000LDL"
