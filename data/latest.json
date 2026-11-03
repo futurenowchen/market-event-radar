@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-03",
-  "generated_at_tpe": "2026-11-03T23:05:33.518777+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-11-04",
+  "generated_at_tpe": "2026-11-04T00:00:31.409140+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 8,
+  "event_count": 9,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -28,6 +28,7 @@
   "provider_counts": {
     "official-kr-mods-cpi": 1,
     "official-tw-dgbas-cpi": 1,
+    "official-us-bls-cpi": 1,
     "official-us-bls-jolts": 1,
     "official-us-bls-nfp": 1,
     "official-us-bls-productivity": 1,
@@ -81,7 +82,7 @@
       ],
       "actual": "2.8%",
       "forecast": "",
-      "previous": "",
+      "previous": "2.9%",
       "source": "Ministry of Data and Statistics, Korea",
       "source_url": "https://mods.go.kr/cpiOaSchdlView.es?mid=b70203020000",
       "status": "released",
@@ -358,6 +359,73 @@
           "unit": "%",
           "is_primary": false,
           "source_series": "CES0500000003"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-bls-cpi-2026-11-10",
+      "time_tpe": "2026-11-10T21:30:00+08:00",
+      "title": "美國消費者物價指數（CPI）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "通膨",
+        "Fed",
+        "NASDAQ",
+        "台指"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "3.7%",
+      "source": "U.S. Bureau of Labor Statistics (BLS)",
+      "source_url": "https://www.bls.gov/schedule/news_release/cpi.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bls-cpi",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "headline_yoy",
+          "label": "Headline YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "3.7%",
+          "unit": "%",
+          "is_primary": true,
+          "source_series": "CUUR0000SA0"
+        },
+        {
+          "metric_id": "headline_mom",
+          "label": "Headline MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.6%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUSR0000SA0"
+        },
+        {
+          "metric_id": "core_yoy",
+          "label": "Core YoY",
+          "actual": "",
+          "forecast": "",
+          "previous": "2.6%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUUR0000SA0L1E"
+        },
+        {
+          "metric_id": "core_mom",
+          "label": "Core MoM",
+          "actual": "",
+          "forecast": "",
+          "previous": "0.3%",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "CUSR0000SA0L1E"
         }
       ]
     }
