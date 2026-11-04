@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-04",
-  "generated_at_tpe": "2026-11-04T00:00:31.409140+08:00",
+  "snapshot_date_tpe": "2026-11-05",
+  "generated_at_tpe": "2026-11-05T00:00:44.877800+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 9,
+  "event_count": 8,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -33,38 +33,9 @@
     "official-us-bls-nfp": 1,
     "official-us-bls-productivity": 1,
     "official-us-dol-claims": 1,
-    "official-us-ism-manufacturing": 1,
     "official-us-ism-services": 1
   },
   "events": [
-    {
-      "event_id": "official-us-ism-manufacturing-2026-11-02",
-      "time_tpe": "2026-11-02T23:00:00+08:00",
-      "title": "美國ISM製造業PMI",
-      "category": "總體經濟",
-      "importance": 2,
-      "tier": "A",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "ISM",
-        "PMI",
-        "製造業",
-        "景氣",
-        "Fed",
-        "schedule-only",
-        "未接授權數值"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Institute for Supply Management (ISM)",
-      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
-      "status": "scheduled",
-      "expects_result": false,
-      "provider": "official-us-ism-manufacturing",
-      "symbol": ""
-    },
     {
       "event_id": "official-kr-mods-cpi-2026-11-03",
       "time_tpe": "2026-11-03T07:00:00+08:00",
