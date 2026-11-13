@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-11-13",
-  "generated_at_tpe": "2026-11-13T00:00:38.419044+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-11-13T21:36:11.117822+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 5,
@@ -95,12 +95,12 @@
         "NASDAQ",
         "台指"
       ],
-      "actual": "",
+      "actual": "6.5%",
       "forecast": "",
       "previous": "6.3%",
       "source": "U.S. Bureau of Labor Statistics (BLS)",
       "source_url": "https://www.bls.gov/schedule/news_release/ppi.htm",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-bls-ppi",
       "symbol": "",
@@ -108,7 +108,7 @@
         {
           "metric_id": "headline_yoy",
           "label": "Final Demand YoY",
-          "actual": "",
+          "actual": "6.5%",
           "forecast": "",
           "previous": "6.3%",
           "unit": "%",
@@ -118,9 +118,9 @@
         {
           "metric_id": "headline_mom",
           "label": "Final Demand MoM",
-          "actual": "",
+          "actual": "0.3%",
           "forecast": "",
-          "previous": "1.3%",
+          "previous": "1.4%",
           "unit": "%",
           "is_primary": false,
           "source_series": "WPSFD4"
@@ -128,7 +128,7 @@
         {
           "metric_id": "core_yoy",
           "label": "Core YoY（除食品/能源/貿易服務）",
-          "actual": "",
+          "actual": "4.9%",
           "forecast": "",
           "previous": "5%",
           "unit": "%",
@@ -138,7 +138,7 @@
         {
           "metric_id": "core_mom",
           "label": "Core MoM（除食品/能源/貿易服務）",
-          "actual": "",
+          "actual": "0.5%",
           "forecast": "",
           "previous": "0.5%",
           "unit": "%",
