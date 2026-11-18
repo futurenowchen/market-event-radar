@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-11-18",
-  "generated_at_tpe": "2026-11-18T00:00:30.993811+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-11-18T21:36:16.656861+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 5,
@@ -95,12 +95,12 @@
         "景氣",
         "利率"
       ],
-      "actual": "",
+      "actual": "1.309M",
       "forecast": "",
-      "previous": "1.221M",
+      "previous": "1.191M",
       "source": "U.S. Census Bureau / HUD",
       "source_url": "https://www.census.gov/construction/nrc/current/",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-census-housing",
       "symbol": "",
@@ -108,20 +108,40 @@
         {
           "metric_id": "housing_starts_saar",
           "label": "新屋開工 SAAR",
-          "actual": "",
+          "actual": "1.309M",
           "forecast": "",
-          "previous": "1.221M",
+          "previous": "1.191M",
           "unit": "annualized units",
           "is_primary": true,
           "source_series": "Census/HUD New Residential Construction"
         },
         {
+          "metric_id": "housing_starts_mom",
+          "label": "新屋開工 MoM",
+          "actual": "9.9%",
+          "forecast": "",
+          "previous": "",
+          "unit": "%",
+          "is_primary": false,
+          "source_series": "Census/HUD New Residential Construction"
+        },
+        {
           "metric_id": "building_permits_saar",
           "label": "建築許可 SAAR",
-          "actual": "",
+          "actual": "1.295M",
           "forecast": "",
-          "previous": "1.400M",
+          "previous": "1.398M",
           "unit": "annualized units",
+          "is_primary": false,
+          "source_series": "Census/HUD New Residential Construction"
+        },
+        {
+          "metric_id": "building_permits_mom",
+          "label": "建築許可 MoM",
+          "actual": "-7.4%",
+          "forecast": "",
+          "previous": "",
+          "unit": "%",
           "is_primary": false,
           "source_series": "Census/HUD New Residential Construction"
         }
