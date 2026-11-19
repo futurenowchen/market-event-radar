@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-19",
-  "generated_at_tpe": "2026-11-19T21:35:59.391189+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-11-20",
+  "generated_at_tpe": "2026-11-20T00:01:07.698165+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 9,
+  "event_count": 8,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -32,56 +32,9 @@
     "official-us-census-durable": 1,
     "official-us-census-housing": 1,
     "official-us-dol-claims": 2,
-    "official-us-fed-g17": 2
+    "official-us-fed-g17": 1
   },
   "events": [
-    {
-      "event_id": "official-us-fed-g17-2026-11-17",
-      "time_tpe": "2026-11-17T22:15:00+08:00",
-      "title": "美國工業生產與產能利用率（G.17）",
-      "category": "總體經濟",
-      "importance": 2,
-      "tier": "B",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "工業生產",
-        "產能利用率",
-        "景氣",
-        "Fed"
-      ],
-      "actual": "-0.4%",
-      "forecast": "",
-      "previous": "0.7%",
-      "source": "Federal Reserve Board",
-      "source_url": "https://www.federalreserve.gov/releases/g17/",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-fed-g17",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "industrial_production_mom",
-          "label": "工業生產 MoM",
-          "actual": "-0.4%",
-          "forecast": "",
-          "previous": "0.7%",
-          "unit": "%",
-          "is_primary": true,
-          "source_series": "Federal Reserve G.17 Total IP"
-        },
-        {
-          "metric_id": "capacity_utilization",
-          "label": "產能利用率",
-          "actual": "76.4%",
-          "forecast": "",
-          "previous": "76.8%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "Federal Reserve G.17 Table 7 Total industry"
-        }
-      ]
-    },
     {
       "event_id": "official-us-census-housing-2026-11-18",
       "time_tpe": "2026-11-18T21:30:00+08:00",
@@ -379,7 +332,7 @@
       ],
       "actual": "",
       "forecast": "",
-      "previous": "200K",
+      "previous": "203K",
       "source": "U.S. Department of Labor (ETA)",
       "source_url": "https://www.dol.gov/newsroom/releases/eta",
       "status": "scheduled",
@@ -392,7 +345,7 @@
           "label": "初領失業救濟金",
           "actual": "",
           "forecast": "",
-          "previous": "200K",
+          "previous": "203K",
           "unit": "K",
           "is_primary": true,
           "source_series": "DOL UI Weekly Claims PDF"
