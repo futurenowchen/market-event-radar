@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-11-21",
-  "generated_at_tpe": "2026-11-21T00:07:59.345579+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-11-21T21:33:01.136319+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 7,
+  "event_count": 6,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -30,57 +30,10 @@
     "official-us-bea-gdp": 1,
     "official-us-bea-pce": 1,
     "official-us-census-durable": 1,
-    "official-us-dol-claims": 2,
+    "official-us-dol-claims": 1,
     "official-us-fed-g17": 1
   },
   "events": [
-    {
-      "event_id": "official-us-dol-claims-2026-11-19",
-      "time_tpe": "2026-11-19T21:30:00+08:00",
-      "title": "美國初領失業救濟金人數（Initial Claims）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "A",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "初領失業救濟",
-        "就業",
-        "Fed",
-        "美元"
-      ],
-      "actual": "203K",
-      "forecast": "",
-      "previous": "202K",
-      "source": "U.S. Department of Labor (ETA)",
-      "source_url": "https://www.dol.gov/newsroom/releases/eta",
-      "status": "released",
-      "expects_result": true,
-      "provider": "official-us-dol-claims",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "initial_claims",
-          "label": "初領失業救濟金",
-          "actual": "203K",
-          "forecast": "",
-          "previous": "202K",
-          "unit": "K",
-          "is_primary": true,
-          "source_series": "DOL UI Weekly Claims PDF"
-        },
-        {
-          "metric_id": "four_week_average",
-          "label": "4週移動平均",
-          "actual": "197.8K",
-          "forecast": "",
-          "previous": "",
-          "unit": "K",
-          "is_primary": false,
-          "source_series": "DOL UI Weekly Claims PDF"
-        }
-      ]
-    },
     {
       "event_id": "official-jp-stat-cpi-2026-11-20",
       "time_tpe": "2026-11-20T07:30:00+08:00",
