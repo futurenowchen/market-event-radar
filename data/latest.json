@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-22",
-  "generated_at_tpe": "2026-11-22T00:09:00.647099+08:00",
+  "snapshot_date_tpe": "2026-11-23",
+  "generated_at_tpe": "2026-11-23T00:01:04.080909+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 6,
+  "event_count": 5,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -26,7 +26,6 @@
     "us_ism": true
   },
   "provider_counts": {
-    "official-jp-stat-cpi": 1,
     "official-us-bea-gdp": 1,
     "official-us-bea-pce": 1,
     "official-us-census-durable": 1,
@@ -34,31 +33,6 @@
     "official-us-fed-g17": 1
   },
   "events": [
-    {
-      "event_id": "official-jp-stat-cpi-2026-11-20",
-      "time_tpe": "2026-11-20T07:30:00+08:00",
-      "title": "日本消費者物價指數（CPI）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "S",
-      "country": "日本",
-      "market_tags": [
-        "日本",
-        "CPI",
-        "通膨",
-        "BOJ",
-        "日圓"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "Statistics Bureau of Japan",
-      "source_url": "https://www.stat.go.jp/english/data/cpi/1582.htm",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-jp-stat-cpi",
-      "symbol": ""
-    },
     {
       "event_id": "official-us-fed-g17-2026-11-24",
       "time_tpe": "2026-11-24T22:15:00+08:00",
