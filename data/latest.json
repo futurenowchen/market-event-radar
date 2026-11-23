@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-23",
-  "generated_at_tpe": "2026-11-23T00:01:04.080909+08:00",
+  "snapshot_date_tpe": "2026-11-24",
+  "generated_at_tpe": "2026-11-24T00:01:01.486421+08:00",
   "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 5,
+  "event_count": 6,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -26,6 +26,7 @@
     "us_ism": true
   },
   "provider_counts": {
+    "official-kr-mods-industry": 1,
     "official-us-bea-gdp": 1,
     "official-us-bea-pce": 1,
     "official-us-census-durable": 1,
@@ -233,6 +234,30 @@
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-us-census-durable",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-kr-mods-industry-2026-11-30",
+      "time_tpe": "2026-11-30T07:00:00+08:00",
+      "title": "韓國工業生產",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "A",
+      "country": "韓國",
+      "market_tags": [
+        "韓國",
+        "工業生產",
+        "景氣",
+        "半導體"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Ministry of Data and Statistics, Korea",
+      "source_url": "https://mods.go.kr/boardDownload.es?bid=216&list_no=443302&seq=1",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-kr-mods-industry",
       "symbol": ""
     }
   ]
