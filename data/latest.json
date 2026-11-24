@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "snapshot_date_tpe": "2026-11-24",
-  "generated_at_tpe": "2026-11-24T00:01:01.486421+08:00",
-  "update_mode": "daily",
+  "generated_at_tpe": "2026-11-24T22:20:58.316659+08:00",
+  "update_mode": "smart",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
   "event_count": 6,
@@ -49,12 +49,12 @@
         "景氣",
         "Fed"
       ],
-      "actual": "",
+      "actual": "-0.4%",
       "forecast": "",
       "previous": "0.7%",
       "source": "Federal Reserve Board",
       "source_url": "https://www.federalreserve.gov/releases/g17/",
-      "status": "scheduled",
+      "status": "released",
       "expects_result": true,
       "provider": "official-us-fed-g17",
       "symbol": "",
@@ -62,7 +62,7 @@
         {
           "metric_id": "industrial_production_mom",
           "label": "工業生產 MoM",
-          "actual": "",
+          "actual": "-0.4%",
           "forecast": "",
           "previous": "0.7%",
           "unit": "%",
@@ -72,7 +72,7 @@
         {
           "metric_id": "capacity_utilization",
           "label": "產能利用率",
-          "actual": "",
+          "actual": "76.4%",
           "forecast": "",
           "previous": "76.8%",
           "unit": "%",
