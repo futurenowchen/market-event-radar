@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-24",
-  "generated_at_tpe": "2026-11-24T22:20:58.316659+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-11-25",
+  "generated_at_tpe": "2026-11-25T00:01:02.496330+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 6,
+  "event_count": 8,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -29,9 +29,11 @@
     "official-kr-mods-industry": 1,
     "official-us-bea-gdp": 1,
     "official-us-bea-pce": 1,
+    "official-us-bls-jolts": 1,
     "official-us-census-durable": 1,
     "official-us-dol-claims": 1,
-    "official-us-fed-g17": 1
+    "official-us-fed-g17": 1,
+    "official-us-ism-manufacturing": 1
   },
   "events": [
     {
@@ -258,6 +260,101 @@
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-kr-mods-industry",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-bls-jolts-2026-12-01",
+      "time_tpe": "2026-12-01T23:00:00+08:00",
+      "title": "美國職缺與勞動力流動調查（JOLTS）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "JOLTS",
+        "就業",
+        "Fed",
+        "NASDAQ"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "7.5M",
+      "source": "U.S. Bureau of Labor Statistics (BLS)",
+      "source_url": "https://www.bls.gov/schedule/news_release/jolts.htm",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-bls-jolts",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "job_openings",
+          "label": "職缺數",
+          "actual": "",
+          "forecast": "",
+          "previous": "7.5M",
+          "unit": "level",
+          "is_primary": true,
+          "source_series": "JTS000000000000000JOL"
+        },
+        {
+          "metric_id": "hires",
+          "label": "聘僱人數",
+          "actual": "",
+          "forecast": "",
+          "previous": "5.4M",
+          "unit": "level",
+          "is_primary": false,
+          "source_series": "JTS000000000000000HIL"
+        },
+        {
+          "metric_id": "quits",
+          "label": "主動離職人數",
+          "actual": "",
+          "forecast": "",
+          "previous": "3.4M",
+          "unit": "level",
+          "is_primary": false,
+          "source_series": "JTS000000000000000QUL"
+        },
+        {
+          "metric_id": "layoffs",
+          "label": "裁員與解僱人數",
+          "actual": "",
+          "forecast": "",
+          "previous": "1.6M",
+          "unit": "level",
+          "is_primary": false,
+          "source_series": "JTS000000000000000LDL"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-ism-manufacturing-2026-12-01",
+      "time_tpe": "2026-12-01T23:00:00+08:00",
+      "title": "美國ISM製造業PMI",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "ISM",
+        "PMI",
+        "製造業",
+        "景氣",
+        "Fed",
+        "schedule-only",
+        "未接授權數值"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Institute for Supply Management (ISM)",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
+      "status": "scheduled",
+      "expects_result": false,
+      "provider": "official-us-ism-manufacturing",
       "symbol": ""
     }
   ]
