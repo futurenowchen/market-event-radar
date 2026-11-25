@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-25",
-  "generated_at_tpe": "2026-11-25T21:36:07.069133+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-11-26",
+  "generated_at_tpe": "2026-11-26T00:03:00.031441+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 8,
+  "event_count": 7,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -26,9 +26,8 @@
     "us_ism": true
   },
   "provider_counts": {
+    "official-kr-mods-cpi": 1,
     "official-kr-mods-industry": 1,
-    "official-us-bea-gdp": 1,
-    "official-us-bea-pce": 1,
     "official-us-bls-jolts": 1,
     "official-us-census-durable": 1,
     "official-us-dol-claims": 1,
@@ -80,99 +79,6 @@
           "unit": "%",
           "is_primary": false,
           "source_series": "Federal Reserve G.17 Table 7 Total industry"
-        }
-      ]
-    },
-    {
-      "event_id": "official-us-bea-gdp-20261125",
-      "time_tpe": "2026-11-25T21:30:00+08:00",
-      "title": "美國國內生產毛額（GDP）－(Second Estimate) and Corporate Profits, 3rd Quarter 2026",
-      "category": "總體經濟",
-      "importance": 2,
-      "tier": "B",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "GDP",
-        "景氣",
-        "利率",
-        "美股",
-        "GDP修正估值"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "",
-      "source": "U.S. Bureau of Economic Analysis (BEA)",
-      "source_url": "https://www.bea.gov/news/schedule",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-us-bea-gdp",
-      "symbol": ""
-    },
-    {
-      "event_id": "official-us-bea-pce-20261125",
-      "time_tpe": "2026-11-25T21:30:00+08:00",
-      "title": "美國個人消費支出物價指數（PCE）",
-      "category": "總體經濟",
-      "importance": 3,
-      "tier": "S",
-      "country": "美國",
-      "market_tags": [
-        "美國",
-        "PCE",
-        "Fed",
-        "利率",
-        "NASDAQ"
-      ],
-      "actual": "",
-      "forecast": "",
-      "previous": "3.6%",
-      "source": "U.S. Bureau of Economic Analysis (BEA)",
-      "source_url": "https://www.bea.gov/news/schedule",
-      "status": "scheduled",
-      "expects_result": true,
-      "provider": "official-us-bea-pce",
-      "symbol": "",
-      "metrics": [
-        {
-          "metric_id": "headline_yoy",
-          "label": "Headline YoY",
-          "actual": "",
-          "forecast": "",
-          "previous": "3.6%",
-          "unit": "%",
-          "is_primary": true,
-          "source_series": "BEA PIO release"
-        },
-        {
-          "metric_id": "headline_mom",
-          "label": "Headline MoM",
-          "actual": "",
-          "forecast": "",
-          "previous": "0.5%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "BEA PIO release"
-        },
-        {
-          "metric_id": "core_yoy",
-          "label": "Core PCE YoY",
-          "actual": "",
-          "forecast": "",
-          "previous": "3.1%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "BEA PIO release"
-        },
-        {
-          "metric_id": "core_mom",
-          "label": "Core PCE MoM",
-          "actual": "",
-          "forecast": "",
-          "previous": "0.3%",
-          "unit": "%",
-          "is_primary": false,
-          "source_series": "BEA PIO release"
         }
       ]
     },
@@ -365,6 +271,31 @@
       "status": "scheduled",
       "expects_result": false,
       "provider": "official-us-ism-manufacturing",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-kr-mods-cpi-2026-12-02",
+      "time_tpe": "2026-12-02T07:00:00+08:00",
+      "title": "韓國消費者物價指數（CPI）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "S",
+      "country": "韓國",
+      "market_tags": [
+        "韓國",
+        "CPI",
+        "通膨",
+        "BOK",
+        "韓元"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Ministry of Data and Statistics, Korea",
+      "source_url": "https://mods.go.kr/cpiOaSchdlView.es?mid=b70203020000",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-kr-mods-cpi",
       "symbol": ""
     }
   ]
