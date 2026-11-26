@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "snapshot_date_tpe": "2026-11-26",
-  "generated_at_tpe": "2026-11-26T22:15:59.064162+08:00",
-  "update_mode": "smart",
+  "snapshot_date_tpe": "2026-11-27",
+  "generated_at_tpe": "2026-11-27T00:08:35.048536+08:00",
+  "update_mode": "daily",
   "macro_backend": "official-free-v1",
   "official_macro_ready": true,
-  "event_count": 6,
+  "event_count": 8,
   "source_health": {
     "jp_boj": true,
     "jp_esri": true,
@@ -30,8 +30,9 @@
     "official-kr-mods-industry": 1,
     "official-us-bls-jolts": 1,
     "official-us-census-durable": 1,
-    "official-us-dol-claims": 1,
-    "official-us-ism-manufacturing": 1
+    "official-us-dol-claims": 2,
+    "official-us-ism-manufacturing": 1,
+    "official-us-ism-services": 1
   },
   "events": [
     {
@@ -248,6 +249,71 @@
       "status": "scheduled",
       "expects_result": true,
       "provider": "official-kr-mods-cpi",
+      "symbol": ""
+    },
+    {
+      "event_id": "official-us-dol-claims-2026-12-03",
+      "time_tpe": "2026-12-03T21:30:00+08:00",
+      "title": "美國初領失業救濟金人數（Initial Claims）",
+      "category": "總體經濟",
+      "importance": 3,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "初領失業救濟",
+        "就業",
+        "Fed",
+        "美元"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "189K",
+      "source": "U.S. Department of Labor (ETA)",
+      "source_url": "https://www.dol.gov/newsroom/releases/eta",
+      "status": "scheduled",
+      "expects_result": true,
+      "provider": "official-us-dol-claims",
+      "symbol": "",
+      "metrics": [
+        {
+          "metric_id": "initial_claims",
+          "label": "初領失業救濟金",
+          "actual": "",
+          "forecast": "",
+          "previous": "189K",
+          "unit": "K",
+          "is_primary": true,
+          "source_series": "DOL UI Weekly Claims PDF"
+        }
+      ]
+    },
+    {
+      "event_id": "official-us-ism-services-2026-12-03",
+      "time_tpe": "2026-12-03T23:00:00+08:00",
+      "title": "美國ISM服務業PMI",
+      "category": "總體經濟",
+      "importance": 2,
+      "tier": "A",
+      "country": "美國",
+      "market_tags": [
+        "美國",
+        "ISM",
+        "PMI",
+        "服務業",
+        "景氣",
+        "Fed",
+        "schedule-only",
+        "未接授權數值"
+      ],
+      "actual": "",
+      "forecast": "",
+      "previous": "",
+      "source": "Institute for Supply Management (ISM)",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
+      "status": "scheduled",
+      "expects_result": false,
+      "provider": "official-us-ism-services",
       "symbol": ""
     }
   ]
